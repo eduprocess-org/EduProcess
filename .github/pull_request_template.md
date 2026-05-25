@@ -1,5 +1,6 @@
+Closes EDUPR-
+
 ## 📝 Technical Description
-- **Huly Issue Linked:** #EDUPR-
 - **Summary of Changes:** (Briefly describe what components were added or modified).
 
 ## 🛠️ Type of Integration
