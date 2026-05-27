@@ -1,12 +1,29 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
+
+import DashboardLayout from "../layouts/DashboardLayout";
+import DashboardPage from "../pages/dashboard/DashboardPage";
 
 function AppRouter() {
   return (
     <BrowserRouter>
+
       <Routes>
-        <Route path="/" element={<h1>Dashboard</h1>} />
-        <Route path="/login" element={<h1>Login</h1>} />
+
+        <Route
+          path="/"
+          element={
+            <DashboardLayout>
+              <DashboardPage />
+            </DashboardLayout>
+          }
+        />
+
       </Routes>
+
     </BrowserRouter>
   );
 }
