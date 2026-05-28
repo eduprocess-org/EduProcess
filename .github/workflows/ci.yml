@@ -1,0 +1,85 @@
+name: EduProcess Continuous Integration (CI)
+
+on:
+  push:
+    branches: [ develop, main ]
+  pull_request:
+    branches: [ develop, main ]
+
+jobs:
+  # FRONT-END
+
+  verify-frontend:
+    name: Frontend Verification (Node 24)
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - name: Checkout Monorepo Code
+        uses: actions/checkout@v4
+
+      - name: Check Frontend Changes
+        id: filter-frontend
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend_files:
+              - 'frontend/**'
+              - '.github/workflows/ci.yml'
+
+      - name: Setup Node.js v24 Environment
+        if: steps:filter-frontend.outputs.frontend_files == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Execute Install Checks (Dependencies)
+        if: steps:filter-frontend.outputs.frontend_files == 'true'
+        run: npm ci
+
+      - name: Execute Build Verification (Compilation)
+        if: steps:filter-frontend.outputs.frontend_files == 'true'
+        run: npm run build
+
+  # BACK-END
+  verify-backend:
+    name: Backend Verification (Node 20)
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout Monorepo Code
+        uses: actions/checkout@v4
+
+      - name: Check Backend Changes
+        id: filter-backend
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend_files:
+              - 'backend/**'
+              - '.github/workflows/ci.yml'
+
+      - name: Setup Node.js v20 LTS Environment
+        if: steps:filter-backend.outputs.backend_files == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: './backend/package-lock.json'
+
+      - name: Execute Install Checks (Dependencies)
+        if: steps:filter-backend.outputs.backend_files == 'true'
+        run: npm ci
+
+      - name: Execute Build Verification (Compilation)
+        if: steps:filter-backend.outputs.backend_files == 'true'
+        run: npm run build
