@@ -1,0 +1,18 @@
+FROM node:24-alpine
+
+WORKDIR /usr/src/app
+
+# Copiar manifiestos de dependencias
+COPY package*.json ./
+
+# Instalar dependencias
+RUN npm install
+
+# Copiar el resto del código del frontend
+COPY . .
+
+# Exponer el puerto por defecto que configuraremos para Vite
+EXPOSE 3000
+
+# Comando para levantar el servidor de desarrollo de Vite
+CMD ["npm", "run", "dev"]
