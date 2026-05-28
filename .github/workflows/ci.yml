@@ -8,7 +8,6 @@ on:
 
 jobs:
   # FRONT-END
-
   verify-frontend:
     name: Frontend Verification (Node 24)
     runs-on: ubuntu-latest
@@ -31,7 +30,7 @@ jobs:
               - '.github/workflows/ci.yml'
 
       - name: Setup Node.js v24 Environment
-        if: steps:filter-frontend.outputs.frontend_files == 'true'
+        if: steps.filter-frontend.outputs.frontend_files == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -39,11 +38,11 @@ jobs:
           cache-dependency-path: './frontend/package-lock.json'
 
       - name: Execute Install Checks (Dependencies)
-        if: steps:filter-frontend.outputs.frontend_files == 'true'
+        if: steps.filter-frontend.outputs.frontend_files == 'true'
         run: npm ci
 
       - name: Execute Build Verification (Compilation)
-        if: steps:filter-frontend.outputs.frontend_files == 'true'
+        if: steps.filter-frontend.outputs.frontend_files == 'true'
         run: npm run build
 
   # BACK-END
@@ -69,7 +68,7 @@ jobs:
               - '.github/workflows/ci.yml'
 
       - name: Setup Node.js v20 LTS Environment
-        if: steps:filter-backend.outputs.backend_files == 'true'
+        if: steps.filter-backend.outputs.backend_files == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -77,9 +76,9 @@ jobs:
           cache-dependency-path: './backend/package-lock.json'
 
       - name: Execute Install Checks (Dependencies)
-        if: steps:filter-backend.outputs.backend_files == 'true'
+        if: steps.filter-backend.outputs.backend_files == 'true'
         run: npm ci
 
       - name: Execute Build Verification (Compilation)
-        if: steps:filter-backend.outputs.backend_files == 'true'
+        if: steps.filter-backend.outputs.backend_files == 'true'
         run: npm run build
