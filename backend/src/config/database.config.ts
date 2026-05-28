@@ -1,10 +1,11 @@
-import { PrismaClient } from '@prisma/client';
+import pkg from '@prisma/client';
+const { PrismaClient } = pkg as any;
 import { PrismaPg } from '@prisma/adapter-pg';
 import { createClient } from '@supabase/supabase-js';
 import { Pool } from 'pg';
 
 declare global {
-    var prisma: PrismaClient | undefined;
+    var prisma: any | undefined;
 }
 
 const connectionString = process.env.DATABASE_URL || '';
