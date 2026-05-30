@@ -1,0 +1,126 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  student
+  admin
+}
+
+enum RequestStatus {
+  pending
+  approved
+  rejected
+  in_review
+}
+
+model Faculty {
+  id             String          @id @default(uuid()) @db.Uuid
+  name           String          @unique
+  description    String          @db.Text
+  careers        Career[]
+  procedureTypes ProcedureType[]
+}
+
+model Career {
+  id             String          @id @default(uuid()) @db.Uuid
+  facultyId      String          @db.Uuid
+  name           String
+  description    String          @db.Text
+  faculty        Faculty         @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  profiles       Profile[]
+  procedureTypes ProcedureType[]
+}
+
+model User {
+  id                String             @id @default(uuid()) @db.Uuid
+  email             String             @unique
+  passwordHash      String
+  firstName         String
+  lastName          String
+  role              Role
+  createdAt         DateTime           @default(now())
+  profile           Profile?
+  procedureRequests ProcedureRequest[]
+  observations      Observation[]
+  notifications     Notification[]
+}
+
+model Profile {
+  id         String  @id @default(uuid()) @db.Uuid
+  userId     String  @unique @db.Uuid
+  careerId   String? @db.Uuid
+  phone      String
+  department String?
+  position   String?
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  career     Career? @relation(fields: [careerId], references: [id], onDelete: SetNull)
+}
+
+model ProcedureType {
+  id                 String              @id @default(uuid()) @db.Uuid
+  facultyId          String?             @db.Uuid
+  careerId           String?             @db.Uuid
+  name               String
+  description        String              @db.Text
+  requirementsText   String              @db.Text
+  isActive           Boolean             @default(true)
+  faculty            Faculty?            @relation(fields: [facultyId], references: [id], onDelete: SetNull)
+  career             Career?             @relation(fields: [careerId], references: [id], onDelete: SetNull)
+  procedureRequests  ProcedureRequest[]
+  procedureEmbedding ProcedureEmbedding?
+}
+
+model ProcedureRequest {
+  id                String             @id @default(uuid()) @db.Uuid
+  studentId         String             @db.Uuid
+  procedureTypeId   String             @db.Uuid
+  status            RequestStatus      @default(pending)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  student           User               @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  procedureType     ProcedureType      @relation(fields: [procedureTypeId], references: [id], onDelete: Cascade)
+  uploadedDocuments UploadedDocument[]
+  observations      Observation[]
+}
+
+model UploadedDocument {
+  id        String           @id @default(uuid()) @db.Uuid
+  requestId String           @db.Uuid
+  fileName  String
+  fileUrl   String
+  uploadedAt DateTime         @default(now())
+  request   ProcedureRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+}
+
+model Observation {
+  id        String           @id @default(uuid()) @db.Uuid
+  requestId String           @db.Uuid
+  adminId   String           @db.Uuid
+  comment   String           @db.Text
+  createdAt DateTime         @default(now())
+  request   ProcedureRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  admin     User             @relation(fields: [adminId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  title     String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ProcedureEmbedding {
+  id                  String        @id @default(uuid()) @db.Uuid
+  procedureTypeId     String        @unique @db.Uuid
+  contentToVectorize  String        @db.Text
+  embeddingVector     Unsupported("vector")
+  procedureType       ProcedureType @relation(fields: [procedureTypeId], references: [id], onDelete: Cascade)
+}
