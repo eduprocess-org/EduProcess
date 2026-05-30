@@ -1,0 +1,68 @@
+export type UserRole = 'student' | 'admin';
+
+export interface RegisterAuthRequest {
+    /** Prefer sending explicit names from frontend. Kept optional for backward compatibility. */
+    fullName?: string;
+    firstName?: string;
+    lastName?: string;
+    email: string;
+    password: string;
+}
+
+export interface LoginAuthRequest {
+    email: string;
+    password: string;
+}
+
+export interface AuthUserDTO {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: UserRole;
+}
+
+export interface AuthTokensDTO {
+    sessionToken: string;
+    refreshToken?: string;
+}
+
+export interface RegisterAuthResponse {
+    success: boolean;
+    message: string;
+    data: AuthUserDTO;
+}
+
+export interface LoginAuthResponse {
+    success: boolean;
+    message: string;
+    data: {
+        user: AuthUserDTO;
+        tokens: AuthTokensDTO;
+    };
+}
+
+export interface UserModel {
+    id: string;
+    email: string;
+    passwordHash: string;
+    firstName: string;
+    lastName: string;
+    role: UserRole;
+    createdAt: Date;
+}
+
+export interface ProfileModel {
+    id: string;
+    userId: string;
+    careerId: string | null;
+    phone: string;
+    department: string | null;
+    position: string | null;
+}
+
+export interface TokenPayload {
+    userId: string;
+    email: string;
+    role: UserRole;
+}
