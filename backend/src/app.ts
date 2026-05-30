@@ -1,14 +1,15 @@
+import 'dotenv/config';
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import authRouter from './contexts/auth/infrastructure/http/auth.routes';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors());
+
+app.use('/api/v1/auth', authRouter);
 
 app.get('/api/v1/health', (req: Request, res: Response) => {
     res.status(200).json({

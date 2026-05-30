@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { TokenPayload } from '../types/auth.types';
+import { TokenPayload } from '../../../contexts/auth/domain/types/auth.types';
 
 const JWT_SESSION_SECRET = process.env.JWT_SESSION_SECRET || 'session-fallback-secret';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'refresh-fallback-secret';
