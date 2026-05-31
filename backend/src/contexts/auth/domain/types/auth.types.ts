@@ -24,7 +24,7 @@ export interface AuthUserDTO {
 
 export interface AuthTokensDTO {
     sessionToken: string;
-    refreshToken?: string;
+    refreshToken: string;
 }
 
 export interface RegisterAuthResponse {
@@ -61,8 +61,14 @@ export interface ProfileModel {
     position: string | null;
 }
 
-export interface TokenPayload {
+export interface SessionTokenPayload {
     userId: string;
     email: string;
     role: UserRole;
 }
+
+export interface RefreshTokenPayload {
+    userId: string;
+}
+
+export type TokenPayload = SessionTokenPayload;
