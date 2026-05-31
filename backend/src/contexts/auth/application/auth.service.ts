@@ -1,5 +1,5 @@
 import { comparePassword, hashPassword } from '../../../shared/infrastructure/config/hash.config';
-import { generateSessionToken } from '../../../shared/infrastructure/config/jwt.config';
+import { generateAuthTokens } from '../../../shared/infrastructure/config/jwt.config';
 import {
     AuthRepository,
     CreateStudentAccountInput,
@@ -77,7 +77,7 @@ export class AuthService {
             role: user.role,
         };
 
-        const sessionToken = generateSessionToken(payload);
+        const tokens = generateAuthTokens(payload);
 
         const publicUser: AuthUserDTO = {
             id: user.id,
@@ -92,9 +92,7 @@ export class AuthService {
             message: 'Login successful',
             data: {
                 user: publicUser,
-                tokens: {
-                    sessionToken,
-                },
+                tokens,
             },
         };
     }
