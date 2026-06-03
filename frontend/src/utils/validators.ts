@@ -12,9 +12,13 @@ export const loginSchema = z.object({
 
 export const registerSchema = z
   .object({
-    fullName: z
+    firstName: z
       .string()
-      .min(3, "Full name is required"),
+      .min(2, "First name is required"),
+
+    lastName: z
+      .string()
+      .min(2, "Last name is required"),
 
     email: z
       .string()

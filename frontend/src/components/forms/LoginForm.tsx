@@ -1,13 +1,9 @@
 import { Link } from "react-router-dom";
-
+import { login } from "../../services/auth/auth.service";
 import { useForm } from "react-hook-form";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { useNavigate } from "react-router-dom";
-
 import { useState } from "react";
-
 import {
   loginSchema,
   type LoginFormData,
@@ -29,19 +25,57 @@ function LoginForm() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-
   const navigate = useNavigate();
+  const [apiError, setApiError] = useState("");
+  const onSubmit = async (data: LoginFormData) => {
+    try {
 
-  const onSubmit = (data: LoginFormData) => {
+    const response = await login(data);
 
-  console.log(data);
+      localStorage.setItem(
+        "sessionToken",
+        response.data.tokens.sessionToken
+      );
 
-  navigate("/");
+      localStorage.setItem(
+        "refreshToken",
+        response.data.tokens.refreshToken
+      );
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(response.data.user)
+      );
+
+      navigate("/");
+
+    } catch (error: any) {
+
+    if (error.response?.status === 401) {
+
+      setApiError("Invalid email or password");
+
+    } else if (error.response?.status === 400) {
+
+      setApiError(error.response.data.message);
+
+    } else {
+
+      setApiError("Unable to connect to server");
+
+    }
+
+    console.error(error);
+}
   };
-
 
   return (
     <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
+      {apiError && (
+        <div className="bg-red-100 border border-red-300 text-red-700 p-3 rounded-lg">
+          {apiError}
+        </div>
+      )}
 
       <h1 className="text-3xl font-bold text-center text-blue-600 mb-2">
         EduProcess

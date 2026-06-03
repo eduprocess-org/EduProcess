@@ -72,7 +72,7 @@ model ProcedureType {
   faculty            Faculty?            @relation(fields: [facultyId], references: [id], onDelete: SetNull)
   career             Career?             @relation(fields: [careerId], references: [id], onDelete: SetNull)
   procedureRequests  ProcedureRequest[]
-  procedureEmbedding ProcedureEmbedding?
+  // procedureEmbedding ProcedureEmbedding?
 }
 
 model ProcedureRequest {
@@ -117,10 +117,10 @@ model Notification {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model ProcedureEmbedding {
-  id                  String        @id @default(uuid()) @db.Uuid
-  procedureTypeId     String        @unique @db.Uuid
-  contentToVectorize  String        @db.Text
-  embeddingVector     Unsupported("vector")
-  procedureType       ProcedureType @relation(fields: [procedureTypeId], references: [id], onDelete: Cascade)
-}
+// model ProcedureEmbedding {
+//   id                 String        @id @default(uuid()) @db.Uuid
+//   procedureTypeId     String        @unique @db.Uuid
+//   contentToVectorize  String        @db.Text
+//   embeddingVector     Unsupported("vector")
+//   procedureType        ProcedureType @relation(fields: [procedureTypeId], references: [id], onDelete: Cascade)
+// }

@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { registerSchema, type RegisterFormData,} from "../../utils/validators";
 import { useState } from "react";
+import { register as registerUser }
+from "../../services/auth/register.service";
 import { Eye, EyeOff,} from "lucide-react";
 
 function RegisterForm() {
@@ -24,16 +26,57 @@ function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
-  const onSubmit = (data: RegisterFormData) => {
+  const onSubmit = async (
+    data: RegisterFormData
+  ) => {
 
-  console.log(data);
+    try {
 
-  toast.success("Account created successfully");
+      const response =
+        await registerUser({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          password: data.password,
+        });
 
-  setTimeout(() => {
-    navigate("/login");
-  }, 1500);
-};
+      toast.success(
+        response.message
+      );
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+
+    } catch (error: any) {
+
+      if (
+        error.response?.status === 409
+      ) {
+
+        toast.error(
+          "Email already exists"
+        );
+
+        return;
+      }
+
+      if (
+        error.response?.status === 400
+      ) {
+
+        toast.error(
+          error.response.data.message
+        );
+
+        return;
+      }
+
+      toast.error(
+        "Unable to connect to server"
+      );
+    }
+  };
 
   return (
     <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
@@ -51,24 +94,41 @@ function RegisterForm() {
         className="flex flex-col gap-4"
       >
 
-        {/* FULL NAME */}
+        {/* FIRST NAME */}
 
         <div>
 
           <label className="block mb-2 font-medium">
-            Full Name
+            First Name
           </label>
 
           <input
             type="text"
-            placeholder="John Doe"
+            placeholder="John"
             className="w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500"
-            {...register("fullName")}
+            {...register("firstName")}
           />
 
-          {errors.fullName && (
+          {errors.firstName && (
             <p className="text-red-500 text-sm mt-1">
-              {errors.fullName.message}
+              {errors.firstName.message}
+            </p>
+          )}
+
+          <label className="block mb-2 font-medium">
+            Last Name
+          </label>
+
+          <input
+            type="text"
+            placeholder="Doe"
+            className="w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500"
+            {...register("lastName")}
+          />
+
+          {errors.lastName && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.lastName.message}
             </p>
           )}
 
