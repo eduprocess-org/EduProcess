@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
 import { login } from "../../services/auth/auth.service";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
