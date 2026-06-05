@@ -6,9 +6,9 @@ const jwt = require('jsonwebtoken');
 process.env.JWT_SESSION_SECRET = process.env.JWT_SESSION_SECRET || 'test-session-secret-2026';
 process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-refresh-secret-2026';
 
-const jwtConfig = require('../../dist/shared/infrastructure/config/jwt.config.js');
-const { authMiddleware } = require('../../dist/shared/infrastructure/http/middlewares/auth.middleware.js');
-const { AuthService } = require('../../dist/contexts/auth/application/auth.service.js');
+const jwtConfig = require('../../dist/infrastructure/config/jwt.config.js');
+const { authMiddleware } = require('../../dist/infrastructure/http/middlewares/auth.middleware.js');
+const { AuthService } = require('../../dist/application/auth/auth.service.js');
 
 const createResponse = () => {
     const response = {

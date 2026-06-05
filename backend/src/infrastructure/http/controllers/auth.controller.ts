@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { AuthService } from '../../application/auth.service';
+import { AuthService } from '../../../application/auth/auth.service';
 import {
     LoginAuthRequest,
     RegisterAuthRequest,
-} from '../../domain/types/auth.types';
+} from '../../../domain/auth/auth.types';
 
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
@@ -41,6 +41,29 @@ export class AuthController {
             const result = await this.authService.login(body);
 
             return res.status(200).json(result);
+        } catch (error) {
+            return this.handleError(error, res);
+        }
+    };
+
+    me = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            // req.user is injected by the authMiddleware
+            const user = (req as any).user;
+            
+            if (!user) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'User context not found',
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                data: {
+                    user
+                }
+            });
         } catch (error) {
             return this.handleError(error, res);
         }
