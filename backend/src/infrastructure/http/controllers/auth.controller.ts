@@ -69,6 +69,34 @@ export class AuthController {
         }
     };
 
+    refresh = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const { refreshToken } = req.body;
+
+            if (!refreshToken) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Refresh token is required',
+                });
+            }
+
+            const result = await this.authService.refreshToken(refreshToken);
+
+            return res.status(200).json(result);
+        } catch (error) {
+            return this.handleError(error, res);
+        }
+    };
+
+    logout = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const result = await this.authService.logout();
+            return res.status(200).json(result);
+        } catch (error) {
+            return this.handleError(error, res);
+        }
+    };
+
     private isValidRegisterBody(body: Partial<RegisterAuthRequest>): body is RegisterAuthRequest {
         const hasExplicitNames =
             typeof body.firstName === 'string' &&

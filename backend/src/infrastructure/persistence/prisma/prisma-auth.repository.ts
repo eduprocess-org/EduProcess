@@ -12,6 +12,12 @@ export class PrismaAuthRepository implements AuthRepository {
         });
     }
 
+    async findById(id: string): Promise<UserModel | null> {
+        return prisma.user.findUnique({
+            where: { id },
+        });
+    }
+
     async createStudentAccount(input: CreateStudentAccountInput): Promise<AuthUserDTO> {
         const createdUser = await prisma.user.create({
             data: {
