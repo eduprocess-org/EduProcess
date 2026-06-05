@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
-import authRouter from './contexts/auth/infrastructure/http/auth.routes';
+import authRouter from './infrastructure/http/routes/auth.routes';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;

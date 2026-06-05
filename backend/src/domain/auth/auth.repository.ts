@@ -1,4 +1,4 @@
-import { AuthUserDTO, UserModel } from '../types/auth.types';
+import { AuthUserDTO, UserModel } from './auth.types';
 
 export interface CreateStudentAccountInput {
     firstName: string;

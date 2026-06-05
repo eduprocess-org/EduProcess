@@ -3,7 +3,7 @@ import {
     RefreshTokenPayload,
     SessionTokenPayload,
     TokenPayload,
-} from '../../../contexts/auth/domain/types/auth.types';
+} from '../../domain/auth/auth.types';
 
 if (!process.env.JWT_SESSION_SECRET) {
     throw new Error('JWT_SESSION_SECRET is not defined');

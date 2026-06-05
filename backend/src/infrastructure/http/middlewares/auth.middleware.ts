@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { verifySessionToken } from '../../config/jwt.config';
-import { TokenPayload } from '../../../../contexts/auth/domain/types/auth.types';
+import { TokenPayload } from '../../../domain/auth/auth.types';
 
 export interface AuthenticatedRequest extends Request {
     user?: TokenPayload;

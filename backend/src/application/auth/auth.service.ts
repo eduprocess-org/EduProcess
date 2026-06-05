@@ -1,9 +1,9 @@
-import { comparePassword, hashPassword } from '../../../shared/infrastructure/config/hash.config';
-import { generateAuthTokens } from '../../../shared/infrastructure/config/jwt.config';
+import { comparePassword, hashPassword } from '../../infrastructure/config/hash.config';
+import { generateAuthTokens } from '../../infrastructure/config/jwt.config';
 import {
     AuthRepository,
     CreateStudentAccountInput,
-} from '../domain/repositories/auth.repository';
+} from '../../domain/auth/auth.repository';
 import {
     AuthUserDTO,
     LoginAuthRequest,
@@ -11,7 +11,7 @@ import {
     RegisterAuthRequest,
     RegisterAuthResponse,
     TokenPayload,
-} from '../domain/types/auth.types';
+} from '../../domain/auth/auth.types';
 
 export class AuthService {
     constructor(private readonly authRepository: AuthRepository) { }
