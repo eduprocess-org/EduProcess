@@ -1,5 +1,5 @@
 import { comparePassword, hashPassword } from '../../infrastructure/config/hash.config';
-import { generateAuthTokens } from '../../infrastructure/config/jwt.config';
+import { generateAuthTokens, verifyRefreshToken } from '../../infrastructure/config/jwt.config';
 import {
     AuthRepository,
     CreateStudentAccountInput,
@@ -94,6 +94,64 @@ export class AuthService {
                 user: publicUser,
                 tokens,
             },
+        };
+    }
+
+    async refreshToken(refreshToken: string): Promise<LoginAuthResponse> {
+        if (!refreshToken) {
+            throw new Error('Refresh token is required');
+        }
+
+        try {
+            // This will throw if the token is invalid or expired
+            const decoded = verifyRefreshToken(refreshToken) as { userId: string };
+            const userId = decoded.userId;
+
+            if (!userId) {
+                throw new Error('Invalid refresh token payload');
+            }
+
+            const user = await this.authRepository.findById(userId);
+
+            if (!user) {
+                throw new Error('User not found');
+            }
+
+            const payload: TokenPayload = {
+                userId: user.id,
+                email: user.email,
+                role: user.role,
+            };
+
+            const tokens = generateAuthTokens(payload);
+
+            const publicUser: AuthUserDTO = {
+                id: user.id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                role: user.role,
+            };
+
+            return {
+                success: true,
+                message: 'Token refreshed successfully',
+                data: {
+                    user: publicUser,
+                    tokens,
+                },
+            };
+        } catch (error) {
+            throw new Error('Invalid or expired refresh token');
+        }
+    }
+
+    async logout(): Promise<{ success: boolean; message: string }> {
+        // Since we are using stateless JWTs for MVP, server-side logout
+        // is simply acknowledging the request. The client will clear the tokens.
+        return {
+            success: true,
+            message: 'Logged out successfully',
         };
     }
 

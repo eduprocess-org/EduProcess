@@ -138,3 +138,50 @@ test('auth middleware accepts valid tokens and rejects invalid cases', () => {
     assert.equal(expiredTokenResult.response.statusCode, 401);
     assert.equal(expiredTokenResult.response.body.code, 'TOKEN_EXPIRED');
 });
+
+test('auth service refreshes token correctly', async () => {
+    const payload = {
+        userId: 'user-123',
+        email: 'student@uce.edu.ec',
+        role: 'student',
+    };
+
+    const repository = {
+        async findByEmail() { return null; },
+        async createStudentAccount() { throw new Error('Not used'); },
+        async findById(id) {
+            if (id !== payload.userId) return null;
+            return {
+                id: payload.userId,
+                email: payload.email,
+                passwordHash: 'hash',
+                firstName: 'Student',
+                lastName: 'User',
+                role: 'student',
+                createdAt: new Date(),
+            };
+        }
+    };
+
+    const authService = new AuthService(repository);
+    const validRefreshToken = jwtConfig.generateRefreshToken({ userId: payload.userId });
+
+    const refreshResult = await authService.refreshToken(validRefreshToken);
+    assert.equal(refreshResult.success, true);
+    assert.ok(refreshResult.data.tokens.sessionToken.length > 0);
+    assert.ok(refreshResult.data.tokens.refreshToken.length > 0);
+    assert.equal(refreshResult.data.user.email, payload.email);
+
+    try {
+        await authService.refreshToken('invalid-token');
+        assert.fail('Should have thrown an error');
+    } catch (error) {
+        assert.equal(error.message, 'Invalid or expired refresh token');
+    }
+});
+
+test('auth service logout returns success', async () => {
+    const authService = new AuthService({});
+    const result = await authService.logout();
+    assert.equal(result.success, true);
+});

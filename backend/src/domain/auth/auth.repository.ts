@@ -9,5 +9,6 @@ export interface CreateStudentAccountInput {
 
 export interface AuthRepository {
     findByEmail(email: string): Promise<UserModel | null>;
+    findById(id: string): Promise<UserModel | null>;
     createStudentAccount(input: CreateStudentAccountInput): Promise<AuthUserDTO>;
 }
