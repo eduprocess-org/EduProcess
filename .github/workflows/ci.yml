@@ -1,4 +1,4 @@
-name: EduProcess Continuous Integration (CI)
+name: EduProcess Continuous Integration (CI) & Deployment Preparation
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ develop, main ]
 
 jobs:
-  # FRONT-END
+  # FRONT-END VERIFICATION
   verify-frontend:
     name: Frontend Verification (Node 24)
     runs-on: ubuntu-latest
@@ -45,7 +45,7 @@ jobs:
         if: steps.filter-frontend.outputs.frontend_files == 'true'
         run: npm run build
 
-  # BACK-END
+  # BACK-END VERIFICATION
   verify-backend:
     name: Backend Verification (Node 20)
     runs-on: ubuntu-latest
@@ -82,3 +82,43 @@ jobs:
       - name: Execute Build Verification (Compilation)
         if: steps.filter-backend.outputs.backend_files == 'true'
         run: npm run build
+
+      - name: Execute Authentication Module Verification (Tests)
+        if: steps.filter-backend.outputs.backend_files == 'true'
+        run: node --test tests/auth/jwt-authentication.test.js
+
+  # AUTOMATED DOCKER HUB PUBLICATION (CD PREPARATION)
+  publish-images:
+    name: Build & Publish Production Images to Docker Hub
+    runs-on: ubuntu-latest
+    needs: [verify-frontend, verify-backend]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
+
+    steps:
+      - name: Checkout Monorepo Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Authenticate to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Backend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/eduprocess-backend:latest
+
+      - name: Build and Push Frontend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/eduprocess-frontend:latest
