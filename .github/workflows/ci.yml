@@ -85,7 +85,7 @@ jobs:
 
       - name: Execute Authentication Module Verification (Tests)
         if: steps.filter-backend.outputs.backend_files == 'true'
-        run: node --test tests/auth/jwt-authentication.test
+        run: node --test tests/auth/jwt-authentication.test.js
 
   # AUTOMATED DOCKER HUB PUBLICATION (CD PREPARATION)
   publish-images:
