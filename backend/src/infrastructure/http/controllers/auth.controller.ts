@@ -150,6 +150,13 @@ export class AuthController {
             });
         }
 
+        if (message === 'Invalid or expired refresh token') {
+            return res.status(401).json({
+                success: false,
+                message,
+            });
+        }
+
         return res.status(500).json({
             success: false,
             message: 'Internal server error',
