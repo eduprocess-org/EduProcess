@@ -8,11 +8,11 @@ function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-slate-100">
+    <div className="flex h-screen w-full bg-slate-100 overflow-hidden">
       {/* Mobile Sidebar */}
       {isSidebarOpen && (
         <div className="fixed inset-0 z-50 flex">
-          <div className="w-64">
+          <div className="w-64 h-full">
             <Sidebar />
           </div>
 
@@ -24,20 +24,21 @@ function DashboardLayout() {
       )}
 
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex flex-shrink-0">
+      <div className="hidden lg:flex flex-shrink-0 h-full">
         <Sidebar />
       </div>
 
-      <div className="flex-1 flex flex-col">
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden">
         <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
 
-        <main className="flex-1 p-8 overflow-auto">
+        {/* Solo esta zona tendrá scroll interno e independiente */}
+        <main className="flex-1 p-8 overflow-y-auto">
           <div className="max-w-7xl mx-auto">
             {/* Renderiza los componentes hijos de las rutas anidadas */}
             <Outlet />
           </div>
         </main>
-
       </div>
     </div>
   );
