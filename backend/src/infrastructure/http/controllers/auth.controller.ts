@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { AuthService } from '../../application/auth.service';
+import { AuthService } from '../../../application/auth/auth.service';
 import {
     LoginAuthRequest,
     RegisterAuthRequest,
-} from '../../domain/types/auth.types';
+} from '../../../domain/auth/auth.types';
 
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
@@ -40,6 +40,57 @@ export class AuthController {
 
             const result = await this.authService.login(body);
 
+            return res.status(200).json(result);
+        } catch (error) {
+            return this.handleError(error, res);
+        }
+    };
+
+    me = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            // req.user is injected by the authMiddleware
+            const user = (req as any).user;
+            
+            if (!user) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'User context not found',
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                data: {
+                    user
+                }
+            });
+        } catch (error) {
+            return this.handleError(error, res);
+        }
+    };
+
+    refresh = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const { refreshToken } = req.body;
+
+            if (!refreshToken) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Refresh token is required',
+                });
+            }
+
+            const result = await this.authService.refreshToken(refreshToken);
+
+            return res.status(200).json(result);
+        } catch (error) {
+            return this.handleError(error, res);
+        }
+    };
+
+    logout = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const result = await this.authService.logout();
             return res.status(200).json(result);
         } catch (error) {
             return this.handleError(error, res);
@@ -93,6 +144,13 @@ export class AuthController {
         }
 
         if (message === 'Invalid credentials') {
+            return res.status(401).json({
+                success: false,
+                message,
+            });
+        }
+
+        if (message === 'Invalid or expired refresh token') {
             return res.status(401).json({
                 success: false,
                 message,

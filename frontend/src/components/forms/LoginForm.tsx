@@ -103,8 +103,6 @@ function LoginForm() {
         className="flex flex-col gap-4"
       >
 
-        {/* EMAIL */}
-
         <div>
 
           <label className="block mb-2 font-medium">
@@ -125,8 +123,6 @@ function LoginForm() {
           )}
 
         </div>
-
-        {/* PASSWORD */}
 
         <div>
 
@@ -167,8 +163,6 @@ function LoginForm() {
 
         </div>
 
-        {/* BUTTON */}
-
         <button
           type="submit"
           className="bg-[#0B2D63] hover:bg-[#143F86] text-white p-3 rounded-xl transition-all duration-200 font-medium w-full"
@@ -177,8 +171,6 @@ function LoginForm() {
         </button>
 
       </form>
-
-      {/* FOOTER */}
 
       <p className="text-center text-sm text-gray-500 mt-6">
 

@@ -1,14 +1,20 @@
-import { prisma } from '../../../../shared/infrastructure/database/database.config';
+import { prisma } from '../database.config';
 import {
     AuthRepository,
     CreateStudentAccountInput,
-} from '../../domain/repositories/auth.repository';
-import { AuthUserDTO, UserModel } from '../../domain/types/auth.types';
+} from '../../../domain/auth/auth.repository';
+import { AuthUserDTO, UserModel } from '../../../domain/auth/auth.types';
 
 export class PrismaAuthRepository implements AuthRepository {
     async findByEmail(email: string): Promise<UserModel | null> {
         return prisma.user.findUnique({
             where: { email },
+        });
+    }
+
+    async findById(id: string): Promise<UserModel | null> {
+        return prisma.user.findUnique({
+            where: { id },
         });
     }
 

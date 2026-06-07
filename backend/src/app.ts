@@ -1,10 +1,9 @@
 import 'dotenv/config';
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
-import authRouter from './contexts/auth/infrastructure/http/auth.routes';
+import authRouter from './infrastructure/http/routes/auth.routes';
 
 const app: Application = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors());
@@ -19,8 +18,11 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
-
 export default app;
+
+if (require.main === module) {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
