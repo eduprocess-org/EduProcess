@@ -79,14 +79,14 @@ function RegisterForm() {
   };
 
   return (
-    <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
+    <div className="bg-white p-10 rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md">
 
-      <h1 className="text-3xl font-bold text-center text-blue-600 mb-2">
-        EduProcess
-      </h1>
+      <h2 className="text-3xl font-bold text-center text-[#0B2D63] mb-2">
+        Create Account 🎓
+      </h2>
 
-      <p className="text-center text-gray-500 mb-6">
-        Create your account
+      <p className="text-center text-gray-500 mb-8">
+        Join EduProcess and manage academic procedures online
       </p>
 
       <form
@@ -257,7 +257,7 @@ function RegisterForm() {
 
         <button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition font-medium"
+          className="bg-[#0B2D63] hover:bg-[#143F86] text-white p-3 rounded-xl transition-all duration-200 font-medium w-full" 
         >
           Register
         </button>
