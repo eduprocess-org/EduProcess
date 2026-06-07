@@ -8,8 +8,13 @@ function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
+<<<<<<< HEAD
     <div className="flex min-h-screen bg-slate-100">
 
+=======
+  <div className="flex min-h-screen bg-slate-100">
+      {/* Mobile Sidebar */}
+>>>>>>> cfb49a40847bf95a58ef7fe38fdc0bebd3ba2584
       {isSidebarOpen && (
         <div className="fixed inset-0 z-50 flex">
           <div className="w-64">
@@ -23,6 +28,10 @@ function DashboardLayout() {
         </div>
       )}
 
+<<<<<<< HEAD
+=======
+      {/* Desktop Sidebar */}
+>>>>>>> cfb49a40847bf95a58ef7fe38fdc0bebd3ba2584
       <div className="hidden lg:flex flex-shrink-0">
         <Sidebar />
       </div>
@@ -33,7 +42,11 @@ function DashboardLayout() {
 
         <main className="flex-1 p-8 overflow-auto">
           <div className="max-w-7xl mx-auto">
+<<<<<<< HEAD
             <Outlet />
+=======
+            {children}
+>>>>>>> cfb49a40847bf95a58ef7fe38fdc0bebd3ba2584
           </div>
         </main>
 
