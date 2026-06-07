@@ -47,7 +47,7 @@ jobs:
 
   # BACK-END VERIFICATION
   verify-backend:
-    name: Backend Verification (Node 20)
+    name: Backend Verification (Node 22)
     runs-on: ubuntu-latest
     
     defaults:
@@ -67,11 +67,11 @@ jobs:
               - 'backend/**'
               - '.github/workflows/ci.yml'
 
-      - name: Setup Node.js v20 LTS Environment
+      - name: Setup Node.js v22 LTS Environment
         if: steps.filter-backend.outputs.backend_files == 'true'
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
           cache-dependency-path: './backend/package-lock.json'
 
@@ -79,13 +79,17 @@ jobs:
         if: steps.filter-backend.outputs.backend_files == 'true'
         run: npm ci
 
+      - name: Execute Prisma Client Generation
+        if: steps.filter-backend.outputs.backend_files == 'true'
+        run: npx prisma generate
+
       - name: Execute Build Verification (Compilation)
         if: steps.filter-backend.outputs.backend_files == 'true'
-        run: npx tsc --noEmitOnError false
+        run: npm run build
 
       - name: Execute Authentication Module Verification (Tests)
         if: steps.filter-backend.outputs.backend_files == 'true'
-        run: node --test tests/auth/jwt-authentication.test.js
+        run: npm test
 
   # AUTOMATED DOCKER HUB PUBLICATION (CD PREPARATION)
   publish-images:
