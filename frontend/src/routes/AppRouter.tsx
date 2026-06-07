@@ -19,7 +19,6 @@ function AppRouter() {
     <BrowserRouter>
       <Routes>
 
-<<<<<<< HEAD
         {/* AUTH */}
         <Route element={<AuthLayout />}>
           <Route
@@ -39,22 +38,6 @@ function AppRouter() {
               </PublicRoute>
             }
           />
-=======
-        {/* AUTH PAGES */}
-
-        <Route element={<AuthLayout />}>
-
-          <Route
-            path="/login"
-            element={<LoginPage />}
-          />
-
-          <Route
-            path="/register"
-            element={<RegisterPage />}
-          />
-
->>>>>>> cfb49a40847bf95a58ef7fe38fdc0bebd3ba2584
         </Route>
 
         {/* DASHBOARD */}

@@ -7,145 +7,48 @@ import {
   LogOut,
 } from "lucide-react";
 
-<<<<<<< HEAD
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-
-=======
->>>>>>> cfb49a40847bf95a58ef7fe38fdc0bebd3ba2584
 import logo from "../../assets/images/Logo.jpeg";
 
 function Sidebar() {
-
   const navigate = useNavigate();
-
-  const {
-    logout,
-  } = useAuth();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
-
     logout();
-
     navigate("/login");
-
   };
 
   return (
-<<<<<<< HEAD
     <aside className="w-64 h-screen bg-[#0B2D63] text-white flex flex-col flex-shrink-0">
-
       {/* HEADER */}
-
       <div className="p-6 border-b border-white/10">
-
-        <div className="flex items-center gap-3">
-
-          <img
-            src={logo}
-            alt="EduProcess"
-            className="w-12 h-12 object-contain"
-          />
-
-          <div>
-
-            <h2 className="text-xl font-bold">
-              EduProcess
-            </h2>
-
-            <p className="text-xs text-slate-300">
-              Academic System
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* MENU */}
-
-      <nav className="flex-1 p-4 space-y-2">
-
-        <a
-          href="#"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10"
-        >
-          <LayoutDashboard size={20} />
-          Dashboard
-        </a>
-
-        <a
-          href="#"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition"
-        >
-          <FileText size={20} />
-          My Procedures
-        </a>
-
-        <a
-          href="#"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition"
-        >
-          <Search size={20} />
-          Search
-        </a>
-
-        <a
-          href="#"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition"
-        >
-          <Bell size={20} />
-          Notifications
-        </a>
-
-        <a
-          href="#"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 transition"
-        >
-          <Settings size={20} />
-          Settings
-        </a>
-=======
-<aside className="w-64 h-full bg-[#0B2D63] text-white flex flex-col">    
-      <div className="p-6 border-b border-white/10">
-
         <div className="flex items-center gap-4">
-
-          <div className="bg-white rounded-xl p-2">
-
+          {/* Contenedor optimizado para el logo */}
+          <div className="bg-white rounded-xl p-2 flex items-center justify-center">
             <img
               src={logo}
               alt="EduProcess"
               className="w-12 h-12 object-contain"
             />
-
           </div>
 
           <div>
-
             <h2 className="text-xl font-bold tracking-wide">
               EduProcess
             </h2>
-
             <p className="text-xs text-slate-300">
               Academic System
             </p>
-
           </div>
-
         </div>
-
       </div>
 
       {/* MENU */}
-
       <nav className="flex-1 p-4">
-
         <div className="space-y-2">
-
           {/* ACTIVE ITEM */}
-
           <a
             href="#"
             className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 border border-white/10 text-white font-medium"
@@ -185,30 +88,19 @@ function Sidebar() {
             <Settings size={20} />
             Settings
           </a>
-
         </div>
->>>>>>> cfb49a40847bf95a58ef7fe38fdc0bebd3ba2584
-
       </nav>
 
       {/* FOOTER */}
-
       <div className="p-4 border-t border-white/10">
-
         <button
-<<<<<<< HEAD
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/20 text-red-300 transition"
-=======
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-300 hover:bg-red-500/20 hover:text-red-200 transition-all duration-200"
->>>>>>> cfb49a40847bf95a58ef7fe38fdc0bebd3ba2584
         >
           <LogOut size={20} />
           Logout
         </button>
-
       </div>
-
     </aside>
   );
 }
