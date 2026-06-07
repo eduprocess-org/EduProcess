@@ -1,9 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../services/auth/auth.service";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+
 import {
   loginSchema,
   type LoginFormData,
@@ -13,6 +13,8 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+
+import { useAuth } from "../../hooks/useAuth";
 
 function LoginForm() {
 
@@ -24,16 +26,23 @@ function LoginForm() {
     resolver: zodResolver(loginSchema),
   });
 
+  const { login: authLogin } = useAuth();
+
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
   const [apiError, setApiError] = useState("");
+
+  const navigate = useNavigate();
+
   const onSubmit = async (data: LoginFormData) => {
+
     try {
 
-    const response = await login(data);
+      setApiError("");
 
-      localStorage.setItem(
-        "sessionToken",
+      const response = await login(data);
+
+      authLogin(
+        response.data.user,
         response.data.tokens.sessionToken
       );
 
@@ -42,55 +51,57 @@ function LoginForm() {
         response.data.tokens.refreshToken
       );
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify(response.data.user)
-      );
-
       navigate("/");
 
     } catch (error: any) {
 
-    if (error.response?.status === 401) {
+      if (error.response?.status === 401) {
 
-      setApiError("Invalid email or password");
+        setApiError(
+          "Invalid email or password"
+        );
 
-    } else if (error.response?.status === 400) {
+      } else if (error.response?.status === 400) {
 
-      setApiError(error.response.data.message);
+        setApiError(
+          error.response.data.message
+        );
 
-    } else {
+      } else {
 
-      setApiError("Unable to connect to server");
+        setApiError(
+          "Unable to connect to server"
+        );
+
+      }
+
+      console.error(error);
 
     }
 
-    console.error(error);
-}
   };
 
   return (
-    <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
+    <div className="bg-white p-10 rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md">
+
       {apiError && (
-        <div className="bg-red-100 border border-red-300 text-red-700 p-3 rounded-lg">
+        <div className="bg-red-100 border border-red-300 text-red-700 p-3 rounded-lg mb-4">
           {apiError}
         </div>
       )}
 
-      <h1 className="text-3xl font-bold text-center text-blue-600 mb-2">
-        EduProcess
-      </h1>
+      <h2 className="text-3xl font-bold text-center text-[#0B2D63] mb-2">
+        Welcome 🎓
+      </h2>
 
-      <p className="text-center text-gray-500 mb-6">
-        Sign in to continue
+      <p className="text-center text-gray-500 mb-8">
+        Sign in to continue managing your academic procedures
       </p>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-4"
       >
-
-        {/* EMAIL */}
 
         <div>
 
@@ -112,8 +123,6 @@ function LoginForm() {
           )}
 
         </div>
-
-        {/* PASSWORD */}
 
         <div>
 
@@ -154,18 +163,14 @@ function LoginForm() {
 
         </div>
 
-        {/* BUTTON */}
-
         <button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition font-medium"
+          className="bg-[#0B2D63] hover:bg-[#143F86] text-white p-3 rounded-xl transition-all duration-200 font-medium w-full"
         >
           Login
         </button>
 
       </form>
-
-      {/* FOOTER */}
 
       <p className="text-center text-sm text-gray-500 mt-6">
 

@@ -12,8 +12,7 @@ function DashboardLayout({ children }: Props) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex bg-slate-100 min-h-screen">
-
+  <div className="flex min-h-screen bg-slate-100">
       {/* Mobile Sidebar */}
       {isSidebarOpen && (
         <div className="fixed inset-0 z-50 flex">
@@ -32,7 +31,7 @@ function DashboardLayout({ children }: Props) {
       )}
 
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block">
+      <div className="hidden lg:flex flex-shrink-0">
         <Sidebar />
       </div>
 
@@ -42,8 +41,10 @@ function DashboardLayout({ children }: Props) {
           onMenuClick={() => setIsSidebarOpen(true)}
         />
 
-        <main className="p-6">
-          {children}
+        <main className="flex-1 p-8 overflow-auto">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
 
       </div>
