@@ -1,32 +1,25 @@
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 
 import Navbar from "../components/navigation/Navbar";
 import Sidebar from "../components/navigation/Sidebar";
 
-type Props = {
-  children: React.ReactNode;
-};
-
-function DashboardLayout({ children }: Props) {
-
+function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-  <div className="flex min-h-screen bg-slate-100">
+    <div className="flex min-h-screen bg-slate-100">
       {/* Mobile Sidebar */}
       {isSidebarOpen && (
         <div className="fixed inset-0 z-50 flex">
-
           <div className="w-64">
             <Sidebar />
           </div>
 
-          {/* Background Overlay */}
           <div
             className="flex-1 bg-black/50"
             onClick={() => setIsSidebarOpen(false)}
           />
-
         </div>
       )}
 
@@ -36,19 +29,16 @@ function DashboardLayout({ children }: Props) {
       </div>
 
       <div className="flex-1 flex flex-col">
-
-        <Navbar
-          onMenuClick={() => setIsSidebarOpen(true)}
-        />
+        <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
 
         <main className="flex-1 p-8 overflow-auto">
           <div className="max-w-7xl mx-auto">
-            {children}
+            {/* Renderiza los componentes hijos de las rutas anidadas */}
+            <Outlet />
           </div>
         </main>
 
       </div>
-
     </div>
   );
 }
