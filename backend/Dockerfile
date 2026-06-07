@@ -1,6 +1,3 @@
-# ==========================================
-# ETAPA 1: Construcción (Builder)
-# ==========================================
 FROM node:20-alpine AS builder
 
 WORKDIR /usr/src/app
@@ -17,9 +14,6 @@ RUN PRISMA_SKIP_POSTINSTALL_GENERATE=true DATABASE_URL="postgresql://dummy:dummy
 
 RUN npx tsc --outDir ./dist --noEmitOnError false
 
-# ==========================================
-# ETAPA 2: Producción (Runner)
-# ==========================================
 FROM node:20-alpine AS runner
 
 RUN apk add --no-cache libc6-compat
@@ -38,5 +32,4 @@ RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma gene
 
 EXPOSE 5000
 
-# 🚨 EL CAMBIO GANADOR: Apuntamos al archivo real de la arquitectura
 CMD ["node", "dist/app.js"]
