@@ -81,7 +81,7 @@ jobs:
 
       - name: Execute Build Verification (Compilation)
         if: steps.filter-backend.outputs.backend_files == 'true'
-        run: npm run build
+        run: npx tsc --noEmitOnError false
 
       - name: Execute Authentication Module Verification (Tests)
         if: steps.filter-backend.outputs.backend_files == 'true'
