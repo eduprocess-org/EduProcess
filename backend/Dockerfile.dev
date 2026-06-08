@@ -1,0 +1,21 @@
+FROM node:20-alpine
+
+# Instalar dependencias necesarias para herramientas de compilación nativas si se requieren
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /usr/src/app
+
+# Copiar manifiestos de dependencias
+COPY package*.json ./
+
+# Instalar dependencias de desarrollo y producción
+RUN npm install
+
+# Copiar el resto del código del backend (útil para la primera construcción)
+COPY . .
+
+# Exponer el puerto del servidor Express
+EXPOSE 5000
+
+# Comando para levantar el servidor con live-reload (ts-node-dev)
+CMD ["npm", "run", "dev"]

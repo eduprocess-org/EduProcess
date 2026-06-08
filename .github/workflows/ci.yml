@@ -1,0 +1,139 @@
+name: EduProcess Continuous Integration (CI) & Deployment Preparation
+
+on:
+  push:
+    branches: [ develop, qa, main ]
+  pull_request:
+    branches: [ develop, qa, main ]
+
+jobs:
+  # FRONT-END VERIFICATION
+  verify-frontend:
+    name: Frontend Verification (Node 24)
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - name: Checkout Monorepo Code
+        uses: actions/checkout@v4
+
+      - name: Check Frontend Changes
+        id: filter-frontend
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend_files:
+              - 'frontend/**'
+              - '.github/workflows/ci.yml'
+
+      - name: Setup Node.js v24 Environment
+        if: steps.filter-frontend.outputs.frontend_files == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Execute Install Checks (Dependencies)
+        if: steps.filter-frontend.outputs.frontend_files == 'true'
+        run: npm ci
+
+      - name: Execute Build Verification (Compilation)
+        if: steps.filter-frontend.outputs.frontend_files == 'true'
+        run: npm run build
+
+  # BACK-END VERIFICATION
+  verify-backend:
+    name: Backend Verification (Node 22)
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout Monorepo Code
+        uses: actions/checkout@v4
+
+      - name: Check Backend Changes
+        id: filter-backend
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend_files:
+              - 'backend/**'
+              - '.github/workflows/ci.yml'
+
+      - name: Setup Node.js v22 LTS Environment
+        if: steps.filter-backend.outputs.backend_files == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: './backend/package-lock.json'
+
+      - name: Execute Install Checks (Dependencies)
+        if: steps.filter-backend.outputs.backend_files == 'true'
+        run: npm ci
+
+      - name: Execute Prisma Client Generation
+        if: steps.filter-backend.outputs.backend_files == 'true'
+        run: npx prisma generate
+
+      - name: Execute Build Verification (Compilation)
+        if: steps.filter-backend.outputs.backend_files == 'true'
+        run: npm run build
+
+      - name: Execute Authentication Module Verification (Tests)
+        if: steps.filter-backend.outputs.backend_files == 'true'
+        run: npm test
+
+  # AUTOMATED DOCKER HUB PUBLICATION (CD PREPARATION)
+  publish-images:
+    name: Build & Publish Production Images to Docker Hub
+    runs-on: ubuntu-latest
+    needs: [verify-frontend, verify-backend]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/qa' || github.ref == 'refs/heads/main')
+
+    steps:
+      - name: Checkout Monorepo Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Authenticate to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set Docker Image Tags
+        id: set-tags
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "tag=prod" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/qa" ]; then
+            echo "tag=qa" >> $GITHUB_OUTPUT
+          else
+            echo "tag=dev" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and Push Backend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/eduprocess-backend:${{ steps.set-tags.outputs.tag }}
+
+      - name: Build and Push Frontend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/eduprocess-frontend:${{ steps.set-tags.outputs.tag }}
