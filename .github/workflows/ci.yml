@@ -2,9 +2,9 @@ name: EduProcess Continuous Integration (CI) & Deployment Preparation
 
 on:
   push:
-    branches: [ develop, main ]
+    branches: [ develop, qa, main ]
   pull_request:
-    branches: [ develop, main ]
+    branches: [ develop, qa, main ]
 
 jobs:
   # FRONT-END VERIFICATION
@@ -96,7 +96,7 @@ jobs:
     name: Build & Publish Production Images to Docker Hub
     runs-on: ubuntu-latest
     needs: [verify-frontend, verify-backend]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/qa' || github.ref == 'refs/heads/main')
 
     steps:
       - name: Checkout Monorepo Code
@@ -111,13 +111,24 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Set Docker Image Tags
+        id: set-tags
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "tag=prod" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/qa" ]; then
+            echo "tag=qa" >> $GITHUB_OUTPUT
+          else
+            echo "tag=dev" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and Push Backend Image
         uses: docker/build-push-action@v6
         with:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/eduprocess-backend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/eduprocess-backend:${{ steps.set-tags.outputs.tag }}
 
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v6
@@ -125,4 +136,4 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/eduprocess-frontend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/eduprocess-frontend:${{ steps.set-tags.outputs.tag }}
