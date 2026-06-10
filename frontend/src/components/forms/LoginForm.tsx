@@ -3,10 +3,9 @@ import { login } from "../../services/auth/auth.service";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { toast } from "sonner"; // 🌟 Estandarización de notificaciones
-
+import { toast } from "sonner"; // 
 import { loginSchema, type LoginFormData } from "../../utils/validators";
-import { Eye, EyeOff, Loader2 } from "lucide-react"; // 🌟 Ícono de carga
+import { Eye, EyeOff, Loader2 } from "lucide-react"; 
 import { useAuth } from "../../hooks/useAuth";
 
 function LoginForm() {
@@ -20,7 +19,7 @@ function LoginForm() {
 
   const { login: authLogin } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // 🌟 Control de estado de carga
+  const [isLoading, setIsLoading] = useState(false); 
 
   const navigate = useNavigate();
 
@@ -61,7 +60,7 @@ function LoginForm() {
   return (
     <div className="bg-white p-10 rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md">
       <h2 className="text-3xl font-bold text-center text-[#0B2D63] mb-2">
-        Welcome 🎓
+        Welcome 
       </h2>
 
       <p className="text-center text-gray-500 mb-8">
