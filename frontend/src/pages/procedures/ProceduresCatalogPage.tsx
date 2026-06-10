@@ -1,7 +1,4 @@
-import { FileText } from "lucide-react";
-
 import ProceduresList from "../../components/procedures/ProceduresList";
-
 import type { Procedure } from "../../types/procedure.types";
 
 const mockProcedures: Procedure[] = [

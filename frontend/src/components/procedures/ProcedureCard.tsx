@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 
 import type { Procedure } from "../../types/procedure.types";
+import { useNavigate } from "react-router-dom";
 
 interface ProcedureCardProps {
   procedure: Procedure;
@@ -13,6 +14,7 @@ interface ProcedureCardProps {
 function ProcedureCard({
   procedure,
 }: ProcedureCardProps) {
+  const navigate = useNavigate();
   const getCategoryStyles = (
     category: string
   ) => {
@@ -114,29 +116,32 @@ function ProcedureCard({
           </span>
         </div>
 
-        <button
-          className="
-            mt-6
-            flex
-            w-full
-            items-center
-            justify-center
-            gap-2
-            rounded-xl
-            bg-[#0B2D63]
-            px-4
-            py-3
-            text-sm
-            font-medium
-            text-white
-            transition-all
-            duration-300
-            hover:bg-[#09224E]
-          "
-        >
-          View Procedure
+            <button
+            onClick={() =>
+                navigate(`/procedures/${procedure.id}`)
+            }
+            className="
+                mt-6
+                flex
+                w-full
+                items-center
+                justify-center
+                gap-2
+                rounded-xl
+                bg-[#0B2D63]
+                px-4
+                py-3
+                text-sm
+                font-medium
+                text-white
+                transition-all
+                duration-300
+                hover:bg-[#09224E]
+            "
+            >
+            View Procedure
 
-          <ArrowRight size={16} />
+            <ArrowRight size={16} />
         </button>
       </div>
     </div>
