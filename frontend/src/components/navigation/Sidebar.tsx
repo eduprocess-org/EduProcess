@@ -7,12 +7,13 @@ import {
   LogOut,
 } from "lucide-react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import logo from "../../assets/images/Logo.jpeg";
 
 function Sidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout } = useAuth();
 
   const handleLogout = () => {
@@ -49,21 +50,29 @@ function Sidebar() {
       <nav className="flex-1 p-4 overflow-y-auto">
         <div className="space-y-2">
           {/* ACTIVE ITEM */}
-          <a
-            href="#"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 border border-white/10 text-white font-medium"
+          <button
+            onClick={() => navigate("/")}
+            className={`flex w-full items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+              location.pathname === "/"
+                ? "bg-white/10 border border-white/10 text-white font-medium"
+                : "text-slate-200 hover:bg-white/10 hover:text-white"
+            }`}
           >
-            <LayoutDashboard size={20} className="flex-shrink-0" />
+            <LayoutDashboard size={20} />
             Dashboard
-          </a>
+          </button>
 
-          <a
-            href="#"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-200 hover:bg-white/10 hover:text-white transition-all duration-200"
+          <button
+            onClick={() => navigate("/procedures")}
+            className={`flex w-full items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+              location.pathname === "/procedures"
+                ? "bg-white/10 border border-white/10 text-white font-medium"
+                : "text-slate-200 hover:bg-white/10 hover:text-white"
+            }`}
           >
             <FileText size={20} className="flex-shrink-0" />
             My Procedures
-          </a>
+          </button>
 
           <a
             href="#"

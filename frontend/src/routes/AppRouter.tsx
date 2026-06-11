@@ -6,7 +6,7 @@ import {
 
 import AuthLayout from "../layouts/AuthLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
-
+import ProceduresCatalogPage from "../pages/procedures/ProceduresCatalogPage";
 import DashboardPage from "../pages/dashboard/DashboardPage";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
@@ -50,6 +50,7 @@ function AppRouter() {
           }
         >
           <Route index element={<DashboardPage />} />
+          <Route path="/procedures" element={<ProceduresCatalogPage />} />
         </Route>
 
       </Routes>
