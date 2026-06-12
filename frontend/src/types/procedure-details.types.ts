@@ -1,10 +1,10 @@
 export interface ProcedureDetails {
   id: string;
   name: string;
-  category: string;
   description: string;
+  category: string;
   estimatedProcessingTime: string;
   requirements: string[];
-  requiredDocuments: string[];
+  documents: string[];
   instructions: string[];
 }
