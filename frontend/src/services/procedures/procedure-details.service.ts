@@ -10,7 +10,7 @@ export async function getProcedureDetails(
 
   const procedure =
     mockProcedureDetails.find(
-      (item) => item.id === id
+      (item: { id: string }) => item.id === id
     );
 
   if (!procedure) {

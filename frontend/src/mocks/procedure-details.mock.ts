@@ -2,7 +2,7 @@ import type { ProcedureDetails } from "../types/procedure-details.types";
 
 export const mockProcedureDetails: ProcedureDetails[] = [
   {
-    id: "1",
+  id: "PROC-001",
     name: "Academic Transcript",
     description:
       "Request your official academic transcript issued by the institution.",
@@ -27,7 +27,7 @@ export const mockProcedureDetails: ProcedureDetails[] = [
   },
 
   {
-    id: "2",
+    id: "PROC-002",
     name: "Enrollment Certificate",
     description:
       "Generate proof of enrollment.",
@@ -47,6 +47,24 @@ export const mockProcedureDetails: ProcedureDetails[] = [
 
     instructions: [
       "Confirm information",
+      "Submit request"
+    ]
+  },
+  {
+    id: "PROC-003",
+    name: "Tuition Payment Validation",
+    description:
+      "Validate your tuition payment for the current semester.",
+    category: "Financial",
+    estimatedProcessingTime: "2 business days",   
+    requirements: [
+      "Have paid tuition for the current semester"
+    ],
+    documents: [
+      "Payment receipt"
+    ],      
+    instructions: [
+      "Upload payment receipt",
       "Submit request"
     ]
   }

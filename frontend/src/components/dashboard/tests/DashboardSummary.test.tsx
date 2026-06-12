@@ -5,37 +5,36 @@ import DashboardSummary from "../DashboardSummary";
 
 describe("DashboardSummary", () => {
   it("shows correct statistics", () => {
-    render(
-      <DashboardSummary
-        requests={[
-          {
-            id: "1",
-            procedureName: "Certificate",
-            status: "PENDING",
-            createdAt: "2026-06-10",
-          },
-          {
-            id: "2",
-            procedureName: "Enrollment",
-            status: "APPROVED",
-            createdAt: "2026-06-09",
-          },
-          {
-            id: "3",
-            procedureName: "Tuition",
-            status: "REJECTED",
-            createdAt: "2026-06-08",
-          },
-        ]}
-      />
-    );
+    const requests = [
+      {
+        id: "REQ-001",
+        procedureId: "PROC-001",
+        procedureName: "Certificate",
+        status: "PENDING" as const,
+        createdAt: "2026-06-10",
+      },
+      {
+        id: "REQ-002",
+        procedureId: "PROC-002",
+        procedureName: "Enrollment",
+        status: "APPROVED" as const,
+        createdAt: "2026-06-09",
+      },
+      {
+        id: "REQ-003",
+        procedureId: "PROC-003",
+        procedureName: "Tuition",
+        status: "REJECTED" as const,
+        createdAt: "2026-06-08",
+      },
+    ];
 
-    expect(
-      screen.getByText("Total Requests")
-    ).toBeInTheDocument();
+    render(<DashboardSummary requests={requests} />);
 
-    expect(
-      screen.getByText("3")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Total")).toBeInTheDocument();
+    expect(screen.getByText("Pending")).toBeInTheDocument();
+    expect(screen.getByText("Approved")).toBeInTheDocument();
+    expect(screen.getByText("Rejected")).toBeInTheDocument();
+    expect(screen.getByText("3")).toBeInTheDocument();
   });
 });

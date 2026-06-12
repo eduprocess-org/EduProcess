@@ -137,7 +137,7 @@ function RequestCard({ request }: Props) {
         </button>
 
         <button
-          onClick={() => navigate(`/requests/${request.id}`)}
+          onClick={() => navigate(`/procedures/${request.procedureId}`)}
           className="
             inline-flex items-center gap-1.5
             rounded-xl bg-[#0B2D63]

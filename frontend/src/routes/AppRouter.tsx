@@ -15,7 +15,9 @@ import RegisterPage from "../pages/auth/RegisterPage";
 import ProcedureRequestPage from "../pages/procedures/ProcedureRequestPage";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import PublicRoute from "../components/auth/PublicRoute";
-
+import RequestTrackingPage
+  from "../pages/requests/RequestTrackingPage";
+  
 function AppRouter() {
   return (
     <BrowserRouter>
@@ -71,6 +73,11 @@ function AppRouter() {
             path="/procedures/:id/request"
             element={<ProcedureRequestPage />}
           />
+
+         <Route
+          path="/requests/:requestId/tracking"
+          element={<RequestTrackingPage />}
+        />
 
         </Route>
 

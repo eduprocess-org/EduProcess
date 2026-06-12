@@ -10,6 +10,7 @@ export async function getStudentRequests(): Promise<StudentRequest[]> {
   return [
     {
       id: "REQ-001",
+      procedureId: "PROC-001",
       procedureName:
         "Academic Certificate",
       status: "PENDING",
@@ -17,6 +18,7 @@ export async function getStudentRequests(): Promise<StudentRequest[]> {
     },
     {
       id: "REQ-002",
+      procedureId: "PROC-002",
       procedureName:
         "Enrollment Certificate",
       status: "APPROVED",
@@ -24,6 +26,7 @@ export async function getStudentRequests(): Promise<StudentRequest[]> {
     },
     {
       id: "REQ-003",
+      procedureId: "PROC-003",
       procedureName:
         "Tuition Payment Validation",
       status: "REJECTED",
