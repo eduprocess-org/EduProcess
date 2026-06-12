@@ -1,17 +1,30 @@
-import { ArrowLeft, Clock3, Send, FileText } from "lucide-react";
-import { Link } from "react-router-dom";
+import {
+  ArrowLeft,
+  Clock3,
+  Send,
+  FileText,
+} from "lucide-react";
+
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
 
 interface Props {
+  id: string;
   name: string;
   description: string;
   estimatedProcessingTime: string;
 }
 
 function ProcedureHeader({
+  id,
   name,
   description,
   estimatedProcessingTime,
 }: Props) {
+  const navigate = useNavigate();
+
   return (
     <>
       <Link
@@ -42,11 +55,9 @@ function ProcedureHeader({
           border-slate-100
         "
       >
-        {/* Top accent bar */}
         <div className="h-[3px] w-full bg-[#0B2D63]" />
 
         <div className="p-8">
-          {/* Badge */}
           <div
             className="
               mb-4
@@ -91,7 +102,6 @@ function ProcedureHeader({
             {description}
           </p>
 
-          {/* Footer row */}
           <div
             className="
               mt-6
@@ -121,11 +131,19 @@ function ProcedureHeader({
                 text-slate-500
               "
             >
-              <Clock3 size={14} className="text-[#0B2D63]" />
+              <Clock3
+                size={14}
+                className="text-[#0B2D63]"
+              />
               {estimatedProcessingTime}
             </div>
 
             <button
+              onClick={() =>
+                navigate(
+                  `/procedures/${id}/request`
+                )
+              }
               className="
                 inline-flex
                 items-center
