@@ -12,7 +12,7 @@ import ProcedureDetailsPage from "../pages/procedures/ProcedureDetailsPage";
 import DashboardPage from "../pages/dashboard/DashboardPage";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
-
+import ProcedureRequestPage from "../pages/procedures/ProcedureRequestPage";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import PublicRoute from "../components/auth/PublicRoute";
 
@@ -61,6 +61,11 @@ function AppRouter() {
           <Route
             path="/procedures/:id"
             element={<ProcedureDetailsPage />}
+          />
+
+          <Route
+            path="/procedures/:id/request"
+            element={<ProcedureRequestPage />}
           />
 
         </Route>

@@ -44,10 +44,9 @@ function ProcedureDetailsPage() {
   return (
     <div className="space-y-6">
       <ProcedureHeader
+        id={procedure.id}
         name={procedure.name}
-        description={
-          procedure.description
-        }
+        description={procedure.description}
         estimatedProcessingTime={
           procedure.estimatedProcessingTime
         }
