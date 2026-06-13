@@ -105,10 +105,35 @@ test('ProcedureService - createRequest throws on invalid procedure', async () =>
     const service = new ProcedureService(repo);
 
     try {
-        await service.createRequest('student-1', 'invalid-id', []);
+        await service.createRequest('student-1', 'invalid-id', [{ originalname: 'x.pdf', buffer: Buffer.from('x'), mimetype: 'application/pdf' }]);
         assert.fail('Should have thrown');
     } catch (error) {
         assert.equal(error.message, 'Procedure not found');
+    }
+});
+
+test('ProcedureService - createRequest throws when no files provided', async () => {
+    const repo = new MockPrismaProcedureRepository();
+    const service = new ProcedureService(repo);
+
+    try {
+        await service.createRequest('student-1', 'proc-1', []);
+        assert.fail('Should have thrown');
+    } catch (error) {
+        assert.equal(error.message, 'At least one document must be provided');
+    }
+});
+
+test('ProcedureService - createRequest throws when procedure is inactive', async () => {
+    const repo = new MockPrismaProcedureRepository();
+    repo.procedures.push({ id: 'proc-inactive', name: 'Trámite Cerrado', isActive: false, procedureRequirements: [] });
+    const service = new ProcedureService(repo);
+
+    try {
+        await service.createRequest('student-1', 'proc-inactive', [{ originalname: 'x.pdf', buffer: Buffer.from('x'), mimetype: 'application/pdf' }]);
+        assert.fail('Should have thrown');
+    } catch (error) {
+        assert.equal(error.message, 'Procedure is not available for new requests');
     }
 });
 
