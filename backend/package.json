@@ -7,7 +7,7 @@
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
-    "test": "npm run build && node --test tests/auth/jwt-authentication.test.js tests/auth/auth-integration.test.js tests/procedures/procedure-integration.test.js"
+    "test": "npm run build && node --test tests/auth/jwt-authentication.test.js tests/auth/auth-integration.test.js tests/procedures/procedure-integration.test.js tests/procedures/procedure-unit.test.js"
   },
   "keywords": [],
   "author": "",
