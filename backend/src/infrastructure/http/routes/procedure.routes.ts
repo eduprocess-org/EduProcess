@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import { ProcedureController } from '../controllers/procedure.controller';
 import { ProcedureService } from '../../../application/procedures/procedure.service';
@@ -7,13 +7,36 @@ import { authMiddleware } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// Configure multer to store files in memory
+const ACCEPTED_MIME_TYPES = [
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'image/jpeg',
+    'image/png',
+];
+
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
-        fileSize: 10 * 1024 * 1024, // 10MB limit per file
+        fileSize: 5 * 1024 * 1024, // 5MB per file — matches Supabase bucket policy
+    },
+    fileFilter: (_req, file, cb) => {
+        if (ACCEPTED_MIME_TYPES.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error(`Unsupported file type: ${file.mimetype}. Accepted: PDF, DOCX, JPEG, PNG`));
+        }
     },
 });
+
+const handleMulterError = (err: Error, _req: Request, res: Response, next: NextFunction) => {
+    if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ success: false, message: 'File exceeds the 5MB size limit' });
+    }
+    if (err?.message?.startsWith('Unsupported file type')) {
+        return res.status(400).json({ success: false, message: err.message });
+    }
+    next(err);
+};
 
 // Dependency Injection
 const repository = new PrismaProcedureRepository();
@@ -27,6 +50,7 @@ router.get('/procedures/:id', authMiddleware, controller.getProcedureDetails);
 // Requests Routes
 router.get('/requests', authMiddleware, controller.getStudentRequests);
 router.post('/requests', authMiddleware, upload.array('documents'), controller.createRequest);
+router.use(handleMulterError);
 router.get('/requests/:id/tracking', authMiddleware, controller.getRequestTracking);
 
 export default router;
