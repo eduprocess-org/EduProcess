@@ -6,6 +6,9 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// ==========================================
+// ENUMS (CONGELADOS PARA PROTEGER AUTH)
+// ==========================================
 enum Role {
   student
   admin
@@ -18,6 +21,9 @@ enum RequestStatus {
   in_review
 }
 
+// ==========================================
+// MÓDULO ORGANIZACIONAL
+// ==========================================
 model Faculty {
   id             String          @id @default(uuid()) @db.Uuid
   name           String          @unique
@@ -36,6 +42,9 @@ model Career {
   procedureTypes ProcedureType[]
 }
 
+// ==========================================
+// MÓDULO DE IDENTIDAD Y SEGURIDAD (INTEGRO)
+// ==========================================
 model User {
   id                String             @id @default(uuid()) @db.Uuid
   email             String             @unique
@@ -48,6 +57,7 @@ model User {
   procedureRequests ProcedureRequest[]
   observations      Observation[]
   notifications     Notification[]
+  auditLogs         AuditLog[]
 }
 
 model Profile {
@@ -61,18 +71,32 @@ model Profile {
   career     Career? @relation(fields: [careerId], references: [id], onDelete: SetNull)
 }
 
+// ==========================================
+// MÓDULO DE TRÁMITES ACADÉMICOS
+// ==========================================
 model ProcedureType {
-  id                 String              @id @default(uuid()) @db.Uuid
-  facultyId          String?             @db.Uuid
-  careerId           String?             @db.Uuid
-  name               String
-  description        String              @db.Text
-  requirementsText   String              @db.Text
-  isActive           Boolean             @default(true)
-  faculty            Faculty?            @relation(fields: [facultyId], references: [id], onDelete: SetNull)
-  career             Career?             @relation(fields: [careerId], references: [id], onDelete: SetNull)
-  procedureRequests  ProcedureRequest[]
-  // procedureEmbedding ProcedureEmbedding?
+  id                   String                 @id @default(uuid()) @db.Uuid
+  facultyId            String?                @db.Uuid
+  careerId             String?                @db.Uuid
+  name                 String
+  description          String                 @db.Text
+  requirementsText     String                 @db.Text
+  isActive             Boolean                @default(true)
+  faculty              Faculty?               @relation(fields: [facultyId], references: [id], onDelete: SetNull)
+  career               Career?                @relation(fields: [careerId], references: [id], onDelete: SetNull)
+  procedureRequests    ProcedureRequest[]
+  procedureRequirements ProcedureRequirement[]
+  procedureEmbedding   ProcedureEmbedding?
+}
+
+// Tabla 11: Requisitos atómicos (3NF)
+model ProcedureRequirement {
+  id              String        @id @default(uuid()) @db.Uuid
+  procedureTypeId String        @db.Uuid
+  name            String
+  description     String        @db.Text
+  isMandatory     Boolean       @default(true)
+  procedureType   ProcedureType @relation(fields: [procedureTypeId], references: [id], onDelete: Cascade)
 }
 
 model ProcedureRequest {
@@ -86,15 +110,29 @@ model ProcedureRequest {
   procedureType     ProcedureType      @relation(fields: [procedureTypeId], references: [id], onDelete: Cascade)
   uploadedDocuments UploadedDocument[]
   observations      Observation[]
+  auditLogs         AuditLog[]
+}
+
+// ==========================================
+// MÓDULO GESTIÓN DOCUMENTAL Y AUDITORÍA
+// ==========================================
+
+// Tabla 12: Catálogo de Tipos de Documentos
+model DocumentTypeCatalog {
+  id                String             @id @default(uuid()) @db.Uuid
+  name              String             @unique
+  uploadedDocuments UploadedDocument[]
 }
 
 model UploadedDocument {
-  id        String           @id @default(uuid()) @db.Uuid
-  requestId String           @db.Uuid
-  fileName  String
-  fileUrl   String
-  uploadedAt DateTime         @default(now())
-  request   ProcedureRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  id         String               @id @default(uuid()) @db.Uuid
+  requestId  String               @db.Uuid
+  typeId     String?              @db.Uuid
+  fileName   String
+  fileUrl    String
+  uploadedAt DateTime             @default(now())
+  request    ProcedureRequest     @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  type       DocumentTypeCatalog? @relation(fields: [typeId], references: [id], onDelete: SetNull)
 }
 
 model Observation {
@@ -107,20 +145,46 @@ model Observation {
   admin     User             @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }
 
-model Notification {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @db.Uuid
-  title     String
-  message   String   @db.Text
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+// ==========================================
+// NOTIFICACIONES, IA Y AUDITORÍA GLOBAL
+// ==========================================
+
+// Tabla 13: Catálogo de Tipos de Notificaciones
+model NotificationTypeCatalog {
+  id            String         @id @default(uuid()) @db.Uuid
+  name          String         @unique
+  notifications Notification[]
 }
 
-// model ProcedureEmbedding {
-//   id                 String        @id @default(uuid()) @db.Uuid
-//   procedureTypeId     String        @unique @db.Uuid
-//   contentToVectorize  String        @db.Text
-//   embeddingVector     Unsupported("vector")
-//   procedureType        ProcedureType @relation(fields: [procedureTypeId], references: [id], onDelete: Cascade)
-// }
+model Notification {
+  id         String                   @id @default(uuid()) @db.Uuid
+  userId     String                   @db.Uuid
+  typeId     String?                  @db.Uuid
+  title      String
+  message    String                   @db.Text
+  isRead     Boolean                  @default(false)
+  createdAt  DateTime                 @default(now())
+  user       User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type       NotificationTypeCatalog? @relation(fields: [typeId], references: [id], onDelete: SetNull)
+}
+
+model ProcedureEmbedding {
+  id                 String        @id @default(uuid()) @db.Uuid
+  procedureTypeId    String        @unique @db.Uuid
+  contentToVectorize String        @db.Text
+  embeddingVector    Unsupported("vector") // Integración nativa pgvector para Supabase
+  procedureType      ProcedureType @relation(fields: [procedureTypeId], references: [id], onDelete: Cascade)
+}
+
+// Tabla 14: Bitácora de Gobernancia y Auditoría
+model AuditLog {
+  id                 String            @id @default(uuid()) @db.Uuid
+  procedureRequestId String?           @db.Uuid
+  userId             String            @db.Uuid
+  action             String
+  oldValue           String?           @db.Text
+  newValue           String?           @db.Text
+  createdAt          DateTime          @default(now())
+  request            ProcedureRequest? @relation(fields: [procedureRequestId], references: [id], onDelete: SetNull)
+  user               User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+}
