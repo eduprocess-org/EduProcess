@@ -4,6 +4,7 @@ import { ProcedureController } from '../controllers/procedure.controller';
 import { ProcedureService } from '../../../application/procedures/procedure.service';
 import { PrismaProcedureRepository } from '../../persistence/prisma/prisma-procedure.repository';
 import { authMiddleware } from '../middlewares/auth.middleware';
+import { adminMiddleware } from '../middlewares/admin.middleware';
 
 const router = Router();
 
@@ -52,5 +53,12 @@ router.get('/requests', authMiddleware, controller.getStudentRequests);
 router.post('/requests', authMiddleware, upload.array('documents'), controller.createRequest);
 router.use(handleMulterError);
 router.get('/requests/:id/tracking', authMiddleware, controller.getRequestTracking);
+router.get('/requests/:id/timeline', authMiddleware, controller.getRequestTimeline);
+
+// Status Management (admin only)
+router.patch('/requests/:id/status', authMiddleware, adminMiddleware, controller.updateRequestStatus);
+
+// Admin Timeline
+router.get('/admin/requests/:id/timeline', authMiddleware, adminMiddleware, controller.adminGetRequestTimeline);
 
 export default router;

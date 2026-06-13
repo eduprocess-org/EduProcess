@@ -40,7 +40,7 @@ export class ProcedureController {
                 return res.status(401).json({ success: false, message: 'Unauthorized' });
             }
 
-            const { procedureId } = req.body;
+            const { procedureId, career, semester, reason } = req.body;
             if (!procedureId) {
                 return res.status(400).json({ success: false, message: 'procedureId is required' });
             }
@@ -50,7 +50,7 @@ export class ProcedureController {
                 return res.status(400).json({ success: false, message: 'At least one document is required' });
             }
 
-            const request = await this.procedureService.createRequest(studentId, procedureId, files);
+            const request = await this.procedureService.createRequest(studentId, procedureId, files, { career, semester, reason });
             res.status(201).json({ success: true, data: request });
         } catch (error) {
             this.handleError(error, res);
@@ -86,6 +86,60 @@ export class ProcedureController {
         }
     };
 
+    public updateRequestStatus = async (req: AuthRequest, res: Response) => {
+        try {
+            const userId = req.user?.userId;
+            const userRole = req.user?.role;
+            if (!userId || !userRole) {
+                return res.status(401).json({ success: false, message: 'Unauthorized' });
+            }
+
+            const { id } = req.params;
+            const { status, comment } = req.body;
+
+            if (!status) {
+                return res.status(400).json({ success: false, message: 'status is required' });
+            }
+
+            const request = await this.procedureService.updateRequestStatus(
+                id,
+                status,
+                userId,
+                userRole,
+                comment
+            );
+
+            res.status(200).json({ success: true, data: request });
+        } catch (error) {
+            this.handleError(error, res);
+        }
+    };
+
+    public getRequestTimeline = async (req: AuthRequest, res: Response) => {
+        try {
+            const studentId = req.user?.userId;
+            if (!studentId) {
+                return res.status(401).json({ success: false, message: 'Unauthorized' });
+            }
+
+            const { id } = req.params;
+            const timeline = await this.procedureService.getRequestTimeline(id, studentId);
+            res.status(200).json({ success: true, data: timeline });
+        } catch (error) {
+            this.handleError(error, res);
+        }
+    };
+
+    public adminGetRequestTimeline = async (req: AuthRequest, res: Response) => {
+        try {
+            const { id } = req.params;
+            const timeline = await this.procedureService.adminGetRequestTimeline(id);
+            res.status(200).json({ success: true, data: timeline });
+        } catch (error) {
+            this.handleError(error, res);
+        }
+    };
+
     private handleError(error: unknown, res: Response) {
         if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
             return res.status(400).json({ success: false, message: 'File exceeds the 5MB size limit' });
@@ -107,6 +161,14 @@ export class ProcedureController {
 
         if (message === 'Failed to upload document') {
             return res.status(502).json({ success: false, message });
+        }
+
+        if (message.startsWith('Invalid status transition')) {
+            return res.status(422).json({ success: false, message });
+        }
+
+        if (message === 'Only administrators can update request status') {
+            return res.status(403).json({ success: false, message });
         }
 
         logger.error('Unhandled error in ProcedureController', { error: message });

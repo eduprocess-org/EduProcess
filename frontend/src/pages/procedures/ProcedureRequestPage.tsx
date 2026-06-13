@@ -1,24 +1,21 @@
 import { useParams } from "react-router-dom";
 
 import ProcedureRequestForm from "../../components/forms/ProcedureRequestForm";
+import ProcedureDetailsSkeleton from "../../components/procedure-details/ProcedureDetailsSkeleton";
+import { useProcedureDetails } from "../../hooks/procedures/useProcedureDetails";
 
 function ProcedureRequestPage() {
   const { id } = useParams();
+  const { procedure, loading } = useProcedureDetails(id ?? "");
 
-  const mockProcedure = {
+  if (loading) {
+    return <ProcedureDetailsSkeleton />;
+  }
+
+  const displayProcedure = procedure ?? {
     id: id ?? "",
-    name: "Academic Certificate",
-    description:
-      "Request an official academic certificate.",
-    estimatedProcessingTime:
-      "3 Business Days",
-    dynamicFields: [
-      {
-        name: "reason",
-        label: "Reason",
-        type: "text",
-      },
-    ],
+    name: "Academic Procedure",
+    description: "Complete the form below to submit your request.",
   };
 
   return (
@@ -33,7 +30,7 @@ function ProcedureRequestPage() {
         </p>
       </div>
 
-      <ProcedureRequestForm procedure={mockProcedure} />
+      <ProcedureRequestForm procedure={displayProcedure} />
     </div>
   );
 }
