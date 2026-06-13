@@ -7,7 +7,7 @@
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
-    "test": "npm run build && node --test tests/auth/jwt-authentication.test.js tests/auth/auth-integration.test.js"
+    "test": "npm run build && node --test tests/auth/jwt-authentication.test.js tests/auth/auth-integration.test.js tests/procedures/procedure-integration.test.js"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +21,7 @@
     "dotenv": "^16.6.1",
     "express": "^4.22.2",
     "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
     "pg": "^8.21.0"
   },
   "devDependencies": {
@@ -28,6 +29,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.25",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.1.0",
     "@types/node": "^20.12.12",
     "@types/pg": "^8.20.0",
     "@types/supertest": "^7.2.0",
