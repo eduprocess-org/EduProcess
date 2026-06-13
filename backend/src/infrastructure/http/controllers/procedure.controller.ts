@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { ProcedureService } from '../../../application/procedures/procedure.service';
+import { logger } from '../../config/logger.config';
 
 interface AuthRequest extends Request {
     user?: {
@@ -91,11 +92,15 @@ export class ProcedureController {
             return res.status(404).json({ success: false, message });
         }
 
-        if (message === 'Failed to upload document') {
-            return res.status(502).json({ success: false, message }); // Bad Gateway
+        if (message === 'Procedure is not available for new requests') {
+            return res.status(409).json({ success: false, message });
         }
 
-        console.error('ProcedureController Error:', error);
+        if (message === 'Failed to upload document') {
+            return res.status(502).json({ success: false, message });
+        }
+
+        logger.error('Unhandled error in ProcedureController', { error: message });
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 }
