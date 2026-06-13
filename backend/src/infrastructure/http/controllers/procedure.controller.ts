@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import multer from 'multer';
 import { ProcedureService } from '../../../application/procedures/procedure.service';
 import { logger } from '../../config/logger.config';
 
@@ -86,8 +87,16 @@ export class ProcedureController {
     };
 
     private handleError(error: unknown, res: Response) {
+        if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({ success: false, message: 'File exceeds the 5MB size limit' });
+        }
+
         const message = error instanceof Error ? error.message : 'Internal server error';
-        
+
+        if (message.startsWith('Unsupported file type')) {
+            return res.status(400).json({ success: false, message });
+        }
+
         if (message === 'Procedure not found' || message === 'Request not found or unauthorized') {
             return res.status(404).json({ success: false, message });
         }
