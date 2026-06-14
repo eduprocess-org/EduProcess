@@ -2,9 +2,9 @@ name: EduProcess CI/CD Multi-Environment Pipeline
 
 on:
   push:
-    branches: [ develop, qa ]
+    branches: [ develop, qa, main ]
   pull_request:
-    branches: [ develop, qa ]
+    branches: [ develop, qa, main ]
 
 jobs:
   verify-frontend:
@@ -89,7 +89,7 @@ jobs:
     name: Build & Publish Images to Docker Hub
     runs-on: ubuntu-latest
     needs: [verify-frontend, verify-backend]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/qa')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/qa' || github.ref == 'refs/heads/main')
     steps:
       - name: Checkout Monorepo Code
         uses: actions/checkout@v4
@@ -116,7 +116,9 @@ jobs:
       - name: Determine Target Image Tag
         id: get-tag
         run: |
-          if [ "${{ github.ref }}" = "refs/heads/qa" ]; then
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "env_tag=prod" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/qa" ]; then
             echo "env_tag=qa" >> $GITHUB_OUTPUT
           else
             echo "env_tag=dev" >> $GITHUB_OUTPUT
@@ -139,7 +141,6 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/eduprocess-frontend:${{ steps.get-tag.outputs.env_tag }}
-
 
   deploy-qa:
     name: Deploy to AWS EC2 QA Environment
@@ -168,9 +169,44 @@ jobs:
           key: ${{ secrets.QA_SSH_KEY }}
           script: |
             cd ~/eduprocess-qa
-            
             mv docker-compose.qa.yml docker-compose.yml 2>/dev/null || true
             mv nginx.qa.conf nginx.conf 2>/dev/null || true
+            sudo systemctl stop nginx 2>/dev/null || true
+            sudo systemctl disable nginx 2>/dev/null || true
+            docker compose pull
+            docker compose up -d --remove-orphans
+            docker image prune -f
+
+  deploy-prod:
+    name: Deploy to AWS EC2 Production Environment
+    runs-on: ubuntu-latest
+    needs: publish-images
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout Monorepo Code
+        uses: actions/checkout@v4
+
+      - name: Copy Infrastructure Files to Production via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PROD_SSH_HOST }}
+          username: ubuntu
+          key: ${{ secrets.PROD_SSH_KEY }}
+          source: "infrastructure/docker-compose.prod.yml,infrastructure/nginx.prod.conf"
+          target: "~/eduprocess-prod"
+          strip_components: 1
+
+      - name: Execute Remote SSH Commands for Production Deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_SSH_HOST }}
+          username: ubuntu
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            cd ~/eduprocess-prod
+            
+            mv docker-compose.prod.yml docker-compose.yml 2>/dev/null || true
+            mv nginx.prod.conf nginx.conf 2>/dev/null || true
             
             sudo systemctl stop nginx 2>/dev/null || true
             sudo systemctl disable nginx 2>/dev/null || true
