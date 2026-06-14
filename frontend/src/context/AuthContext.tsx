@@ -33,7 +33,11 @@ export function AuthProvider({ children }: Props) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+<<<<<<< HEAD
   // 🔥 SAFE PARSE (evita romper app si localStorage está corrupto)
+=======
+  // SAFE PARSE 
+>>>>>>> develop
   const safeParseUser = (value: string | null): User | null => {
     if (!value) return null;
     try {
@@ -43,7 +47,11 @@ export function AuthProvider({ children }: Props) {
     }
   };
 
+<<<<<<< HEAD
   // 🔥 HYDRATION + SYNC INICIAL
+=======
+  // HYDRATION + SYNC INICIAL
+>>>>>>> develop
   useEffect(() => {
     const storedUser = safeParseUser(localStorage.getItem("user"));
     const storedToken = localStorage.getItem("sessionToken");
@@ -54,7 +62,11 @@ export function AuthProvider({ children }: Props) {
     setLoading(false);
   }, []);
 
+<<<<<<< HEAD
   // 🔥 SYNC ENTRE PESTAÑAS (IMPORTANTE EN PROYECTOS REALES)
+=======
+  //  SYNC ENTRE PESTAÑAS 
+>>>>>>> develop
   useEffect(() => {
     const syncAuth = () => {
       const storedUser = safeParseUser(localStorage.getItem("user"));
@@ -71,7 +83,11 @@ export function AuthProvider({ children }: Props) {
     };
   }, []);
 
+<<<<<<< HEAD
   // 🔐 LOGIN
+=======
+  // LOGIN
+>>>>>>> develop
   const login = (userData: User, sessionToken: string) => {
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("sessionToken", sessionToken);
@@ -80,7 +96,11 @@ export function AuthProvider({ children }: Props) {
     setToken(sessionToken);
   };
 
+<<<<<<< HEAD
   // 🚪 LOGOUT (FORZADO LIMPIO)
+=======
+  // LOGOUT 
+>>>>>>> develop
   const logout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("sessionToken");
@@ -89,7 +109,10 @@ export function AuthProvider({ children }: Props) {
     setUser(null);
     setToken(null);
 
+<<<<<<< HEAD
     // opcional pero útil en apps reales
+=======
+>>>>>>> develop
     window.location.href = "/login";
   };
 

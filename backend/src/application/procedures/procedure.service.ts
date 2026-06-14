@@ -1,0 +1,218 @@
+import { ProcedureRepository } from '../../domain/procedures/procedure.repository';
+import { supabase } from '../../infrastructure/config/supabase.config';
+import { logger } from '../../infrastructure/config/logger.config';
+import { isTransitionValid, STATUS_LABELS } from '../../domain/procedures/status-machine';
+import { StatusHistoryService } from './status-history.service';
+
+export class ProcedureService {
+    private readonly statusHistoryService: StatusHistoryService;
+
+    constructor(private readonly procedureRepository: ProcedureRepository) {
+        this.statusHistoryService = new StatusHistoryService();
+    }
+
+    async getAllProcedures() {
+        return this.procedureRepository.findAllActive();
+    }
+
+    async getProcedureDetails(id: string) {
+        const procedure = await this.procedureRepository.findById(id);
+        if (!procedure) {
+            logger.warn('Procedure not found', { procedureId: id });
+            throw new Error('Procedure not found');
+        }
+        return procedure;
+    }
+
+    async createRequest(
+        studentId: string,
+        procedureId: string,
+        files: Express.Multer.File[],
+        extra?: { career?: string; semester?: string; reason?: string }
+    ) {
+        logger.info('Procedure request creation attempt', { studentId, procedureId, fileCount: files.length });
+
+        if (!studentId) {
+            logger.warn('Request creation rejected: missing studentId');
+            throw new Error('Authenticated student required');
+        }
+
+        if (files.length === 0) {
+            logger.warn('Request creation rejected: no documents provided', { studentId, procedureId });
+            throw new Error('At least one document must be provided');
+        }
+
+        const procedure = await this.procedureRepository.findById(procedureId);
+
+        if (!procedure) {
+            logger.warn('Request creation rejected: procedure does not exist', { studentId, procedureId });
+            throw new Error('Procedure not found');
+        }
+
+        if (!procedure.isActive) {
+            logger.warn('Request creation rejected: procedure is inactive', { studentId, procedureId });
+            throw new Error('Procedure is not available for new requests');
+        }
+
+        const uploadedDocuments: Array<{ fileName: string; fileUrl: string }> = [];
+
+        for (const file of files) {
+            const fileExtension = file.originalname.split('.').pop();
+            const fileName = `${studentId}_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
+
+            const { error } = await supabase.storage
+                .from('documents')
+                .upload(fileName, file.buffer, {
+                    contentType: file.mimetype,
+                });
+
+            if (error) {
+                logger.error('Supabase storage upload failed', { studentId, procedureId, fileName, error: error.message });
+                throw new Error('Failed to upload document');
+            }
+
+            const { data: publicUrlData } = supabase.storage
+                .from('documents')
+                .getPublicUrl(fileName);
+
+            uploadedDocuments.push({
+                fileName: file.originalname,
+                fileUrl: publicUrlData.publicUrl,
+            });
+        }
+
+        const request = await this.procedureRepository.createRequest({
+            studentId,
+            procedureTypeId: procedureId,
+            documents: uploadedDocuments,
+            career: extra?.career,
+            semester: extra?.semester,
+            reason: extra?.reason,
+        });
+
+        await this.procedureRepository.createAuditLog(
+            request.id,
+            studentId,
+            'STATUS_CHANGE',
+            null,
+            'pending'
+        );
+
+        logger.info('Procedure request created successfully', { requestId: request.id, studentId, procedureId });
+
+        return request;
+    }
+
+    async getStudentRequests(studentId: string) {
+        return this.procedureRepository.findRequestsByStudent(studentId);
+    }
+
+    async getRequestTracking(requestId: string, studentId: string) {
+        const request = await this.procedureRepository.findRequestTracking(requestId, studentId);
+        if (!request) {
+            logger.warn('Request tracking not found or unauthorized', { requestId, studentId });
+            throw new Error('Request not found or unauthorized');
+        }
+        return request;
+    }
+
+    async updateRequestStatus(
+        requestId: string,
+        newStatus: string,
+        userId: string,
+        userRole: string,
+        comment?: string
+    ) {
+        logger.info('Status update attempt', { requestId, newStatus, userId, userRole });
+
+        if (userRole !== 'admin') {
+            logger.warn('Status update rejected: not authorized', { requestId, userId, userRole });
+            throw new Error('Only administrators can update request status');
+        }
+
+        const request = await this.procedureRepository.findByIdWithoutAuth(requestId);
+        if (!request) {
+            logger.warn('Status update rejected: request not found', { requestId });
+            throw new Error('Request not found');
+        }
+
+        const currentStatus = request.status;
+        if (!isTransitionValid(currentStatus, newStatus)) {
+            logger.warn('Status update rejected: invalid transition', {
+                requestId,
+                fromStatus: currentStatus,
+                toStatus: newStatus,
+            });
+            throw new Error(`Invalid status transition from ${currentStatus} to ${newStatus}`);
+        }
+
+        const updatedRequest = await this.procedureRepository.updateStatus({
+            requestId,
+            newStatus,
+            userId,
+            comment,
+        });
+
+        await this.procedureRepository.createAuditLog(
+            requestId,
+            userId,
+            'STATUS_CHANGE',
+            currentStatus,
+            newStatus
+        );
+
+        this.statusHistoryService.logStatusChange({
+            requestId,
+            fromStatus: currentStatus,
+            toStatus: newStatus,
+            userId,
+        });
+
+        logger.info('Request status updated successfully', {
+            requestId,
+            fromStatus: currentStatus,
+            toStatus: newStatus,
+            userId,
+        });
+
+        return updatedRequest;
+    }
+
+    async getRequestTimeline(requestId: string, studentId: string) {
+        const request = await this.procedureRepository.findRequestTracking(requestId, studentId);
+        if (!request) {
+            logger.warn('Request timeline not found or unauthorized', { requestId, studentId });
+            throw new Error('Request not found or unauthorized');
+        }
+
+        return this.statusHistoryService.buildTimeline(
+            {
+                createdAt: request.createdAt,
+                status: request.status,
+                observations: request.observations,
+                auditLogs: request.auditLogs,
+            },
+            STATUS_LABELS
+        );
+    }
+
+    async adminGetRequestTimeline(requestId: string) {
+        const request = await this.procedureRepository.findByIdWithoutAuth(requestId);
+        if (!request) {
+            logger.warn('Request timeline not found', { requestId });
+            throw new Error('Request not found');
+        }
+
+        const auditLogs = await this.procedureRepository.findAuditLogsByRequest(requestId);
+
+        return this.statusHistoryService.buildTimeline(
+            {
+                createdAt: request.createdAt,
+                status: request.status,
+                observations: request.observations,
+                auditLogs,
+            },
+            STATUS_LABELS
+        );
+    }
+}
