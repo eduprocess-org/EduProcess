@@ -3,7 +3,7 @@ import { login } from "../../services/auth/auth.service";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { toast } from "sonner"; // 
+import { toast } from "sonner"; 
 import { loginSchema, type LoginFormData } from "../../utils/validators";
 import { Eye, EyeOff, Loader2 } from "lucide-react"; 
 import { useAuth } from "../../hooks/useAuth";
@@ -22,6 +22,10 @@ function LoginForm() {
   const [isLoading, setIsLoading] = useState(false); 
 
   const navigate = useNavigate();
+
+  // 🛠️ REPARADO: Se reinyectó la firma de la función asíncrona y la apertura del bloque try
+  const onSubmit = async (data: LoginFormData) => {
+    try {
       setIsLoading(true); 
       const response = await login(data);
 
@@ -40,7 +44,7 @@ function LoginForm() {
     } catch (error: any) {
       console.error(error);
       
-      //  Feedback consistente usando Toasts de Sonner
+      // Feedback consistente usando Toasts de Sonner
       if (error.response?.status === 401) {
         toast.error("Invalid email or password");
       } else if (error.response?.status === 400) {
