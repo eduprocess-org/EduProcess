@@ -6,14 +6,18 @@ import {
 
 import AuthLayout from "../layouts/AuthLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
-
-import DashboardPage from "../pages/dashboard/DashboardPage";
+import StudentDashboardPage from "../pages/dashboard/StudentDashboardPage";
+import ProceduresCatalogPage from "../pages/procedures/ProceduresCatalogPage";
+import ProcedureDetailsPage from "../pages/procedures/ProcedureDetailsPage";
+import DashboardPage from "../pages/dashboard/StudentDashboardPage";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
-
+import ProcedureRequestPage from "../pages/procedures/ProcedureRequestPage";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import PublicRoute from "../components/auth/PublicRoute";
-
+import RequestTrackingPage
+  from "../pages/requests/RequestTrackingPage";
+  
 function AppRouter() {
   return (
     <BrowserRouter>
@@ -50,6 +54,31 @@ function AppRouter() {
           }
         >
           <Route index element={<DashboardPage />} />
+          <Route
+            path="/requests"
+            element={<StudentDashboardPage />}
+          />
+          
+          <Route
+            path="/procedures"
+            element={<ProceduresCatalogPage />}
+          />
+
+          <Route
+            path="/procedures/:id"
+            element={<ProcedureDetailsPage />}
+          />
+
+          <Route
+            path="/procedures/:id/request"
+            element={<ProcedureRequestPage />}
+          />
+
+         <Route
+          path="/requests/:requestId/tracking"
+          element={<RequestTrackingPage />}
+        />
+
         </Route>
 
       </Routes>

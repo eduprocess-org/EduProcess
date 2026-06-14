@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { registerSchema, type RegisterFormData } from "../../utils/validators";
 import { register as registerUser } from "../../services/auth/register.service";
-import { Eye, EyeOff, Loader2 } from "lucide-react"; // 🌟 Ícono de carga
+import { Eye, EyeOff, Loader2 } from "lucide-react"; 
 
 function RegisterForm() {
   const {
@@ -18,7 +18,7 @@ function RegisterForm() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // 🌟 Control de estado de carga
+  const [isLoading, setIsLoading] = useState(false); 
   const navigate = useNavigate();
 
   const onSubmit = async (data: RegisterFormData) => {
@@ -54,7 +54,7 @@ function RegisterForm() {
   return (
     <div className="bg-white p-10 rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md">
       <h2 className="text-3xl font-bold text-center text-[#0B2D63] mb-2">
-        Create Account 🎓
+        Create Account 
       </h2>
       <p className="text-center text-gray-500 mb-8">
         Join EduProcess and manage academic procedures online
@@ -130,6 +130,20 @@ function RegisterForm() {
           {errors.password && (
             <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
           )}
+           <p className="text-xs text-gray-500 mt-2">
+            Password must contain at least:
+            <br />
+            • 8 characters
+            <br />
+            • 1 uppercase letter
+            <br />
+            • 1 lowercase letter
+            <br />
+            • 1 number
+            <br />
+            • 1 special character
+          </p>
+
         </div>
 
         {/* CONFIRM PASSWORD */}
