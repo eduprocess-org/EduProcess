@@ -4,19 +4,11 @@ const apiBaseUrl = import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL 
   ? import.meta.env.VITE_API_URL 
   : "";
 
-<<<<<<< HEAD
-console.log("API URL =", apiBaseUrl || "Ruta Relativa Activa");
-
-=======
->>>>>>> develop
 export const apiClient = axios.create({
   baseURL: `${apiBaseUrl}/api/v1`,
   headers: {
     "Content-Type": "application/json",
   },
-<<<<<<< HEAD
-});
-=======
 });
 
 apiClient.interceptors.request.use((config) => {
@@ -96,4 +88,3 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
->>>>>>> develop
