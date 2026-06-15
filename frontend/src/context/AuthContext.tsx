@@ -88,8 +88,6 @@ export function AuthProvider({ children }: Props) {
 
     setUser(null);
     setToken(null);
-
-    window.location.href = "/login";
   };
 
   return (
