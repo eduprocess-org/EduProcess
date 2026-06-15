@@ -25,6 +25,7 @@ describe("RequestCard", () => {
         <RequestCard
           request={{
             id: "REQ-001",
+            procedureId: "PROC-001",
             procedureName:
               "Academic Certificate",
             status: "PENDING",

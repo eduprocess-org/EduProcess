@@ -5,6 +5,7 @@ export type RequestStatus =
 
 export interface StudentRequest {
   id: string;
+  procedureId: string;
   procedureName: string;
   status: RequestStatus;
   createdAt: string;
