@@ -1,6 +1,13 @@
+import { apiClient } from "../api/apiClient";
+
 export interface ProcedureRequestPayload {
   procedureId: string;
-  data: any;
+  data: {
+    career: string;
+    semester: string;
+    reason: string;
+    document: FileList;
+  };
 }
 
 export interface ProcedureRequestResponse {
@@ -11,14 +18,23 @@ export interface ProcedureRequestResponse {
 export async function createProcedureRequest(
   payload: ProcedureRequestPayload
 ): Promise<ProcedureRequestResponse> {
-  await new Promise((resolve) =>
-    setTimeout(resolve, 1500)
-  );
+  const formData = new FormData();
+  formData.append("procedureId", payload.procedureId);
 
-  console.log(payload);
+  formData.append("career", payload.data.career);
+  formData.append("semester", payload.data.semester);
+  formData.append("reason", payload.data.reason);
+
+  if (payload.data.document?.[0]) {
+    formData.append("documents", payload.data.document[0]);
+  }
+
+  const response = await apiClient.post("/requests", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 
   return {
-    requestId: crypto.randomUUID(),
-    status: "PENDING",
+    requestId: response.data.data.id,
+    status: response.data.data.status.toUpperCase(),
   };
 }
