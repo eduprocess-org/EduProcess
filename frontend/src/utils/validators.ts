@@ -24,6 +24,10 @@ export const registerSchema = z
       .string()
       .email("Invalid email address"),
 
+    career: z
+      .string()
+      .min(1, "Career is required"),
+
     password: z
       .string()
       .min(8, "Password must contain at least 8 characters")
@@ -44,8 +48,7 @@ export const registerSchema = z
         "Password must contain at least one special character"
       ),
 
-    confirmPassword: z
-      .string(),
+    confirmPassword: z.string(),
   })
 
   .refine((data) => data.password === data.confirmPassword, {

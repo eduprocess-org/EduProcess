@@ -8,6 +8,7 @@ export interface AuthUser {
   email: string;
   firstName: string;
   lastName: string;
+  career?: string;
   role: "student" | "admin";
 }
 
@@ -28,6 +29,7 @@ export interface RegisterRequest {
   lastName: string;
   email: string;
   password: string;
+  career: string;
 }
 
 export interface RegisterResponse {
@@ -38,6 +40,7 @@ export interface RegisterResponse {
     email: string;
     firstName: string;
     lastName: string;
+    career: string;
     role: string;
   };
 }
