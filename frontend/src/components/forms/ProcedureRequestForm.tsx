@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
-import { User, Briefcase, BookOpen, FileText, Paperclip, AlertCircle } from "lucide-react";
-
+import { User, Trash2,  Briefcase, BookOpen, FileText, Paperclip, AlertCircle } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { procedureRequestSchema } from "../../schemas/procedureRequest.schema";
 import { createProcedureRequest } from "../../services/procedures/procedureRequest.service";
@@ -18,10 +17,8 @@ interface Props {
 }
 
 interface FormData {
-  career: string;
   semester: string;
   reason: string;
-  document: FileList;
 }
 
 export default function ProcedureRequestForm({ procedure }: Props) {
@@ -31,7 +28,7 @@ export default function ProcedureRequestForm({ procedure }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [requestId, setRequestId] = useState<string | null>(null);
-
+  const [files, setFiles] = useState<File[]>([]);
   const {
     register,
     handleSubmit,
@@ -40,15 +37,85 @@ export default function ProcedureRequestForm({ procedure }: Props) {
     resolver: yupResolver(procedureRequestSchema),
   });
 
+  const handleFilesChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const selectedFiles = Array.from(
+      event.target.files || []
+    );
+
+    if (files.length + selectedFiles.length > 5) {
+      setError("You can upload a maximum of 5 files.");
+      return;
+    }
+
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+    ];
+
+    const validFiles: File[] = [];
+
+    for (const file of selectedFiles) {
+      // Validar formato
+      if (!allowedTypes.includes(file.type)) {
+        setError(
+          `${file.name} is not a valid file. Only PDF, JPG and PNG files are allowed.`
+        );
+        continue;
+      }
+
+      // Validar tamaño
+      if (file.size > 5 * 1024 * 1024) {
+        setError(
+          `${file.name} exceeds the maximum size of 5 MB.`
+        );
+        continue;
+      }
+
+      validFiles.push(file);
+    }
+
+    if (validFiles.length > 0) {
+      setError(null);
+    }
+
+    setFiles((prev) => [...prev, ...validFiles]);
+  };
+
+  const removeFile = (index: number) => {
+    setFiles((prev) =>
+      prev.filter((_, i) => i !== index)
+    );
+  };
+
   const onSubmit = async (data: FormData) => {
     if (loading) return;
+
+    if (files.length === 0) {
+      setError("Please upload at least one supporting document.");
+      return;
+    }
+
+    if (files.length > 5) {
+      setError("You can upload a maximum of 5 files.");
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
+
       const response = await createProcedureRequest({
         procedureId: procedure.id,
-        data,
+        data: {
+          ...data,
+          documents: files,
+        },
       });
+
       setRequestId(response.requestId);
     } catch (err: any) {
       setError(err.message || "Failed to submit request");
@@ -122,52 +189,24 @@ export default function ProcedureRequestForm({ procedure }: Props) {
 
         {/* Career */}
         <div>
-          <label 
-          htmlFor="career"
-          className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700">
+          <label
+            className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700"
+          >
             <BookOpen size={14} className="text-[#0B2D63]" />
             Career
           </label>
-          <select
-            id="career"
-            {...register("career")}
-            className="
-              w-full rounded-lg border border-slate-200 bg-slate-50
-              px-3 py-2.5 text-sm text-slate-800
-              outline-none transition
-              focus:border-[#0B2D63] focus:bg-white focus:ring-2 focus:ring-[#0B2D63]/10
-            "
-            >
-            <option value="">
-                Select your career
-            </option>
 
-            <option value="Information Systems">
-                Sistemas de la Información
-            </option>
-
-            <option value="Civil Engineering">
-                Ingeniería Civil
-            </option>
-
-            <option value="Mechanical Engineering">
-                Ingeniería Mecánica
-            </option>
-
-            <option value="Computer Graphics">
-                Computación Gráfica
-            </option>
-
-            <option value="Industrial Design">
-                Diseño Industrial
-            </option>
-            </select>
-          {errors.career?.message && (
-            <p className="mt-1.5 flex items-center gap-1 text-xs text-red-500">
-              <AlertCircle size={12} />
-              {errors.career.message}
-            </p>
-          )}
+          <input
+          type="text"
+          value={user?.career ?? "Not assigned"}
+          disabled
+          readOnly
+          className="
+            w-full rounded-lg border border-slate-200 bg-slate-100
+            px-3 py-2.5 text-sm text-slate-800
+            cursor-not-allowed
+          "
+          />
         </div>
 
         {/* Semester */}
@@ -231,14 +270,15 @@ export default function ProcedureRequestForm({ procedure }: Props) {
           )}
         </div>
 
-        {/* Document */}
+        {/* Documents */}
         <div>
-          <label 
-          htmlFor="document"
-          className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700">
+          <label
+            className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700"
+          >
             <Paperclip size={14} className="text-[#0B2D63]" />
-            Supporting Document
+            Supporting Documents
           </label>
+
           <div
             className="
               w-full rounded-lg border border-dashed border-slate-300 bg-slate-50
@@ -247,24 +287,71 @@ export default function ProcedureRequestForm({ procedure }: Props) {
             "
           >
             <input
-                id="document"
               type="file"
-              {...register("document")}
-              className="w-full cursor-pointer text-sm text-slate-500 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-[#0B2D63] file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-white hover:file:bg-[#09224E]"
+              multiple
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={handleFilesChange}
+              className="
+                w-full cursor-pointer text-sm text-slate-500
+                file:mr-3
+                file:cursor-pointer
+                file:rounded-lg
+                file:border-0
+                file:bg-[#0B2D63]
+                file:px-3
+                file:py-1.5
+                file:text-xs
+                file:font-medium
+                file:text-white
+              "
             />
-            <p className="mt-2 text-xs text-slate-400">
+
+            <p className="mt-2 text-xs text-slate-500">
               PDF, JPG or PNG accepted
             </p>
-          </div>
-          {errors.document?.message && (
-            <p className="mt-1.5 flex items-center gap-1 text-xs text-red-500">
-              <AlertCircle size={12} />
-              {errors.document.message}
+
+            <p className="text-xs text-amber-600 mt-1">
+              Maximum size: 5 MB per file
             </p>
+          </div>
+
+          {files.length > 0 && (
+            <div className="mt-4 space-y-2">
+              {files.map((file, index) => (
+                <div
+                  key={`${file.name}-${index}`}
+                  className="
+                    flex items-center justify-between
+                    rounded-lg border border-slate-200
+                    bg-white px-3 py-2
+                  "
+                >
+                  <div>
+                    <p className="text-sm font-medium">
+                      {file.name}
+                    </p>
+
+                    <p className="text-xs text-slate-500">
+                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => removeFile(index)}
+                    className="
+                      text-red-500
+                      hover:text-red-700
+                    "
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
-
       {/* Error banner */}
       {error && (
         <div className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
