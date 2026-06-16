@@ -3,10 +3,9 @@ import { apiClient } from "../api/apiClient";
 export interface ProcedureRequestPayload {
   procedureId: string;
   data: {
-    career: string;
     semester: string;
     reason: string;
-    document: FileList;
+  documents: File[];
   };
 }
 
@@ -21,12 +20,11 @@ export async function createProcedureRequest(
   const formData = new FormData();
   formData.append("procedureId", payload.procedureId);
 
-  formData.append("career", payload.data.career);
   formData.append("semester", payload.data.semester);
   formData.append("reason", payload.data.reason);
 
-  if (payload.data.document?.[0]) {
-    formData.append("documents", payload.data.document[0]);
+  if (payload.data.documents?.[0]) {
+    formData.append("documents", payload.data.documents[0]);
   }
 
   const response = await apiClient.post("/requests", formData, {
