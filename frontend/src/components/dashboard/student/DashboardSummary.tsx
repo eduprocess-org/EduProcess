@@ -1,5 +1,5 @@
 import { Files, Clock, CheckCircle, XCircle, TrendingUp, Check, X } from "lucide-react";
-import type { StudentRequest } from "../../types/studentRequest.types";
+import type { StudentRequest } from "../../../types/student/studentRequest.types";
 
 interface Props {
   requests: StudentRequest[];

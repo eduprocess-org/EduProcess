@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Eye, MapPin, Calendar, FileText, FileCheck, Receipt, GraduationCap } from "lucide-react";
-import type { StudentRequest } from "../../types/studentRequest.types";
+import type { StudentRequest } from "../../../types/student/studentRequest.types";
 
 interface Props {
   request: StudentRequest;
