@@ -11,8 +11,16 @@ export class ProcedureService {
         this.statusHistoryService = new StatusHistoryService();
     }
 
-    async getAllProcedures() {
-        return this.procedureRepository.findAllActive();
+    async getAllProcedures(studentId?: string) {
+        if (!studentId) {
+            return this.procedureRepository.findAllActive();
+        }
+
+        const studentCareer = await this.procedureRepository.findStudentCareer(studentId);
+        return this.procedureRepository.findAllActive(
+            studentCareer?.careerId ?? undefined,
+            studentCareer?.facultyId ?? undefined
+        );
     }
 
     async getProcedureDetails(id: string) {
@@ -81,11 +89,13 @@ export class ProcedureService {
             });
         }
 
+        const studentCareer = await this.procedureRepository.findStudentCareer(studentId);
+
         const request = await this.procedureRepository.createRequest({
             studentId,
             procedureTypeId: procedureId,
             documents: uploadedDocuments,
-            career: extra?.career,
+            career: studentCareer?.careerName ?? undefined,
             semester: extra?.semester,
             reason: extra?.reason,
         });
