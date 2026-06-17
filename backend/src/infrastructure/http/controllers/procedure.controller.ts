@@ -14,9 +14,10 @@ interface AuthRequest extends Request {
 export class ProcedureController {
     constructor(private readonly procedureService: ProcedureService) {}
 
-    public getProcedures = async (req: Request, res: Response) => {
+    public getProcedures = async (req: AuthRequest, res: Response) => {
         try {
-            const procedures = await this.procedureService.getAllProcedures();
+            const studentId = req.user?.userId;
+            const procedures = await this.procedureService.getAllProcedures(studentId);
             res.status(200).json({ success: true, data: procedures });
         } catch (error) {
             this.handleError(error, res);
@@ -40,7 +41,7 @@ export class ProcedureController {
                 return res.status(401).json({ success: false, message: 'Unauthorized' });
             }
 
-            const { procedureId, career, semester, reason } = req.body;
+            const { procedureId, semester, reason } = req.body;
             if (!procedureId) {
                 return res.status(400).json({ success: false, message: 'procedureId is required' });
             }
@@ -50,7 +51,7 @@ export class ProcedureController {
                 return res.status(400).json({ success: false, message: 'At least one document is required' });
             }
 
-            const request = await this.procedureService.createRequest(studentId, procedureId, files, { career, semester, reason });
+            const request = await this.procedureService.createRequest(studentId, procedureId, files, { semester, reason });
             res.status(201).json({ success: true, data: request });
         } catch (error) {
             this.handleError(error, res);
