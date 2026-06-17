@@ -46,6 +46,7 @@ export class AuthService {
             lastName,
             email,
             passwordHash,
+            careerId: request.careerId,
         };
 
         const createdUser = await this.authRepository.createStudentAccount(input);
@@ -85,6 +86,7 @@ export class AuthService {
             firstName: user.firstName,
             lastName: user.lastName,
             role: user.role,
+            career: (user as any).career?.name,
         };
 
         return {
@@ -131,6 +133,7 @@ export class AuthService {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 role: user.role,
+                career: (user as any).career?.name,
             };
 
             return {
