@@ -3,7 +3,7 @@ import { apiClient } from "../api/apiClient";
 import type {
   RegisterRequest ,
   RegisterResponse,
-} from "../../types/auth.types";
+} from "../../types/auth/auth.types";
 
 export const register = async (
   data: RegisterRequest

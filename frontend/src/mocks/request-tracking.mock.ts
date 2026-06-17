@@ -1,6 +1,6 @@
 import type {
   RequestTracking,
-} from "../types/request-tracking.types";
+} from "../types/student/request-tracking.types";
 
 export const mockRequestTracking: RequestTracking[] = [
   {

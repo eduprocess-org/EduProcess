@@ -1,17 +1,30 @@
-import { apiClient } from "../api/apiClient";
-import type {
-  LoginRequest,
-  LoginResponse,
-} from "../../types/auth.types";
+import { mockUsers } from "../../mocks/auth.mock";
+import type { LoginRequest } from "../../types/auth/auth.types";
 
-export const login = async (
-  credentials: LoginRequest
-): Promise<LoginResponse> => {
-
-  const response = await apiClient.post(
-    "/auth/login",
-    credentials
+export const login = async (credentials: LoginRequest) => {
+  const user = mockUsers.find(
+    (u) =>
+      u.email === credentials.email &&
+      u.password === credentials.password
   );
 
-  return response.data;
+  if (!user) {
+    throw {
+      response: {
+        status: 401,
+      },
+    };
+  }
+
+  return {
+    success: true,
+    message: "Login successful",
+    data: {
+      user,
+      tokens: {
+        sessionToken: "mock-token",
+        refreshToken: "mock-refresh",
+      },
+    },
+  };
 };
