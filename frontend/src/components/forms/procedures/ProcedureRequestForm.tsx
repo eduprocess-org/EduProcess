@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
-import { User, Trash2,  Briefcase, BookOpen, FileText, Paperclip, AlertCircle } from "lucide-react";
+import { User, Trash2, Briefcase, BookOpen, FileText, Paperclip, AlertCircle } from "lucide-react";
 import { useAuth } from "../../../hooks/useAuth";
 import { procedureRequestSchema } from "../../../schemas/procedureRequest.schema";
 import { createProcedureRequest } from "../../../services/student/procedures/procedureRequest.service";
