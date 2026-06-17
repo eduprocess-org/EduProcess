@@ -4,11 +4,11 @@ import {
 } from "react";
 
 import { getProcedureDetails }
-  from "../../services/procedures/procedure-details.service";
+  from "../../services/student/procedures/procedure-details.service";
 
 import type {
   ProcedureDetails,
-} from "../../types/procedure-details.types";
+} from "../../types/procedures/procedure-details.types";
 
 export function useProcedureDetails(
   id: string

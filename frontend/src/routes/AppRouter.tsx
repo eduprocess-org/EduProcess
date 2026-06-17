@@ -6,18 +6,23 @@ import {
 
 import AuthLayout from "../layouts/AuthLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
-import StudentDashboardPage from "../pages/dashboard/StudentDashboardPage";
-import ProceduresCatalogPage from "../pages/procedures/ProceduresCatalogPage";
-import ProcedureDetailsPage from "../pages/procedures/ProcedureDetailsPage";
-import DashboardPage from "../pages/dashboard/StudentDashboardPage";
+
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
-import ProcedureRequestPage from "../pages/procedures/ProcedureRequestPage";
+
+import StudentDashboardPage from "../pages/student/dashboard/StudentDashboardPage";
+
+import ProceduresCatalogPage from "../pages/student/procedures/ProceduresCatalogPage";
+import ProcedureDetailsPage from "../pages/student/procedures/ProcedureDetailsPage";
+import ProcedureRequestPage from "../pages/student/procedures/ProcedureRequestPage";
+
+import RequestTrackingPage from "../pages/student/requests/RequestTrackingPage";
+
+import AdminDashboardPage from "../pages/admin/dashboard/AdminDashboardPage";
+
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import PublicRoute from "../components/auth/PublicRoute";
-import RequestTrackingPage
-  from "../pages/requests/RequestTrackingPage";
-  
+
 function AppRouter() {
   return (
     <BrowserRouter>
@@ -44,7 +49,7 @@ function AppRouter() {
           />
         </Route>
 
-        {/* DASHBOARD */}
+        {/* STUDENT */}
         <Route
           path="/"
           element={
@@ -53,32 +58,54 @@ function AppRouter() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<DashboardPage />} />
+          {/* Dashboard principal */}
           <Route
-            path="/requests"
+            index
             element={<StudentDashboardPage />}
           />
-          
+
+          {/* My Requests */}
           <Route
-            path="/procedures"
+            path="requests"
+            element={<StudentDashboardPage />}
+          />
+
+          {/* Procedures */}
+          <Route
+            path="procedures"
             element={<ProceduresCatalogPage />}
           />
 
           <Route
-            path="/procedures/:id"
+            path="procedures/:id"
             element={<ProcedureDetailsPage />}
           />
 
           <Route
-            path="/procedures/:id/request"
+            path="procedures/:id/request"
             element={<ProcedureRequestPage />}
           />
 
-         <Route
-          path="/requests/:requestId/tracking"
-          element={<RequestTrackingPage />}
-        />
+          {/* Request Tracking */}
+          <Route
+            path="requests/:requestId/tracking"
+            element={<RequestTrackingPage />}
+          />
+        </Route>
 
+        {/* ADMIN */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute roles={["admin"]}>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            index
+            element={<AdminDashboardPage />}
+          />
         </Route>
 
       </Routes>
