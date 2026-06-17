@@ -32,3 +32,9 @@ coverage/
 # OS
 Thumbs.db
 documents/
+
+# Documentation (local only, exported to Word)
+docs/
+
+# MiCode local data
+.mimocode/
