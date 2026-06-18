@@ -29,7 +29,7 @@ export interface RegisterRequest {
   lastName: string;
   email: string;
   password: string;
-  career: string;
+  careerId?: string;
 }
 
 export interface RegisterResponse {
