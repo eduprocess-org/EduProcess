@@ -7,7 +7,8 @@
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
-    "test": "npm run build && node --test tests/auth/jwt-authentication.test.js tests/auth/auth-integration.test.js tests/auth/careers.test.js tests/procedures/procedure-integration.test.js tests/procedures/procedure-unit.test.js tests/procedures/file-upload.test.js tests/procedures/status-machine.test.js tests/procedures/status-update.test.js tests/procedures/timeline.test.js tests/procedures/full-flow.test.js"
+    "test": "npm run build && node --test tests/auth/jwt-authentication.test.js tests/auth/auth-integration.test.js tests/auth/careers.test.js tests/procedures/procedure-integration.test.js tests/procedures/procedure-unit.test.js tests/procedures/file-upload.test.js tests/procedures/status-machine.test.js tests/procedures/status-update.test.js tests/procedures/timeline.test.js tests/procedures/full-flow.test.js tests/admin/admin-dashboard-unit.test.js tests/admin/admin-dashboard-integration.test.js",
+    "seed:admin": "node prisma/seeds/admin.seed.js"
   },
   "keywords": [],
   "author": "",
