@@ -24,7 +24,7 @@ export const registerSchema = z
       .string()
       .email("Invalid email address"),
 
-    career: z
+    careerId: z
       .string()
       .min(1, "Career is required"),
 
