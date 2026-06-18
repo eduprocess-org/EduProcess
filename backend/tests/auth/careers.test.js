@@ -14,7 +14,7 @@ const { authMiddleware } = require('../../dist/infrastructure/http/middlewares/a
 const { generateSessionToken } = require('../../dist/infrastructure/config/jwt.config.js');
 const { Router } = require('express');
 
-// ─── Mock prisma ─────────────────────────────────────────────────────────────
+// ─── Mock service ─────────────────────────────────────────────────────────────
 
 const mockCareers = [
     {
@@ -31,15 +31,10 @@ const mockCareers = [
     },
 ];
 
-// We need to mock the prisma import at module level
-// Since the controller imports from database.config, we override it
-const originalModule = require.cache[require.resolve('../../dist/infrastructure/persistence/database.config.js')];
-if (originalModule) {
-    originalModule.exports.prisma = {
-        career: {
-            findMany: async () => mockCareers,
-        },
-    };
+class MockCareerService {
+    async getAllCareers() {
+        return mockCareers;
+    }
 }
 
 // ─── Build test Express app ───────────────────────────────────────────────────
@@ -48,7 +43,8 @@ const buildTestApp = () => {
     const app = express();
     app.use(express.json());
 
-    const careerController = new CareerController();
+    const service = new MockCareerService();
+    const careerController = new CareerController(service);
 
     const router = Router();
     router.get('/careers', authMiddleware, careerController.getAll);
