@@ -21,6 +21,7 @@ function RegisterForm() {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: { careerId: "" },
@@ -239,15 +240,9 @@ function RegisterForm() {
                 <div className="relative">
                   <select
                     disabled={isLoading}
-                    defaultValue=""
                     className={inputCls(!!errors.careerId) + " appearance-none pr-8 cursor-pointer"}
                     {...register("careerId")}
-                    onChange={(e) => {
-                      e.target.style.color = e.target.value === "" ? "#CBD5E1" : "#334155";
-                    }}
-                    ref={(el) => {
-                      if (el) el.style.color = el.value === "" ? "#CBD5E1" : "#334155";
-                    }}
+                    style={{ color: watch("careerId") ? "#334155" : "#CBD5E1" }}
                   >
                     <option value="" disabled style={{ color: "#94a3b8" }}>Select your career</option>
                     {careers.map((career) => (

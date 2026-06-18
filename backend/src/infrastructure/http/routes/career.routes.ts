@@ -10,6 +10,6 @@ const repository = new PrismaCareerRepository();
 const service = new CareerService(repository);
 const controller = new CareerController(service);
 
-careerRouter.get('/careers', authMiddleware, controller.getAll);
+careerRouter.get('/careers', controller.getAll);
 
 export default careerRouter;
