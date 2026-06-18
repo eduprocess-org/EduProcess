@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AdminDashboardService } from "../../../application/admin/admin-dashboard.service";
-import { logger } from "../../config/logger.config";
+import { handleError } from "../utils/error-handler";
 
 export class AdminDashboardController {
   constructor(private readonly adminDashboardService: AdminDashboardService) {}
@@ -10,7 +10,7 @@ export class AdminDashboardController {
       const stats = await this.adminDashboardService.getDashboardStats();
       res.status(200).json({ success: true, data: stats });
     } catch (error) {
-      this.handleError(error, res);
+      handleError(error, res, "AdminDashboardController");
     }
   };
 
@@ -19,7 +19,7 @@ export class AdminDashboardController {
       const requests = await this.adminDashboardService.getRecentRequests();
       res.status(200).json({ success: true, data: requests });
     } catch (error) {
-      this.handleError(error, res);
+      handleError(error, res, "AdminDashboardController");
     }
   };
 
@@ -28,7 +28,7 @@ export class AdminDashboardController {
       const data = await this.adminDashboardService.getRequestsByProcedureType();
       res.status(200).json({ success: true, data });
     } catch (error) {
-      this.handleError(error, res);
+      handleError(error, res, "AdminDashboardController");
     }
   };
 
@@ -54,7 +54,7 @@ export class AdminDashboardController {
 
       res.status(200).json({ success: true, data: result });
     } catch (error) {
-      this.handleError(error, res);
+      handleError(error, res, "AdminDashboardController");
     }
   };
 
@@ -64,7 +64,7 @@ export class AdminDashboardController {
       const detail = await this.adminDashboardService.getRequestDetail(id);
       res.status(200).json({ success: true, data: detail });
     } catch (error) {
-      this.handleError(error, res);
+      handleError(error, res, "AdminDashboardController");
     }
   };
 
@@ -74,7 +74,7 @@ export class AdminDashboardController {
       const documents = await this.adminDashboardService.getRequestDocuments(id);
       res.status(200).json({ success: true, data: documents });
     } catch (error) {
-      this.handleError(error, res);
+      handleError(error, res, "AdminDashboardController");
     }
   };
 
@@ -84,19 +84,7 @@ export class AdminDashboardController {
       const history = await this.adminDashboardService.getRequestHistory(id);
       res.status(200).json({ success: true, data: history });
     } catch (error) {
-      this.handleError(error, res);
+      handleError(error, res, "AdminDashboardController");
     }
   };
-
-  private handleError(error: unknown, res: Response) {
-    const message =
-      error instanceof Error ? error.message : "Internal server error";
-
-    if (message === "Request not found") {
-      return res.status(404).json({ success: false, message });
-    }
-
-    logger.error("Unhandled error in AdminDashboardController", { error: message });
-    res.status(500).json({ success: false, message: "Internal server error" });
-  }
 }
