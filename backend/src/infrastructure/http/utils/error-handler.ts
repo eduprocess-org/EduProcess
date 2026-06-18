@@ -9,6 +9,7 @@ interface ErrorMapping {
 const ERROR_MAPPINGS: ErrorMapping[] = [
   { message: "Request not found", status: 404 },
   { message: "Procedure not found", status: 404 },
+  { message: "Observation not found", status: 404 },
   { message: "Request not found or unauthorized", status: 404 },
   { message: "A user with this email already exists", status: 409 },
   { message: "Only institutional emails ending in @uce.edu.ec are allowed", status: 400 },
