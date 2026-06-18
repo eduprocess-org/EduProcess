@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    image: xfrixonl/eduprocess-backend:prod
+    container_name: eduprocess-backend-prod
+    restart: always
+    env_file:
+      - .env
+    command: sh -c "DATABASE_URL=postgresql://postgres.erlpwsbpfwcyukfdpphm:rP3jC3k4dJjOCio6@aws-1-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true node dist/app.js"
+    networks:
+      - eduprocess-prod-network
+
+  frontend:
+    image: xfrixonl/eduprocess-frontend:prod
+    container_name: eduprocess-frontend-prod
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - eduprocess-prod-network
+
+  nginx:
+    image: nginx:1.25.5-alpine
+    container_name: eduprocess-nginx-prod
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - eduprocess-prod-network
+    depends_on:
+      - backend
+      - frontend
+
+networks:
+  eduprocess-prod-network:
+    driver: bridge

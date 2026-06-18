@@ -33,7 +33,7 @@ export function AuthProvider({ children }: Props) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔥 SAFE PARSE (evita romper app si localStorage está corrupto)
+  // SAFE PARSE 
   const safeParseUser = (value: string | null): User | null => {
     if (!value) return null;
     try {
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: Props) {
     }
   };
 
-  // 🔥 HYDRATION + SYNC INICIAL
+  // HYDRATION + SYNC INICIAL
   useEffect(() => {
     const storedUser = safeParseUser(localStorage.getItem("user"));
     const storedToken = localStorage.getItem("sessionToken");
@@ -54,7 +54,7 @@ export function AuthProvider({ children }: Props) {
     setLoading(false);
   }, []);
 
-  // 🔥 SYNC ENTRE PESTAÑAS (IMPORTANTE EN PROYECTOS REALES)
+  //  SYNC ENTRE PESTAÑAS 
   useEffect(() => {
     const syncAuth = () => {
       const storedUser = safeParseUser(localStorage.getItem("user"));
@@ -71,7 +71,7 @@ export function AuthProvider({ children }: Props) {
     };
   }, []);
 
-  // 🔐 LOGIN
+  // LOGIN
   const login = (userData: User, sessionToken: string) => {
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("sessionToken", sessionToken);
@@ -80,7 +80,7 @@ export function AuthProvider({ children }: Props) {
     setToken(sessionToken);
   };
 
-  // 🚪 LOGOUT (FORZADO LIMPIO)
+  // LOGOUT 
   const logout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("sessionToken");
@@ -88,9 +88,6 @@ export function AuthProvider({ children }: Props) {
 
     setUser(null);
     setToken(null);
-
-    // opcional pero útil en apps reales
-    window.location.href = "/login";
   };
 
   return (
