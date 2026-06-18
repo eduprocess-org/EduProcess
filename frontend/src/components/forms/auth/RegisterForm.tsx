@@ -2,11 +2,19 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { registerSchema, type RegisterFormData } from "../../../utils/validators";
 import { register as registerUser } from "../../../services/auth/register.service";
+import { apiClient } from "../../../services/api/apiClient";
 import { Eye, EyeOff, Loader2, BookOpen, Users, Award } from "lucide-react";
 import logo from "../../../assets/images/Logo.jpeg";
+
+interface Career {
+  id: string;
+  name: string;
+  description: string;
+  faculty: { id: string; name: string };
+}
 
 function RegisterForm() {
   const {
@@ -15,13 +23,26 @@ function RegisterForm() {
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { career: "" },
+    defaultValues: { careerId: "" },
   });
 
+  const [careers, setCareers] = useState<Career[]>([]);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCareers = async () => {
+      try {
+        const response = await apiClient.get("/careers");
+        setCareers(response.data.data);
+      } catch (error) {
+        console.error("Error loading careers:", error);
+      }
+    };
+    fetchCareers();
+  }, []);
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
@@ -31,7 +52,7 @@ function RegisterForm() {
         lastName: data.lastName,
         email: data.email,
         password: data.password,
-        career: data.career,
+        careerId: data.careerId,
       });
       toast.success(response.message || "Account created successfully!");
       setTimeout(() => {
@@ -214,13 +235,13 @@ function RegisterForm() {
               </Field>
 
               {/* Career */}
-              <Field label="Career" error={errors.career?.message}>
+              <Field label="Career" error={errors.careerId?.message}>
                 <div className="relative">
                   <select
                     disabled={isLoading}
                     defaultValue=""
-                    className={inputCls(!!errors.career) + " appearance-none pr-8 cursor-pointer"}
-                    {...register("career")}
+                    className={inputCls(!!errors.careerId) + " appearance-none pr-8 cursor-pointer"}
+                    {...register("careerId")}
                     onChange={(e) => {
                       e.target.style.color = e.target.value === "" ? "#CBD5E1" : "#334155";
                     }}
@@ -229,11 +250,11 @@ function RegisterForm() {
                     }}
                   >
                     <option value="" disabled style={{ color: "#94a3b8" }}>Select your career</option>
-                    <option value="Information Systems" style={{ color: "#334155" }}>Information Systems</option>
-                    <option value="Civil Engineering" style={{ color: "#334155" }}>Civil Engineering</option>
-                    <option value="Computer Graphics Engineering" style={{ color: "#334155" }}>Computer Graphics Engineering</option>
-                    <option value="Industrial Engineering" style={{ color: "#334155" }}>Industrial Engineering</option>
-                    <option value="Mechanical Engineering" style={{ color: "#334155" }}>Mechanical Engineering</option>
+                    {careers.map((career) => (
+                      <option key={career.id} value={career.id} style={{ color: "#334155" }}>
+                        {career.name}
+                      </option>
+                    ))}
                   </select>
                   {/* chevron */}
                   <svg className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -242,6 +263,7 @@ function RegisterForm() {
                 </div>
               </Field>
 
+              {/* Password */}
               <Field label="Password" error={errors.password?.message}>
                 <div className="relative">
                   <input
@@ -270,6 +292,7 @@ function RegisterForm() {
                 </ul>
               </Field>
 
+              {/* Confirm Password */}
               <Field label="Confirm Password" error={errors.confirmPassword?.message}>
                 <div className="relative">
                   <input

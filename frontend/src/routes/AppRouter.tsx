@@ -19,7 +19,7 @@ import ProcedureRequestPage from "../pages/student/procedures/ProcedureRequestPa
 import RequestTrackingPage from "../pages/student/requests/RequestTrackingPage";
 
 import AdminDashboardPage from "../pages/admin/dashboard/AdminDashboardPage";
-
+import RequestManagementPage from "../pages/admin/requests/RequestsManagementPage";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import PublicRoute from "../components/auth/PublicRoute";
 
@@ -105,6 +105,11 @@ function AppRouter() {
           <Route
             index
             element={<AdminDashboardPage />}
+          />
+
+          <Route
+              path="/admin/requests"
+              element={<RequestManagementPage />}
           />
         </Route>
 

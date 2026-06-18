@@ -1,46 +1,23 @@
-import AdminDashboardSummary
-  from "../../../components/dashboard/admin/AdminDashboardSummary";
+import AdminDashboardSummary from "../../../components/dashboard/admin/AdminDashboardSummary";
+import AdminRecentRequests from "../../../components/dashboard/admin/AdminRecentRequests";
+import AdminQuickActions from "../../../components/dashboard/admin/AdminQuickActions";
+import AdminDashboardLoading from "../../../components/dashboard/admin/AdminDashboardLoading";
+import AdminDashboardError from "../../../components/dashboard/admin/AdminDashboardError";
+import { useAdminDashboard } from "../../../hooks/admin/useAdminDashboard";
+import { Zap, ListChecks } from "lucide-react";
 
-import AdminRecentRequests
-  from "../../../components/dashboard/admin/AdminRecentRequests";
-
-import AdminQuickActions
-  from "../../../components/dashboard/admin/AdminQuickActions";
-
-import AdminDashboardLoading
-  from "../../../components/dashboard/admin/AdminDashboardLoading";
-
-import AdminDashboardError
-  from "../../../components/dashboard/admin/AdminDashboardError";
-
-import { useAdminDashboard }
-  from "../../../hooks/admin/useAdminDashboard";
-
-import { LayoutDashboard, Zap, ListChecks } from "lucide-react";
+const navy   = "#1B2B5E";
+const blue   = "#2563EB";
+const border = "#E4EAF4";
+const muted  = "#64748B";
+const bgPage = "#F0F4FA";
 
 function AdminDashboardPage() {
-  const {
-    stats,
-    requests,
-    loading,
-    error,
-  } = useAdminDashboard();
+  const { stats, requests, loading, error } = useAdminDashboard();
 
-  if (loading) {
-    return <AdminDashboardLoading />;
-  }
-
-  if (error) {
-    return (
-      <AdminDashboardError
-        message={error}
-      />
-    );
-  }
-
-  if (!stats) {
-    return null;
-  }
+  if (loading) return <AdminDashboardLoading />;
+  if (error)   return <AdminDashboardError message={error} />;
+  if (!stats)  return null;
 
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -49,22 +26,18 @@ function AdminDashboardPage() {
   });
 
   return (
-    <div className="space-y-8 pb-10">
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: bgPage,
+        padding: "0.75rem 2.5rem 3rem",
+      }}
+    >
+      <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", flexDirection: "column", gap: "2rem" }}>
 
-      {/* Header */}
+        {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-              style={{ background: "rgba(11,45,99,0.08)" }}
-            >
-              <LayoutDashboard size={16} style={{ color: "#0B2D63" }} />
-            </div>
-            <span className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-              Admin panel
-            </span>
-          </div>
 
           <h1 className="text-3xl font-bold text-[#0B2D63] tracking-tight">
             Administrator Dashboard
@@ -80,39 +53,100 @@ function AdminDashboardPage() {
         </span>
       </div>
 
-      {/* Summary */}
-      <AdminDashboardSummary
-        total={stats.totalRequests}
-        pending={stats.pendingRequests}
-        approved={stats.approvedRequests}
-        rejected={stats.rejectedRequests}
+        {/* ── Summary stats ── */}
+        <div>
+          <AdminDashboardSummary
+            total={stats.totalRequests}
+            pending={stats.pendingRequests}
+            approved={stats.approvedRequests}
+            rejected={stats.rejectedRequests}
+          />
+        </div>
+
+        {/* ── Quick actions ── */}
+        <section>
+          <SectionLabel icon={<Zap size={13} />} label="Quick actions" />
+          <AdminQuickActions />
+        </section>
+
+        {/* ── Recent requests ── */}
+        <section>
+          <SectionLabel icon={<ListChecks size={13} />} label="Recent requests" />
+          <div
+            style={{
+              backgroundColor: "#ffffff",
+              border: `1px solid ${border}`,
+              borderRadius: 16,
+              overflow: "hidden",
+            }}
+          >
+            {/* thin accent bar */}
+            <div
+              style={{
+                height: 3,
+                background: `linear-gradient(90deg, ${navy} 0%, ${blue} 100%)`,
+              }}
+            />
+            <AdminRecentRequests requests={requests} />
+          </div>
+        </section>
+
+      </div>
+    </div>
+  );
+}
+
+function SectionLabel({
+  icon,
+  label,
+}: {
+  icon: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 7,
+        marginBottom: "0.75rem",
+      }}
+    >
+      <span
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 24,
+          height: 24,
+          borderRadius: 7,
+          backgroundColor: "#EFF6FF",
+          color: blue,
+          flexShrink: 0,
+        }}
+      >
+        {icon}
+      </span>
+      <h2
+        style={{
+          fontSize: "0.72rem",
+          fontWeight: 700,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          color: muted,
+          margin: 0,
+        }}
+      >
+        {label}
+      </h2>
+      <div
+        style={{
+          flex: 1,
+          height: 1,
+          backgroundColor: border,
+          marginLeft: 4,
+        }}
       />
-
-      {/* Quick actions */}
-      <section>
-        <div className="flex items-center gap-2 mb-3">
-          <Zap size={14} style={{ color: "#1A52A8" }} />
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Quick actions
-          </h2>
-        </div>
-
-        <AdminQuickActions />
-      </section>
-
-      {/* Recent requests */}
-      <section>
-        <div className="flex items-center gap-2 mb-3">
-          <ListChecks size={14} style={{ color: "#1A52A8" }} />
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Recent requests
-          </h2>
-        </div>
-
-        <AdminRecentRequests
-          requests={requests}
-        />
-      </section>
     </div>
   );
 }

@@ -3,6 +3,8 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import authRouter from './infrastructure/http/routes/auth.routes';
 import procedureRouter from './infrastructure/http/routes/procedure.routes';
+import careerRouter from './infrastructure/http/routes/career.routes';
+import adminDashboardRouter from './infrastructure/http/routes/admin-dashboard.routes';
 
 const app: Application = express();
 
@@ -11,6 +13,8 @@ app.use(cors());
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1', procedureRouter);
+app.use('/api/v1', careerRouter);
+app.use('/api/v1', adminDashboardRouter);
 
 app.get('/api/v1/health', (req: Request, res: Response) => {
     res.status(200).json({

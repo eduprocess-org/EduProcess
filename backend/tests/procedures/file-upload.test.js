@@ -26,7 +26,7 @@ const FILE_SIZE_LIMIT = 5 * 1024 * 1024; // 5MB
 // ─── Mock Service ─────────────────────────────────────────────────────────────
 
 class MockProcedureService {
-    async getAllProcedures() { return []; }
+    async getAllProcedures(studentId) { return []; }
     async getProcedureDetails(id) { throw new Error('Procedure not found'); }
     async createRequest(studentId, procedureId, files) {
         return { id: 'req-new', studentId, procedureTypeId: procedureId, status: 'pending', documents: [] };

@@ -9,10 +9,40 @@ import {
 } from '../../../domain/procedures/procedure.types';
 
 export class PrismaProcedureRepository implements ProcedureRepository {
-    async findAllActive(): Promise<ProcedureTypeDTO[]> {
+    async findAllActive(userCareerId?: string, userFacultyId?: string): Promise<ProcedureTypeDTO[]> {
+        const conditions: any[] = [
+            { careerId: null, facultyId: null },
+        ];
+
+        if (userFacultyId) {
+            conditions.push({ facultyId: userFacultyId });
+        }
+
+        if (userCareerId) {
+            conditions.push({ careerId: userCareerId });
+        }
+
         return prisma.procedureType.findMany({
-            where: { isActive: true },
+            where: {
+                isActive: true,
+                OR: conditions,
+            },
         });
+    }
+
+    async findStudentCareer(studentId: string): Promise<{ careerId: string | null; facultyId: string | null; careerName: string | null } | null> {
+        const user = await prisma.user.findUnique({
+            where: { id: studentId },
+            include: { career: true },
+        });
+
+        if (!user) return null;
+
+        return {
+            careerId: user.careerId,
+            facultyId: user.career?.facultyId ?? null,
+            careerName: user.career?.name ?? null,
+        };
     }
 
     async findById(id: string): Promise<ProcedureTypeDTO | null> {
