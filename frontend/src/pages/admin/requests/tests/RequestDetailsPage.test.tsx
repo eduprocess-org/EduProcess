@@ -15,6 +15,15 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
+// Mock de sonner para evitar errores de renderizado en el entorno de pruebas
+vi.mock("sonner", () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+  },
+}));
+
 describe("RequestDetailsPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -47,10 +56,11 @@ describe("RequestDetailsPage", () => {
     expect(screen.getByText("Carlos Andrés Vera")).toBeInTheDocument();
     expect(screen.getByText("carlos.vera@uce.edu.ec")).toBeInTheDocument();
     
-    expect(screen.getByText("Comprobante_Pago_Aranceles.pdf")).toBeInTheDocument();
+    // Cambiado para hacer match con el mock en inglés de la UI
+    expect(screen.getByText("Fee_Payment_Receipt.pdf")).toBeInTheDocument();
   });
 
-  it("executes approval workflow updates successfully", async () => {
+  it("executes approval workflow updates successfully after confirmation modal", async () => {
     const user = userEvent.setup();
     renderComponent("REQ-888");
 
@@ -58,14 +68,24 @@ describe("RequestDetailsPage", () => {
       expect(screen.queryByText(/loading request details…/i)).not.toBeInTheDocument();
     });
 
+    // 1. Clic en el botón principal de aprobación
     const approveButton = screen.getByRole("button", { name: /approve request/i });
     await user.click(approveButton);
 
+    // 2. Verificar que el modal de confirmación se abrió
+    expect(screen.getByText("Confirm Status Transition")).toBeInTheDocument();
+
+    // 3. Confirmar la acción haciendo clic en el botón del modal
+    const confirmButton = screen.getByRole("button", { name: /yes, confirm update/i });
+    await user.click(confirmButton);
+
+    // 4. Esperar a que la UI actualice el estado a APPROVED
     await waitFor(() => {
-    const approvedElements = screen.getAllByText(/APPROVED/i);
-    expect(approvedElements.length).toBeGreaterThan(0);
+      const approvedElements = screen.getAllByText(/APPROVED/i);
+      expect(approvedElements.length).toBeGreaterThan(0);
     });
 
+    // 5. Los botones de acción deben desaparecer al ser estado terminal
     expect(screen.queryByRole("button", { name: /approve request/i })).not.toBeInTheDocument();
   });
 
