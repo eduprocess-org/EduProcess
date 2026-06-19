@@ -15,7 +15,6 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-<<<<<<< HEAD
 // Mock de sonner para evitar errores de renderizado en el entorno de pruebas
 vi.mock("sonner", () => ({
   toast: {
@@ -25,8 +24,6 @@ vi.mock("sonner", () => ({
   },
 }));
 
-=======
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
 describe("RequestDetailsPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -59,18 +56,11 @@ describe("RequestDetailsPage", () => {
     expect(screen.getByText("Carlos Andrés Vera")).toBeInTheDocument();
     expect(screen.getByText("carlos.vera@uce.edu.ec")).toBeInTheDocument();
     
-<<<<<<< HEAD
     // Cambiado para hacer match con el mock en inglés de la UI
     expect(screen.getByText("Fee_Payment_Receipt.pdf")).toBeInTheDocument();
   });
 
   it("executes approval workflow updates successfully after confirmation modal", async () => {
-=======
-    expect(screen.getByText("Comprobante_Pago_Aranceles.pdf")).toBeInTheDocument();
-  });
-
-  it("executes approval workflow updates successfully", async () => {
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
     const user = userEvent.setup();
     renderComponent("REQ-888");
 
@@ -78,7 +68,6 @@ describe("RequestDetailsPage", () => {
       expect(screen.queryByText(/loading request details…/i)).not.toBeInTheDocument();
     });
 
-<<<<<<< HEAD
     // 1. Clic en el botón principal de aprobación
     const approveButton = screen.getByRole("button", { name: /approve request/i });
     await user.click(approveButton);
@@ -97,16 +86,6 @@ describe("RequestDetailsPage", () => {
     });
 
     // 5. Los botones de acción deben desaparecer al ser estado terminal
-=======
-    const approveButton = screen.getByRole("button", { name: /approve request/i });
-    await user.click(approveButton);
-
-    await waitFor(() => {
-    const approvedElements = screen.getAllByText(/APPROVED/i);
-    expect(approvedElements.length).toBeGreaterThan(0);
-    });
-
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
     expect(screen.queryByRole("button", { name: /approve request/i })).not.toBeInTheDocument();
   });
 

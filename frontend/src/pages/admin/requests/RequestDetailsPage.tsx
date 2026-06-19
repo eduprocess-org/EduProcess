@@ -13,10 +13,7 @@ import {
   FileText,
   Eye,
   Download,
-<<<<<<< HEAD
   AlertTriangle,
-=======
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
 } from "lucide-react";
 import type { AdminRequestListItem } from "../../../types/admin/adminRequest.types";
 import RequestStatusBadge from "../../../components/admin-requests/RequestStatusBadge";
@@ -30,7 +27,6 @@ interface DetailedAdminRequest extends AdminRequestListItem {
   history: Array<{ status: string; user: string; comment?: string; date: string }>;
 }
 
-<<<<<<< HEAD
 type RequestStatus = "PENDING" | "IN_REVIEW" | "APPROVED" | "REJECTED";
 
 // Strict academic workflow boundary transition matrices
@@ -41,8 +37,6 @@ const VALID_TRANSITIONS: Record<RequestStatus, RequestStatus[]> = {
   REJECTED: [], // Terminal State
 };
 
-=======
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const t = {
   navy:       "#0F1F4B",
@@ -113,13 +107,10 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [comment, setComment] = useState("");
-<<<<<<< HEAD
 
   // Confirmation Modal Internal State Management
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<RequestStatus | null>(null);
-=======
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
 
   useEffect(() => {
     if (!requestId) return;
@@ -127,11 +118,7 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
     async function fetchRequestDetails() {
       try {
         setLoading(true);
-<<<<<<< HEAD
         // Atomic delay simulation mimicking realistic REST roundtrips
-=======
-        // Simulación de delay e integración de mock estructurado atómicamente
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
         await new Promise((res) => setTimeout(res, 400));
 
         const mockRequest: DetailedAdminRequest = {
@@ -140,7 +127,6 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
           studentEmail: "carlos.vera@uce.edu.ec",
           procedureName: "Enrollment Certificate",
           status: "PENDING",
-<<<<<<< HEAD
           career: "Information Systems Engineering",
           semester: "Seventh Semester",
           createdAt: "2026-06-18T14:30:00Z",
@@ -152,19 +138,6 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
           history: [
             { status: "IN_REVIEW", user: "System", comment: "Automatic assignment to admin tray", date: "2026-06-18T14:32:00Z" },
             { status: "PENDING", user: "Carlos Andrés Vera", comment: "Initial application successfully submitted", date: "2026-06-18T14:30:00Z" }
-=======
-          career: "Ingeniería en Sistemas de Información",
-          semester: "Séptimo Semestre",
-          createdAt: "2026-06-18T14:30:00Z",
-          updatedAt: "2026-06-18T14:32:00Z",
-          documents: [
-            { id: "doc-1", name: "Comprobante_Pago_Aranceles.pdf", url: "#" },
-            { id: "doc-2", name: "Cedula_Identidad_Escaneada.pdf", url: "#" },
-          ],
-          history: [
-            { status: "EN REVISIÓN", user: "Sistema", comment: "Automatic assignment to admin tray", date: "2026-06-18T14:32:00Z" },
-            { status: "CREADA", user: "Carlos Andrés Vera", comment: "Initial application successfully submitted", date: "2026-06-18T14:30:00Z" }
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
           ]
         };
         setRequest(mockRequest);
@@ -207,33 +180,20 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
       }
       
       const newHistoryItem = {
-<<<<<<< HEAD
         status: targetStatus,
         user: "Administrative Coordinator",
         comment: comment.trim() ? comment.trim() : `Procedure marked as ${targetStatus.toLowerCase()}`,
-=======
-        status: nextStatus,
-        user: "Coordinador Administrador",
-        comment: comment.trim() ? comment.trim() : `Procedure marked as ${nextStatus.toLowerCase()}`,
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
         date: new Date().toISOString()
       };
 
       setRequest({ 
         ...request, 
-<<<<<<< HEAD
         status: targetStatus,
         history: [newHistoryItem, ...request.history]
       });
       
       setComment("");
       toast.success(`Request successfully marked as ${targetStatus}.`);
-=======
-        status: nextStatus,
-        history: [newHistoryItem, ...request.history]
-      });
-      setComment("");
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
     } catch (error) {
       console.error(error);
       toast.error("An error occurred while updating the procedure status.");
@@ -249,10 +209,7 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
     document.body.appendChild(link);
     link.click();
     link.remove();
-<<<<<<< HEAD
     toast.info(`Downloading ${name}`);
-=======
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
   };
 
   if (loading) {
@@ -323,11 +280,7 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
                 <div className="flex flex-wrap gap-2">
                   <button
                     disabled={updating}
-<<<<<<< HEAD
                     onClick={() => initiateStatusTransition("APPROVED")}
-=======
-                    onClick={() => handleAction("APPROVED")}
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
                     className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                     style={{ background: t.emerald }}
                     onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.background = "#047857")}
@@ -337,11 +290,7 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
                   </button>
                   <button
                     disabled={updating}
-<<<<<<< HEAD
                     onClick={() => initiateStatusTransition("REJECTED")}
-=======
-                    onClick={() => handleAction("REJECTED")}
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
                     className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                     style={{ background: t.rose }}
                     onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.background = "#B91C1C")}
@@ -356,13 +305,8 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
             {isTerminal && (
               <p className="mt-3 text-xs font-medium" style={{ color: t.subtle }}>
                 This request has been{" "}
-<<<<<<< HEAD
                 <span className="font-bold" style={{ color: request.status === "APPROVED" ? t.emerald : t.rose }}>
                   {request.status}
-=======
-                <span style={{ color: request.status === "APPROVED" ? t.emerald : t.rose }}>
-                  {request.status.toLowerCase()}
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
                 </span>{" "}
                 and can no longer be dynamically modified.
               </p>
@@ -417,11 +361,7 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
                 <textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-<<<<<<< HEAD
                   placeholder="Add an internal justification or observation regarding this academic decision..."
-=======
-                  placeholder="Add an internal justification or observation regarding this academic decision.."
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
                   className="w-full min-h-[90px] p-3 text-sm border rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
                   style={{ borderColor: t.border, color: t.ink }}
                 />
@@ -442,15 +382,9 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
                     <span style={{ color: log.status === "APPROVED" ? t.emerald : log.status === "REJECTED" ? t.rose : t.navyLight }}>
                       {log.status}
                     </span>
-<<<<<<< HEAD
                     <span style={{ color: t.subtle }}>{new Date(log.date).toLocaleDateString("en-US")}</span>
                   </div>
                   <p className="text-[11px] font-medium" style={{ color: t.muted }}>by {log.user}</p>
-=======
-                    <span style={{ color: t.subtle }}>{new Date(log.date).toLocaleDateString("es-EC")}</span>
-                  </div>
-                  <p className="text-[11px] font-medium" style={{ color: t.muted }}>por {log.user}</p>
->>>>>>> d2c027a9d805c3b4a002f248d9feb8b4754c588c
                   {log.comment && (
                     <p className="text-xs p-2 rounded-lg bg-slate-50 border italic mt-1" style={{ borderColor: t.border, color: t.ink }}>
                       "{log.comment}"
