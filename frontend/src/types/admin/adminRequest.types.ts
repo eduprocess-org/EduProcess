@@ -1,3 +1,12 @@
+export type RequestStatus = "PENDING" | "IN_REVIEW" | "APPROVED" | "REJECTED";
+
+export const VALID_TRANSITIONS: Record<RequestStatus, RequestStatus[]> = {
+  PENDING: ["IN_REVIEW", "APPROVED", "REJECTED"],
+  IN_REVIEW: ["APPROVED", "REJECTED"],
+  APPROVED: [], 
+  REJECTED: [], 
+};
+
 export interface AdminRequestListItem {
   id: string;
   studentName: string;
