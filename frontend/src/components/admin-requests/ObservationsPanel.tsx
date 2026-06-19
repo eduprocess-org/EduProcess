@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { MessageSquare, Send, Clock, RefreshCw, User, Trash2 } from "lucide-react";
+import { MessageSquare, RefreshCw, Trash2 } from "lucide-react";
 import { apiClient } from "../../services/api/apiClient";
 
 interface ObservationsPanelProps {
@@ -29,16 +29,15 @@ export default function ObservationsPanel({ requestId }: ObservationsPanelProps)
   const [comment, setComment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Activada para cumplir con el uso de la variable y evitar el error TS6133
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
 
-  // 1. Obtener observaciones - Alineado a contrato 2.2 (/api/v1/admin/requests/:requestId/observations)
   const fetchObservations = async () => {
     if (!requestId) return;
     setIsLoading(true);
     try {
-      // Usamos la ruta completa según la guía (el apiClient debe tener baseURL: /api/v1)
       const response = await apiClient.get(`/admin/requests/${requestId}/observations`);
-      setObservations(response.data.data || []); // La guía especifica que viene en data.data
+      setObservations(response.data.data || []);
     } catch (error: any) {
       console.error(error);
       toast.error(error.response?.status === 401 ? "Sesión expirada" : "Error al cargar observaciones.");
@@ -51,7 +50,6 @@ export default function ObservationsPanel({ requestId }: ObservationsPanelProps)
     fetchObservations();
   }, [requestId]);
 
-  // 2. Crear observación - Alineado a contrato 2.1
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!comment.trim()) return;
@@ -72,7 +70,6 @@ export default function ObservationsPanel({ requestId }: ObservationsPanelProps)
     }
   };
 
-  // 3. Eliminar observación - Alineado a contrato 2.4
   const handleDelete = async (id: string) => {
     if (!window.confirm("¿Eliminar esta observación permanentemente?")) return;
 
@@ -91,7 +88,6 @@ export default function ObservationsPanel({ requestId }: ObservationsPanelProps)
 
   return (
     <div className="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style={{ borderColor: t.border }}>
-      {/* Encabezado */}
       <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: t.border }}>
         <div className="flex items-center gap-2">
           <MessageSquare size={18} style={{ color: t.blue }} />
@@ -102,7 +98,6 @@ export default function ObservationsPanel({ requestId }: ObservationsPanelProps)
         </button>
       </div>
 
-      {/* Formulario */}
       <form onSubmit={handleSubmit} className="space-y-3">
         <textarea
           value={comment}
@@ -123,7 +118,6 @@ export default function ObservationsPanel({ requestId }: ObservationsPanelProps)
         </div>
       </form>
 
-      {/* Listado */}
       {isLoading ? (
         <div className="text-center py-4 text-xs">Cargando...</div>
       ) : observations.length === 0 ? (
@@ -139,7 +133,8 @@ export default function ObservationsPanel({ requestId }: ObservationsPanelProps)
               <p className="text-xs text-slate-800">{obs.comment}</p>
               <button 
                 onClick={() => handleDelete(obs.id)}
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-red-500"
+                disabled={isDeletingId === obs.id}
+                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-red-500 disabled:opacity-50"
               >
                 <Trash2 size={12} />
               </button>

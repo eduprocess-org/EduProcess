@@ -49,7 +49,6 @@ describe("AdministrativeObservations Component", () => {
   });
 
   it("prevents submission and displays warning if comment input is empty", async () => {
-    const user = userEvent.setup();
     render(
       <AdministrativeObservations
         requestId="REQ-999"
@@ -64,12 +63,11 @@ describe("AdministrativeObservations Component", () => {
     });
 
     const submitBtn = screen.getByRole("button", { name: /Submit Observation/i });
-    // El botón HTML se deshabilita si está vacío por atributo nativo, pero testeamos la lógica
     expect(submitBtn).toBeDisabled();
   });
 
   it("appends new observation onto timeline correctly upon API response", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup(); // Ahora sí usado
     const newMockObs = {
       id: "obs-2",
       authorName: "Administrative Coordinator",
@@ -108,7 +106,7 @@ describe("AdministrativeObservations Component", () => {
         requestId="REQ-999"
         fetchObservationsApi={mockFetchApi}
         submitObservationApi={mockSubmitApi}
-        isAdmin={false} // Read-only mode
+        isAdmin={false}
       />
     );
 
