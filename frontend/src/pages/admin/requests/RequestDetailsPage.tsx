@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import type { AdminRequestListItem } from "../../../types/admin/adminRequest.types";
 import RequestStatusBadge from "../../../components/admin-requests/RequestStatusBadge";
+import ObservationsPanel from "../../../components/admin-requests/ObservationsPanel";
 
 interface Props {
   onStatusUpdate?: (id: string, newStatus: string) => Promise<void>;
@@ -283,8 +284,6 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
                     onClick={() => initiateStatusTransition("APPROVED")}
                     className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                     style={{ background: t.emerald }}
-                    onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.background = "#047857")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = t.emerald)}
                   >
                     <CheckCircle2 size={14} /> Approve Request
                   </button>
@@ -293,8 +292,6 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
                     onClick={() => initiateStatusTransition("REJECTED")}
                     className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                     style={{ background: t.rose }}
-                    onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.background = "#B91C1C")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = t.rose)}
                   >
                     <XCircle size={14} /> Reject Request
                   </button>
@@ -353,6 +350,9 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
                 ))}
               </div>
             </div>
+
+            {/* NUEVO MÓDULO INTEGRADO (EDUPR-164) - PANEL DE OBSERVACIONES ADMINISTRATIVAS */}
+            <ObservationsPanel requestId={request.id} />
 
             {/* Resolution Comment Area */}
             {!isTerminal && (
