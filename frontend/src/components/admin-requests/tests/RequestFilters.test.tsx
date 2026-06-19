@@ -78,10 +78,10 @@ describe("RequestFilters", () => {
 
     await user.selectOptions(
       screen.getAllByRole("combobox")[0],
-      "pending"
+      "PENDING"
     );
 
     expect(onStatus)
-      .toHaveBeenCalledWith("pending");
+      .toHaveBeenCalledWith("PENDING");
   });
 });

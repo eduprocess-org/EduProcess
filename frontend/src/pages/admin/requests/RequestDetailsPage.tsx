@@ -13,7 +13,6 @@ import {
   FileText,
   Eye,
   Download,
-  Clock,
 } from "lucide-react";
 import type { AdminRequestListItem } from "../../../types/admin/adminRequest.types";
 import RequestStatusBadge from "../../../components/admin-requests/RequestStatusBadge";
@@ -87,16 +86,6 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
       <span className="h-px flex-1" style={{ background: t.border }} />
     </div>
   );
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("es-EC", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 }
 
 // ─── Main page ─────────────────────────────────────────────────────────────────
@@ -254,16 +243,20 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
                   <button
                     disabled={updating}
                     onClick={() => handleAction("APPROVED")}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                     style={{ background: t.emerald }}
+                    onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.background = "#047857")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = t.emerald)}
                   >
                     <CheckCircle2 size={14} /> Approve Request
                   </button>
                   <button
                     disabled={updating}
                     onClick={() => handleAction("REJECTED")}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                     style={{ background: t.rose }}
+                    onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.background = "#B91C1C")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = t.rose)}
                   >
                     <XCircle size={14} /> Reject Request
                   </button>
