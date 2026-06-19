@@ -58,7 +58,6 @@ describe("RequestDetailsPage", () => {
       expect(screen.queryByText(/loading request details…/i)).not.toBeInTheDocument();
     });
 
-    const textarea = screen.getByRole("textbox");
     const approveButton = screen.getByRole("button", { name: /approve request/i });
     await user.click(approveButton);
 

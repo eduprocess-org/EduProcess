@@ -8,7 +8,6 @@ import {
   XCircle,
   GraduationCap,
   BookOpen,
-  CalendarDays,
   RefreshCw,
   FileText,
   Eye,
@@ -21,7 +20,6 @@ interface Props {
   onStatusUpdate?: (id: string, newStatus: string) => Promise<void>;
 }
 
-// Interfaz extendida para el flujo completo de auditoría y archivos adjuntos
 interface DetailedAdminRequest extends AdminRequestListItem {
   documents: Array<{ id: string; name: string; url: string }>;
   history: Array<{ status: string; user: string; comment?: string; date: string }>;
