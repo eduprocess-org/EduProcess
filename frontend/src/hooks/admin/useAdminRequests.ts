@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { getAdminRequests } from "../../services/admin/requests/requestManagement.service.mock";
+import { getAdminRequests } from "../../services/admin/requests/requestManagement.service";
 
 import type {
   AdminRequest,
