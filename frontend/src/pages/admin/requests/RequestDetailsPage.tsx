@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -12,6 +13,7 @@ import {
   FileText,
   Eye,
   Download,
+  AlertTriangle,
 } from "lucide-react";
 import type { AdminRequestListItem } from "../../../types/admin/adminRequest.types";
 import RequestStatusBadge from "../../../components/admin-requests/RequestStatusBadge";
@@ -24,6 +26,16 @@ interface DetailedAdminRequest extends AdminRequestListItem {
   documents: Array<{ id: string; name: string; url: string }>;
   history: Array<{ status: string; user: string; comment?: string; date: string }>;
 }
+
+type RequestStatus = "PENDING" | "IN_REVIEW" | "APPROVED" | "REJECTED";
+
+// Strict academic workflow boundary transition matrices
+const VALID_TRANSITIONS: Record<RequestStatus, RequestStatus[]> = {
+  PENDING: ["IN_REVIEW", "APPROVED", "REJECTED"],
+  IN_REVIEW: ["APPROVED", "REJECTED"],
+  APPROVED: [], // Terminal State
+  REJECTED: [], // Terminal State
+};
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const t = {
@@ -96,13 +108,17 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
   const [updating, setUpdating] = useState(false);
   const [comment, setComment] = useState("");
 
+  // Confirmation Modal Internal State Management
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<RequestStatus | null>(null);
+
   useEffect(() => {
     if (!requestId) return;
 
     async function fetchRequestDetails() {
       try {
         setLoading(true);
-        // Simulación de delay e integración de mock estructurado atómicamente
+        // Atomic delay simulation mimicking realistic REST roundtrips
         await new Promise((res) => setTimeout(res, 400));
 
         const mockRequest: DetailedAdminRequest = {
@@ -111,22 +127,23 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
           studentEmail: "carlos.vera@uce.edu.ec",
           procedureName: "Enrollment Certificate",
           status: "PENDING",
-          career: "Ingeniería en Sistemas de Información",
-          semester: "Séptimo Semestre",
+          career: "Information Systems Engineering",
+          semester: "Seventh Semester",
           createdAt: "2026-06-18T14:30:00Z",
           updatedAt: "2026-06-18T14:32:00Z",
           documents: [
-            { id: "doc-1", name: "Comprobante_Pago_Aranceles.pdf", url: "#" },
-            { id: "doc-2", name: "Cedula_Identidad_Escaneada.pdf", url: "#" },
+            { id: "doc-1", name: "Fee_Payment_Receipt.pdf", url: "#" },
+            { id: "doc-2", name: "Scanned_National_ID.pdf", url: "#" },
           ],
           history: [
-            { status: "EN REVISIÓN", user: "Sistema", comment: "Automatic assignment to admin tray", date: "2026-06-18T14:32:00Z" },
-            { status: "CREADA", user: "Carlos Andrés Vera", comment: "Initial application successfully submitted", date: "2026-06-18T14:30:00Z" }
+            { status: "IN_REVIEW", user: "System", comment: "Automatic assignment to admin tray", date: "2026-06-18T14:32:00Z" },
+            { status: "PENDING", user: "Carlos Andrés Vera", comment: "Initial application successfully submitted", date: "2026-06-18T14:30:00Z" }
           ]
         };
         setRequest(mockRequest);
       } catch (error) {
         console.error(error);
+        toast.error("Failed to retrieve request detailed information.");
       } finally {
         setLoading(false);
       }
@@ -135,29 +152,51 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
     fetchRequestDetails();
   }, [requestId]);
 
-  const handleAction = async (nextStatus: "APPROVED" | "REJECTED") => {
+  const initiateStatusTransition = (nextStatus: RequestStatus) => {
     if (!request) return;
+
+    // Validate if the transition is allowed by the workflow matrix
+    const allowedTransitions = VALID_TRANSITIONS[request.status as RequestStatus] || [];
+    if (!allowedTransitions.includes(nextStatus)) {
+      toast.error(`Invalid workflow transition from ${request.status} to ${nextStatus}.`);
+      return;
+    }
+
+    setPendingStatus(nextStatus);
+    setIsConfirmOpen(true);
+  };
+
+  const handleAction = async () => {
+    if (!request || !pendingStatus) return;
+    
+    setIsConfirmOpen(false);
+    const targetStatus = pendingStatus;
+    setPendingStatus(null);
+
     try {
       setUpdating(true);
       if (onStatusUpdate) {
-        await onStatusUpdate(request.id, nextStatus);
+        await onStatusUpdate(request.id, targetStatus);
       }
       
       const newHistoryItem = {
-        status: nextStatus,
-        user: "Coordinador Administrador",
-        comment: comment.trim() ? comment.trim() : `Procedure marked as ${nextStatus.toLowerCase()}`,
+        status: targetStatus,
+        user: "Administrative Coordinator",
+        comment: comment.trim() ? comment.trim() : `Procedure marked as ${targetStatus.toLowerCase()}`,
         date: new Date().toISOString()
       };
 
       setRequest({ 
         ...request, 
-        status: nextStatus,
+        status: targetStatus,
         history: [newHistoryItem, ...request.history]
       });
+      
       setComment("");
+      toast.success(`Request successfully marked as ${targetStatus}.`);
     } catch (error) {
       console.error(error);
+      toast.error("An error occurred while updating the procedure status.");
     } finally {
       setUpdating(false);
     }
@@ -170,6 +209,7 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
     document.body.appendChild(link);
     link.click();
     link.remove();
+    toast.info(`Downloading ${name}`);
   };
 
   if (loading) {
@@ -240,7 +280,7 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
                 <div className="flex flex-wrap gap-2">
                   <button
                     disabled={updating}
-                    onClick={() => handleAction("APPROVED")}
+                    onClick={() => initiateStatusTransition("APPROVED")}
                     className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                     style={{ background: t.emerald }}
                     onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.background = "#047857")}
@@ -250,7 +290,7 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
                   </button>
                   <button
                     disabled={updating}
-                    onClick={() => handleAction("REJECTED")}
+                    onClick={() => initiateStatusTransition("REJECTED")}
                     className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                     style={{ background: t.rose }}
                     onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.background = "#B91C1C")}
@@ -265,10 +305,10 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
             {isTerminal && (
               <p className="mt-3 text-xs font-medium" style={{ color: t.subtle }}>
                 This request has been{" "}
-                <span style={{ color: request.status === "APPROVED" ? t.emerald : t.rose }}>
-                  {request.status.toLowerCase()}
+                <span className="font-bold" style={{ color: request.status === "APPROVED" ? t.emerald : t.rose }}>
+                  {request.status}
                 </span>{" "}
-                and can no longer be modified.
+                and can no longer be dynamically modified.
               </p>
             )}
           </div>
@@ -321,7 +361,7 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
                 <textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="Add an internal justification or observation regarding this academic decision.."
+                  placeholder="Add an internal justification or observation regarding this academic decision..."
                   className="w-full min-h-[90px] p-3 text-sm border rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
                   style={{ borderColor: t.border, color: t.ink }}
                 />
@@ -342,9 +382,9 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
                     <span style={{ color: log.status === "APPROVED" ? t.emerald : log.status === "REJECTED" ? t.rose : t.navyLight }}>
                       {log.status}
                     </span>
-                    <span style={{ color: t.subtle }}>{new Date(log.date).toLocaleDateString("es-EC")}</span>
+                    <span style={{ color: t.subtle }}>{new Date(log.date).toLocaleDateString("en-US")}</span>
                   </div>
-                  <p className="text-[11px] font-medium" style={{ color: t.muted }}>por {log.user}</p>
+                  <p className="text-[11px] font-medium" style={{ color: t.muted }}>by {log.user}</p>
                   {log.comment && (
                     <p className="text-xs p-2 rounded-lg bg-slate-50 border italic mt-1" style={{ borderColor: t.border, color: t.ink }}>
                       "{log.comment}"
@@ -358,6 +398,47 @@ export default function RequestDetailsPage({ onStatusUpdate }: Props) {
         </div>
 
       </div>
+
+      {/* ── Confirmation Transition Dialog Overlay ───────────────────────── */}
+      {isConfirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl border animate-in fade-in zoom-in-95 duration-150" style={{ borderColor: t.border }}>
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle size={20} style={{ color: pendingStatus === "APPROVED" ? t.emerald : t.rose }} />
+              <h3 className="text-lg font-bold" style={{ color: t.navy }}>Confirm Status Transition</h3>
+            </div>
+            
+            <p className="text-sm" style={{ color: t.muted }}>
+              Are you sure you want to change this request lifecycle status to{" "}
+              <span className="font-extrabold uppercase" style={{ color: pendingStatus === "APPROVED" ? t.emerald : t.rose }}>{pendingStatus}</span>?
+              {comment.trim() && (
+                <span className="block mt-2 p-2 bg-slate-50 border rounded-lg text-xs italic" style={{ borderColor: t.border }}>
+                  <strong>Attached Resolution Justification:</strong> "{comment}"
+                </span>
+              )}
+            </p>
+            
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => { setIsConfirmOpen(false); setPendingStatus(null); }}
+                className="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors"
+                style={{ color: t.ink }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleAction}
+                className="px-4 py-2 text-xs font-bold text-white rounded-xl transition-all active:scale-95 shadow-sm"
+                style={{ background: pendingStatus === "APPROVED" ? t.emerald : t.rose }}
+              >
+                Yes, Confirm Update
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
