@@ -15,11 +15,18 @@ function ProtectedRoute({ children, roles }: Props) {
     return <Navigate to="/login" replace />;
   }
 
-  //  validación por roles (futuro admin, etc.)
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
   if (roles && roles.length > 0) {
-    const hasRole = roles.includes(user?.role || "");
+    const hasRole = roles.includes(user.role);
 
     if (!hasRole) {
+      if (user.role === "admin") {
+        return <Navigate to="/admin" replace />;
+      }
+
       return <Navigate to="/" replace />;
     }
   }

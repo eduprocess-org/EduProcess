@@ -7,6 +7,7 @@ import { registerSchema, type RegisterFormData } from "../../../utils/validators
 import { register as registerUser } from "../../../services/auth/register.service";
 import { apiClient } from "../../../services/api/apiClient";
 import { Eye, EyeOff, Loader2, BookOpen, Users, Award } from "lucide-react";
+import logo from "../../../assets/images/Logo.jpeg";
 
 interface Career {
   id: string;
@@ -14,7 +15,6 @@ interface Career {
   description: string;
   faculty: { id: string; name: string };
 }
-import logo from "../../../assets/images/Logo.jpeg";
 
 function RegisterForm() {
   const {
@@ -258,6 +258,7 @@ function RegisterForm() {
                 </div>
               </Field>
 
+              {/* Password */}
               <Field label="Password" error={errors.password?.message}>
                 <div className="relative">
                   <input
@@ -286,6 +287,7 @@ function RegisterForm() {
                 </ul>
               </Field>
 
+              {/* Confirm Password */}
               <Field label="Confirm Password" error={errors.confirmPassword?.message}>
                 <div className="relative">
                   <input

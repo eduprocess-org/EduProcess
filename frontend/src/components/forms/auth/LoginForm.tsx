@@ -26,26 +26,43 @@ function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       setIsLoading(true);
-    const response = await login(data);
 
-    authLogin(
-      {
-        ...response.data.user,
-        career: "Information Systems",
-      },
-      response.data.tokens.sessionToken
-    );
-      localStorage.setItem("refreshToken", response.data.tokens.refreshToken);
+      const response = await login(data);
+      authLogin(
+        {
+          ...response.data.user,
+        },
+        response.data.tokens.sessionToken
+      );
+
+      localStorage.setItem(
+        "refreshToken",
+        response.data.tokens.refreshToken
+      );
+
       toast.success("Welcome back! Loading system...");
-      navigate("/");
+
+      const role = response.data.user.role;
+
+      if (role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
+
     } catch (error: any) {
       console.error(error);
+
       if (error.response?.status === 401) {
         toast.error("Invalid email or password");
       } else if (error.response?.status === 400) {
-        toast.error(error.response.data.message || "Bad request parameters");
+        toast.error(
+          error.response.data.message || "Bad request parameters"
+        );
       } else {
-        toast.error("Unable to connect to server. Please check your internet connection.");
+        toast.error(
+          "Unable to connect to server. Please check your internet connection."
+        );
       }
     } finally {
       setIsLoading(false);
