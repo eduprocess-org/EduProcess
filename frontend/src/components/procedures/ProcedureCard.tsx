@@ -4,7 +4,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-import type { Procedure } from "../../types/procedure.types";
+import type { Procedure } from "../../types/procedures/procedure.types";
 import { useNavigate } from "react-router-dom";
 
 interface ProcedureCardProps {

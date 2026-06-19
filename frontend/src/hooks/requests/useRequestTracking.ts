@@ -5,11 +5,11 @@ import {
 
 import {
   getRequestTracking,
-} from "../../services/requests/requestTracking.service";
+} from "../../services/student/requests/requestTracking.service";
 
 import type {
   RequestTracking,
-} from "../../types/request-tracking.types";
+} from "../../types/student/request-tracking.types";
 
 export function
 useRequestTracking(

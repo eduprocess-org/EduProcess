@@ -38,6 +38,7 @@ model Career {
   name           String
   description    String          @db.Text
   faculty        Faculty         @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  users          User[]
   profiles       Profile[]
   procedureTypes ProcedureType[]
 }
@@ -52,7 +53,9 @@ model User {
   firstName         String
   lastName          String
   role              Role
+  careerId          String?            @db.Uuid
   createdAt         DateTime           @default(now())
+  career            Career?            @relation(fields: [careerId], references: [id], onDelete: SetNull)
   profile           Profile?
   procedureRequests ProcedureRequest[]
   observations      Observation[]

@@ -7,6 +7,7 @@ export interface RegisterAuthRequest {
     lastName?: string;
     email: string;
     password: string;
+    careerId?: string;
 }
 
 export interface LoginAuthRequest {
@@ -20,6 +21,7 @@ export interface AuthUserDTO {
     firstName: string;
     lastName: string;
     role: UserRole;
+    career?: string;
 }
 
 export interface AuthTokensDTO {
