@@ -1,11 +1,12 @@
-import type { AdminRequest } from "../../services/admin/requests/requestManagement.service";
+import type { AdminRequestListItem } from "../../types/admin/adminRequest.types";
 import RequestStatusBadge from "./RequestStatusBadge";
 
 interface Props {
-  request: AdminRequest;
+  request: AdminRequestListItem;
   isEven: boolean;
   selected: boolean;
   onSelect: (id: string) => void;
+  onView: () => void;
 }
 
 const navy   = "#1B2B5E";
@@ -40,6 +41,7 @@ export default function RequestTableRow({
   isEven,
   selected,
   onSelect,
+  onView,
 }: Props) {
   const av = avatarColor(request.studentName);
 
@@ -47,23 +49,24 @@ export default function RequestTableRow({
     <tr
       style={{
         borderBottom: `0.5px solid ${border}`,
-        backgroundColor: isEven ? "#FFFFFF" : "#FAFBFD",
+        backgroundColor: selected ? "#F0F6FF" : isEven ? "#FFFFFF" : "#FAFBFD",
         transition: "background-color .15s",
       }}
       onMouseEnter={(e) => {
-        const row = e.currentTarget;
-        row.style.backgroundColor = "#F0F6FF";
-        const accent = row.querySelector(".row-accent") as HTMLElement | null;
+        if (!selected) {
+          e.currentTarget.style.backgroundColor = "#F0F6FF";
+        }
+        const accent = e.currentTarget.querySelector(".row-accent") as HTMLElement | null;
         if (accent) accent.style.opacity = "1";
       }}
       onMouseLeave={(e) => {
-        const row = e.currentTarget;
-        row.style.backgroundColor = isEven ? "#FFFFFF" : "#FAFBFD";
-        const accent = row.querySelector(".row-accent") as HTMLElement | null;
+        if (!selected) {
+          e.currentTarget.style.backgroundColor = isEven ? "#FFFFFF" : "#FAFBFD";
+        }
+        const accent = e.currentTarget.querySelector(".row-accent") as HTMLElement | null;
         if (accent) accent.style.opacity = "0";
       }}
     >
-      {/* Checkbox */}
       <td className="px-4 py-3">
         <input
           type="checkbox"
@@ -72,7 +75,6 @@ export default function RequestTableRow({
         />
       </td>
 
-      {/* Request ID */}
       <td
         className="px-5 py-3.5"
         style={{ position: "relative", paddingLeft: "1.5rem" }}
@@ -88,7 +90,7 @@ export default function RequestTableRow({
             height: "60%",
             borderRadius: 4,
             backgroundColor: blue,
-            opacity: 0,
+            opacity: selected ? 1 : 0,
             transition: "opacity .15s",
           }}
         />
@@ -109,7 +111,6 @@ export default function RequestTableRow({
         </span>
       </td>
 
-      {/* Student */}
       <td className="px-5 py-3.5">
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div
@@ -135,14 +136,12 @@ export default function RequestTableRow({
         </div>
       </td>
 
-      {/* Email */}
       <td className="px-5 py-3.5">
         <span style={{ fontSize: ".8rem", color: muted }}>
           {request.studentEmail}
         </span>
       </td>
 
-      {/* Procedure */}
       <td className="px-5 py-3.5">
         <span
           style={{
@@ -170,12 +169,10 @@ export default function RequestTableRow({
         </span>
       </td>
 
-      {/* Status */}
       <td className="px-5 py-3.5">
         <RequestStatusBadge status={request.status} />
       </td>
 
-      {/* Submitted */}
       <td className="px-5 py-3.5">
         <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
           <span
@@ -186,14 +183,14 @@ export default function RequestTableRow({
               fontVariantNumeric: "tabular-nums",
             }}
           >
-            {new Date(request.submittedAt).toLocaleDateString("en-GB", {
+            {new Date(request.createdAt).toLocaleDateString("en-GB", {
               day: "2-digit",
               month: "short",
               year: "numeric",
             })}
           </span>
           <span style={{ fontSize: ".7rem", color: subtle }}>
-            {new Date(request.submittedAt).toLocaleTimeString("en-GB", {
+            {new Date(request.createdAt).toLocaleTimeString("en-GB", {
               hour: "2-digit",
               minute: "2-digit",
             })}
@@ -201,10 +198,10 @@ export default function RequestTableRow({
         </div>
       </td>
 
-      {/* Actions */}
       <td className="px-5 py-3.5">
         <button
           type="button"
+          onClick={onView}
           style={{
             padding: "5px 14px",
             borderRadius: 7,

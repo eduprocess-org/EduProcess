@@ -1,37 +1,58 @@
 import { useEffect, useState } from "react";
-
-import { getAdminRequests } from "../../services/admin/requests/requestManagement.service";
+import { getAdminRequests } from "../../services/admin/requests/adminRequest.service";
 
 import type {
-  AdminRequest,
-  RequestFilters,
-} from "../../services/admin/requests/requestManagement.service";
+  AdminRequestListItem,
+  AdminRequestFilters,
+} from "../../types/admin/adminRequest.types";
 
-export function useAdminRequests(
-  filters: RequestFilters
-) {
-  const [requests, setRequests] = useState<AdminRequest[]>([]);
+interface UseAdminRequestsParams {
+  page: number;
+  limit: number;
+  search: string;
+  status: string;
+  procedureTypeId: string; 
+  sortField: string;
+  sortDirection: "asc" | "desc";
+}
+
+export function useAdminRequests(params: UseAdminRequestsParams) {
+  const [requests, setRequests] = useState<AdminRequestListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
+  const { page, limit, search, status, procedureTypeId, sortField, sortDirection } = params;
+
   useEffect(() => {
     loadRequests();
-  }, [JSON.stringify(filters)]);
+  }, [page, limit, search, status, procedureTypeId, sortField, sortDirection]);
 
   async function loadRequests() {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await getAdminRequests(filters);
+      const filters: AdminRequestFilters = {
+        status: status || undefined,
+        search: search || undefined,
+        procedureTypeId: procedureTypeId || undefined,
+      };
 
-      setRequests(response.requests);
+      const response = await getAdminRequests(
+        filters,
+        page,
+        limit,
+        sortField,
+        sortDirection
+      );
+
+      setRequests(response.data);
       setTotal(response.total);
       setTotalPages(response.totalPages);
     } catch (err: any) {
-      setError(err.message || "Failed to load requests.");
+      setError(err?.message || "Failed to load requests.");
     } finally {
       setLoading(false);
     }

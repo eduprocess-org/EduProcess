@@ -89,7 +89,6 @@ export default function RequestFilters({
   return (
     <div className="grid gap-3 md:grid-cols-3">
 
-      {/* Search */}
       <div className="relative">
         <svg
           className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
@@ -111,18 +110,17 @@ export default function RequestFilters({
         />
       </div>
 
-      {/* Status */}
       <FocusSelect
         value={status}
         onChange={(e) => onStatusChange(e.target.value)}
       >
         <option value="">All Statuses</option>
-        <option value="PENDING">Pending</option>
-        <option value="APPROVED">Approved</option>
-        <option value="REJECTED">Rejected</option>
+        <option value="pending">Pending</option>
+        <option value="in_review">In Review</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
       </FocusSelect>
 
-      {/* Procedure */}
       <FocusSelect
         value={procedure}
         onChange={(e) => onProcedureChange(e.target.value)}

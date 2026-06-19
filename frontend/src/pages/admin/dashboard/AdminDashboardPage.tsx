@@ -4,7 +4,8 @@ import AdminQuickActions from "../../../components/dashboard/admin/AdminQuickAct
 import AdminDashboardLoading from "../../../components/dashboard/admin/AdminDashboardLoading";
 import AdminDashboardError from "../../../components/dashboard/admin/AdminDashboardError";
 import { useAdminDashboard } from "../../../hooks/admin/useAdminDashboard";
-import { Zap, ListChecks } from "lucide-react";
+// Importamos BarChart2 para la nueva sección de distribución
+import { Zap, ListChecks, BarChart2 } from "lucide-react"; 
 
 const navy   = "#1B2B5E";
 const blue   = "#2563EB";
@@ -13,7 +14,7 @@ const muted  = "#64748B";
 const bgPage = "#F0F4FA";
 
 function AdminDashboardPage() {
-  const { stats, requests, loading, error } = useAdminDashboard();
+  const { stats, requests, distribution, loading, error } = useAdminDashboard();
 
   if (loading) return <AdminDashboardLoading />;
   if (error)   return <AdminDashboardError message={error} />;
@@ -36,22 +37,20 @@ function AdminDashboardPage() {
       <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", flexDirection: "column", gap: "2rem" }}>
 
         {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-        <div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-[#0B2D63] tracking-tight">
+              Administrator Dashboard
+            </h1>
+            <p className="text-slate-500 mt-1">
+              Overview of procedures and requests.
+            </p>
+          </div>
 
-          <h1 className="text-3xl font-bold text-[#0B2D63] tracking-tight">
-            Administrator Dashboard
-          </h1>
-
-          <p className="text-slate-500 mt-1">
-            Overview of procedures and requests.
-          </p>
+          <span className="text-sm text-slate-400 sm:text-right">
+            {today}
+          </span>
         </div>
-
-        <span className="text-sm text-slate-400 sm:text-right">
-          {today}
-        </span>
-      </div>
 
         {/* ── Summary stats ── */}
         <div>
@@ -68,6 +67,43 @@ function AdminDashboardPage() {
           <SectionLabel icon={<Zap size={13} />} label="Quick actions" />
           <AdminQuickActions />
         </section>
+
+        {/* ── Distribution by Procedure  ── */}
+        {distribution && distribution.length > 0 && (
+          <section>
+            <SectionLabel icon={<BarChart2 size={13} />} label="Requests by Procedure" />
+            <div
+              style={{
+                backgroundColor: "#ffffff",
+                border: `1px solid ${border}`,
+                borderRadius: 16,
+                padding: "1.5rem",
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+                gap: "1rem",
+              }}
+            >
+              {distribution.map((item) => (
+                <div 
+                  key={item.procedureTypeId}
+                  style={{
+                    padding: "1rem",
+                    backgroundColor: "#F8FAFC",
+                    borderRadius: 12,
+                    border: `1px solid ${border}`
+                  }}
+                >
+                  <p style={{ fontSize: "0.85rem", fontWeight: 600, color: navy, margin: "0 0 0.25rem 0" }}>
+                    {item.procedureName}
+                  </p>
+                  <p style={{ fontSize: "1.5rem", fontWeight: 700, color: blue, margin: 0 }}>
+                    {item.count} <span style={{ fontSize: "0.8rem", color: muted, fontWeight: 400 }}>solicitudes</span>
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ── Recent requests ── */}
         <section>

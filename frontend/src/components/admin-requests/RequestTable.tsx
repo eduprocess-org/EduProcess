@@ -1,14 +1,15 @@
-import type { AdminRequest } from "../../services/admin/requests/requestManagement.service";
+import type { AdminRequestListItem } from "../../types/admin/adminRequest.types";
 import RequestTableRow from "./RequestTableRow";
 
 interface Props {
-  requests: AdminRequest[];
+  requests: AdminRequestListItem[];
   sortBy: string;
   order: "asc" | "desc";
   onSort: (field: string) => void;
   selectedRequests: string[];
   onToggleSelect: (id: string) => void;
   onToggleSelectAll: () => void;
+  onViewRequest: (id: string) => void;
 }
 
 const navy      = "#1B2B5E";
@@ -16,12 +17,12 @@ const borderClr = "#D9E3F0";
 const textMuted = "#64748B";
 
 const columns = [
-  { label: "Request ID", field: "id"          },
-  { label: "Student",    field: "studentName"  },
-  { label: "Email",      field: "email"        },
-  { label: "Procedure",  field: "procedureName"},
-  { label: "Status",     field: "status"       },
-  { label: "Submitted",  field: "submittedAt"  },
+  { label: "Request ID", field: "id" },
+  { label: "Student",    field: "studentName" },
+  { label: "Email",      field: "studentEmail" },
+  { label: "Procedure",  field: "procedureName" },
+  { label: "Status",     field: "status" },
+  { label: "Submitted",  field: "createdAt" },
 ];
 
 export default function RequestTable({
@@ -32,6 +33,7 @@ export default function RequestTable({
   selectedRequests,
   onToggleSelect,
   onToggleSelectAll,
+  onViewRequest,
 }: Props) {
   if (!requests.length) {
     return (
@@ -108,7 +110,6 @@ export default function RequestTable({
               </th>
             ))}
 
-            {/* Actions column — no label */}
             <th className="w-20 px-5 py-3" />
           </tr>
         </thead>
@@ -121,6 +122,7 @@ export default function RequestTable({
               isEven={index % 2 === 0}
               selected={selectedRequests.includes(request.id)}
               onSelect={() => onToggleSelect(request.id)}
+              onView={() => onViewRequest(request.id)}
             />
           ))}
         </tbody>

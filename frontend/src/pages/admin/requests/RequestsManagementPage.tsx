@@ -1,27 +1,28 @@
 import { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 import RequestFilters from "../../../components/admin-requests/RequestFilters";
 import RequestTable from "../../../components/admin-requests/RequestTable";
 
 import { useAdminRequests } from "../../../hooks/admin/useAdminRequests";
 
 export default function RequestManagementPage() {
+  const navigate = useNavigate();
   const [search, setSearch]       = useState("");
   const [status, setStatus]       = useState("");
   const [procedure, setProcedure] = useState("");
   const [page, setPage]           = useState(1);
-  const [sortBy, setSortBy]       = useState("submittedAt");
+  const [sortBy, setSortBy]       = useState("createdAt"); 
   const [order, setOrder]         = useState<"asc" | "desc">("desc");
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
 
-  const { requests, loading, error, totalPages, total } = useAdminRequests({
+  const { requests = [], loading, error, totalPages, total, reload } = useAdminRequests({
     page,
     limit: 10,
     search,
     status,
-    procedure,
-    sortBy,
-    order,
+    procedureTypeId: procedure, 
+    sortField: sortBy,          
+    sortDirection: order,
   });
 
   function handleSort(field: string) {
@@ -40,11 +41,12 @@ export default function RequestManagementPage() {
   }
 
   function handleToggleSelectAll() {
-    if (selectedRequests.length === requests.length) {
+    const currentRequests = requests ?? [];
+    if (selectedRequests.length === currentRequests.length && currentRequests.length > 0) {
       setSelectedRequests([]);
       return;
     }
-    setSelectedRequests(requests.map((r) => r.id));
+    setSelectedRequests(currentRequests.map((r) => r.id));
   }
 
   const navy      = "#1B2B5E";
@@ -83,7 +85,7 @@ export default function RequestManagementPage() {
               Total Requests
             </p>
             <p className="text-2xl font-bold" style={{ color: navy }}>
-              {total}
+              {total || 0}
             </p>
           </div>
         </div>
@@ -162,7 +164,6 @@ export default function RequestManagementPage() {
               className="overflow-hidden rounded-2xl border bg-white shadow-sm"
               style={{ borderColor: borderClr }}
             >
-              {/* Accent bar */}
               <div
                 style={{
                   height: 3,
@@ -178,6 +179,7 @@ export default function RequestManagementPage() {
                 selectedRequests={selectedRequests}
                 onToggleSelect={handleToggleSelect}
                 onToggleSelectAll={handleToggleSelectAll}
+                onViewRequest={(id) => navigate(`/admin/requests/${id}`)}
               />
             </div>
 
@@ -185,7 +187,7 @@ export default function RequestManagementPage() {
             <div className="flex items-center justify-between px-1">
               <p className="text-xs" style={{ color: textSub }}>
                 Page <strong style={{ color: navy }}>{page}</strong> of{" "}
-                {totalPages}
+                {totalPages || 1}
               </p>
 
               <div className="flex gap-2">
@@ -208,19 +210,19 @@ export default function RequestManagementPage() {
                 </button>
 
                 <button
-                  disabled={page === totalPages}
+                  disabled={page === totalPages || totalPages === 0}
                   onClick={() => setPage((prev) => prev + 1)}
                   style={{
                     padding: "7px 16px",
                     borderRadius: 8,
                     border: "none",
                     backgroundColor:
-                      page === totalPages ? "#CBD5E1" : navy,
+                      page === totalPages || totalPages === 0 ? "#CBD5E1" : navy,
                     color: "#ffffff",
                     fontSize: ".8rem",
                     fontWeight: 500,
                     cursor:
-                      page === totalPages ? "not-allowed" : "pointer",
+                      page === totalPages || totalPages === 0 ? "not-allowed" : "pointer",
                     transition: "background .12s",
                   }}
                 >
