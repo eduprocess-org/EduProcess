@@ -15,7 +15,7 @@ export default function RequestManagementPage() {
   const [order, setOrder]         = useState<"asc" | "desc">("desc");
   const [selectedRequests, setSelectedRequests] = useState<string[]>([]);
 
-  const { requests = [], loading, error, totalPages, total, reload } = useAdminRequests({
+  const { requests = [], loading, error, totalPages, total} = useAdminRequests({
     page,
     limit: 10,
     search,
