@@ -12,3 +12,9 @@ export interface RecentRequest {
   status: "PENDING" | "APPROVED" | "REJECTED";
   createdAt: string;
 }
+
+export interface RequestsByProcedure {
+  procedureTypeId: string;
+  procedureName: string;
+  count: number;
+}

@@ -34,7 +34,6 @@ export function AuthProvider({ children }: Props) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // SAFE PARSE 
   const safeParseUser = (value: string | null): User | null => {
     if (!value) return null;
     try {
@@ -44,10 +43,13 @@ export function AuthProvider({ children }: Props) {
     }
   };
 
-  // HYDRATION + SYNC INICIAL
+  // HYDRATION INICIAL
   useEffect(() => {
     const storedUser = safeParseUser(localStorage.getItem("user"));
-    const storedToken = localStorage.getItem("sessionToken");
+
+    const storedToken =
+      localStorage.getItem("sessionToken") ||
+      localStorage.getItem("refreshToken"); // 🔥 FIX
 
     setUser(storedUser);
     setToken(storedToken);
@@ -55,11 +57,14 @@ export function AuthProvider({ children }: Props) {
     setLoading(false);
   }, []);
 
-  //  SYNC ENTRE PESTAÑAS 
+  // SYNC ENTRE PESTAÑAS
   useEffect(() => {
     const syncAuth = () => {
       const storedUser = safeParseUser(localStorage.getItem("user"));
-      const storedToken = localStorage.getItem("sessionToken");
+
+      const storedToken =
+        localStorage.getItem("sessionToken") ||
+        localStorage.getItem("refreshToken");
 
       setUser(storedUser);
       setToken(storedToken);
@@ -81,7 +86,7 @@ export function AuthProvider({ children }: Props) {
     setToken(sessionToken);
   };
 
-  // LOGOUT 
+  // LOGOUT
   const logout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("sessionToken");
@@ -97,7 +102,7 @@ export function AuthProvider({ children }: Props) {
         user,
         token,
         loading,
-        isAuthenticated: !!token,
+        isAuthenticated: !!user && !!token, // 🔥 FIX CLAVE
         login,
         logout,
       }}
