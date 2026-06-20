@@ -1,11 +1,12 @@
+// src/services/admin/requests/adminRequest.service.ts
 import { apiClient } from "../../api/apiClient";
 import type {
   AdminRequestListItem,
-  PaginatedResult,
   AdminRequestDetail,
   AdminRequestDocument,
   AdminRequestHistoryEntry,
   AdminRequestFilters,
+  PaginatedResult,
 } from "../../../types/admin/adminRequest.types";
 
 export const getAdminRequests = async (
@@ -14,13 +15,12 @@ export const getAdminRequests = async (
   limit: number = 10,
   sortField: string = "createdAt",
   sortDirection: "asc" | "desc" = "desc"
-): Promise<PaginatedResult<AdminRequestListItem>> => { 
+): Promise<PaginatedResult<AdminRequestListItem>> => {
   const params = new URLSearchParams();
   params.set("page", String(page));
   params.set("limit", String(limit));
   params.set("sortField", sortField);
   params.set("sortDirection", sortDirection);
-
   if (filters.status) params.set("status", filters.status);
   if (filters.procedureTypeId) params.set("procedureTypeId", filters.procedureTypeId);
   if (filters.career) params.set("career", filters.career);
@@ -45,10 +45,14 @@ export const getAdminRequestHistory = async (id: string): Promise<AdminRequestHi
   return data.data;
 };
 
-export const updateAdminRequestStatus = async (
+export const updateRequestStatus = async (
   id: string,
   status: string,
   comment?: string
-): Promise<void> => {
-  await apiClient.patch(`/admin/requests/${id}/status`, { status, comment });
+): Promise<AdminRequestDetail> => {
+  const { data } = await apiClient.patch(`/admin/requests/${id}/status`, {
+    status,
+    comment,
+  });
+  return data.data;
 };

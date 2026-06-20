@@ -14,7 +14,7 @@ interface Props {
 
 const navy      = "#1B2B5E";
 const borderClr = "#D9E3F0";
-const textMuted = "#64748B";
+const textMuted = "#10294d";
 
 const columns = [
   { label: "Request ID", field: "id" },
@@ -73,7 +73,7 @@ export default function RequestTable({
         <thead>
           <tr
             style={{
-              backgroundColor: "#F8FAFC",
+              backgroundColor: "#b7c8da",
               borderBottom: `0.5px solid ${borderClr}`,
             }}
           >
