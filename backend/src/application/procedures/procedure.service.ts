@@ -1,7 +1,7 @@
 import { ProcedureRepository } from '../../domain/procedures/procedure.repository';
 import { supabase } from '../../infrastructure/config/supabase.config';
 import { logger } from '../../infrastructure/config/logger.config';
-import { isTransitionValid, STATUS_LABELS } from '../../domain/procedures/status-machine';
+import { isTransitionValid, normalizeStatus, STATUS_LABELS } from '../../domain/procedures/status-machine';
 import { StatusHistoryService } from './status-history.service';
 
 export class ProcedureService {
@@ -133,7 +133,8 @@ export class ProcedureService {
         userRole: string,
         comment?: string
     ) {
-        logger.info('Status update attempt', { requestId, newStatus, userId, userRole });
+        const normalizedStatus = normalizeStatus(newStatus);
+        logger.info('Status update attempt', { requestId, newStatus: normalizedStatus, userId, userRole });
 
         if (userRole !== 'admin') {
             logger.warn('Status update rejected: not authorized', { requestId, userId, userRole });
@@ -147,18 +148,18 @@ export class ProcedureService {
         }
 
         const currentStatus = request.status;
-        if (!isTransitionValid(currentStatus, newStatus)) {
+        if (!isTransitionValid(currentStatus, normalizedStatus)) {
             logger.warn('Status update rejected: invalid transition', {
                 requestId,
                 fromStatus: currentStatus,
-                toStatus: newStatus,
+                toStatus: normalizedStatus,
             });
-            throw new Error(`Invalid status transition from ${currentStatus} to ${newStatus}`);
+            throw new Error(`Invalid status transition from ${currentStatus} to ${normalizedStatus}`);
         }
 
         const updatedRequest = await this.procedureRepository.updateStatus({
             requestId,
-            newStatus,
+            newStatus: normalizedStatus,
             userId,
             comment,
         });
@@ -168,20 +169,20 @@ export class ProcedureService {
             userId,
             'STATUS_CHANGE',
             currentStatus,
-            newStatus
+            normalizedStatus
         );
 
         this.statusHistoryService.logStatusChange({
             requestId,
             fromStatus: currentStatus,
-            toStatus: newStatus,
+            toStatus: normalizedStatus,
             userId,
         });
 
         logger.info('Request status updated successfully', {
             requestId,
             fromStatus: currentStatus,
-            toStatus: newStatus,
+            toStatus: normalizedStatus,
             userId,
         });
 

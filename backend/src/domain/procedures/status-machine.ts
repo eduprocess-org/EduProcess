@@ -5,10 +5,16 @@ export const VALID_TRANSITIONS: Record<string, string[]> = {
   rejected: [],
 };
 
+export function normalizeStatus(status: string): string {
+  return status.toLowerCase().trim();
+}
+
 export function isTransitionValid(from: string, to: string): boolean {
-  const allowed = VALID_TRANSITIONS[from];
+  const normalizedFrom = normalizeStatus(from);
+  const normalizedTo = normalizeStatus(to);
+  const allowed = VALID_TRANSITIONS[normalizedFrom];
   if (!allowed) return false;
-  return allowed.includes(to);
+  return allowed.includes(normalizedTo);
 }
 
 export function getNextPossibleStatuses(current: string): string[] {

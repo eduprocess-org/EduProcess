@@ -4,12 +4,19 @@ import { AdminDashboardService } from "../../../application/admin/admin-dashboar
 import { PrismaAdminDashboardRepository } from "../../persistence/prisma/admin/prisma-admin-dashboard.repository";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { adminMiddleware } from "../middlewares/admin.middleware";
+import { ProcedureController } from "../controllers/procedure.controller";
+import { ProcedureService } from "../../../application/procedures/procedure.service";
+import { PrismaProcedureRepository } from "../../persistence/prisma/prisma-procedure.repository";
 
 const router = Router();
 
 const repository = new PrismaAdminDashboardRepository();
 const service = new AdminDashboardService(repository);
 const controller = new AdminDashboardController(service);
+
+const procedureRepository = new PrismaProcedureRepository();
+const procedureService = new ProcedureService(procedureRepository);
+const procedureController = new ProcedureController(procedureService);
 
 // Dashboard stats
 router.get(
@@ -60,6 +67,13 @@ router.get(
   authMiddleware,
   adminMiddleware,
   controller.getRequestHistory
+);
+
+router.patch(
+  "/admin/requests/:id/status",
+  authMiddleware,
+  adminMiddleware,
+  procedureController.updateRequestStatus
 );
 
 export default router;
