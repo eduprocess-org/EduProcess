@@ -60,15 +60,17 @@ const PING_STYLE = `
 `;
 
 export default function RequestStatusBadge({ status }: Props) {
-  const s = styles[status] ?? {
-    bg: "#FFFBEB",
-    color: "#B45309",
-    border: "#FDE68A",
-    dot: "#F59E0B",
-    label: status,
+  // 🔥 Normalizar a mayúsculas para que coincida con las claves de styles
+  const normalizedStatus = status.toUpperCase() as keyof typeof styles;
+  const s = styles[normalizedStatus] ?? {
+    bg: "#F3F4F6",
+    color: "#374151",
+    border: "#D1D5DB",
+    dot: "#9CA3AF",
+    label: status.charAt(0).toUpperCase() + status.slice(1).toLowerCase(),
   };
 
-  const isPulsing = status === "PENDING" || status === "IN_REVIEW";
+  const isPulsing = normalizedStatus === "PENDING" || normalizedStatus === "IN_REVIEW";
 
   return (
     <>
@@ -91,7 +93,7 @@ export default function RequestStatusBadge({ status }: Props) {
           userSelect: "none",
         }}
       >
-        {/* Dot with optional pulse */}
+        {/* Dot con posible pulsación */}
         <span style={{ position: "relative", display: "inline-flex", width: 7, height: 7, flexShrink: 0 }}>
           {isPulsing && (
             <span

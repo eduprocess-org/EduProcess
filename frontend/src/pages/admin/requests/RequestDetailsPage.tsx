@@ -24,7 +24,6 @@ import { useAdminRequestHistory } from "../../../hooks/admin/useAdminRequestHist
 import { updateRequestStatus } from "../../../services/admin/requests/adminRequest.service";
 import ObservationsPanel from "../../../components/admin-requests/ObservationsPanel";
 import type { RequestStatus } from "../../../types/admin/adminRequest.types";
-import { VALID_TRANSITIONS } from "../../../types/admin/adminRequest.types";
 
 // ─── Tokens ───────────────────────────────────────────────────────────────────
 const tk = {
@@ -47,14 +46,14 @@ const tk = {
   inkSoft:  "#334155",
 };
 
-// ─── Status badge (inline, no external component for pending color override) ──
+// ─── Status badge (inline) ──────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
   const s = status.toLowerCase();
   const map: Record<string, { bg: string; color: string; label: string }> = {
-    pending:  { bg: tk.amberBg,   color: tk.amber,   label: "Pending"  },
-    approved: { bg: tk.emeraldBg, color: tk.emerald, label: "Approved" },
-    rejected: { bg: tk.roseBg,    color: tk.rose,    label: "Rejected" },
+    pending:   { bg: tk.amberBg,   color: tk.amber,   label: "Pending"   },
     in_review: { bg: tk.blueSoft,  color: tk.navyMid, label: "In Review" },
+    approved:  { bg: tk.emeraldBg, color: tk.emerald, label: "Approved"  },
+    rejected:  { bg: tk.roseBg,    color: tk.rose,    label: "Rejected"  },
   };
   const style = map[s] ?? { bg: tk.bg, color: tk.muted, label: status };
   return (
@@ -106,13 +105,28 @@ export default function RequestDetailsPage() {
   const loading = detailLoading || docsLoading || historyLoading;
   if (detailError) toast.error("Failed to load request.");
 
+  // ── Lógica de transición alineada con el backend ──────────────────────────
   const initiateStatusTransition = (nextStatus: RequestStatus) => {
     if (!detail) return;
-    const cur = detail.status.toUpperCase() as RequestStatus;
-    if (!(VALID_TRANSITIONS[cur] || []).includes(nextStatus)) {
-      toast.error(`Cannot transition from ${cur} to ${nextStatus}.`);
+
+    // El backend usa minúsculas, nosotros internamente usamos mayúsculas para los tipos,
+    // pero comparamos con el estado en minúsculas (que es lo que viene del backend).
+    const current = detail.status.toLowerCase(); // "pending", "in_review", etc.
+
+    // Reglas estrictas (coinciden con el backend)
+    const allowed: Record<string, RequestStatus[]> = {
+      pending:   ["IN_REVIEW"],
+      in_review: ["APPROVED", "REJECTED"],
+      approved:  [],
+      rejected:  [],
+    };
+
+    const allowedList = allowed[current] || [];
+    if (!allowedList.includes(nextStatus)) {
+      toast.error(`Cannot transition from ${current} to ${nextStatus.toLowerCase()}.`);
       return;
     }
+
     setPendingStatus(nextStatus);
     setIsConfirmOpen(true);
   };
@@ -120,7 +134,7 @@ export default function RequestDetailsPage() {
   const handleAction = async () => {
     if (!detail || !pendingStatus) return;
     setIsConfirmOpen(false);
-    const target = pendingStatus.toLowerCase();
+    const target = pendingStatus.toLowerCase(); // "approved" o "rejected" (o "in_review")
     setPendingStatus(null);
     try {
       setUpdating(true);
@@ -173,8 +187,8 @@ export default function RequestDetailsPage() {
       </div>
     );
 
-  const currentStatus = detail.status.toUpperCase() as RequestStatus;
-  const isTerminal = currentStatus === "APPROVED" || currentStatus === "REJECTED";
+  const currentStatus = detail.status.toLowerCase(); // "pending", "in_review", etc.
+  const isTerminal = currentStatus === "approved" || currentStatus === "rejected";
   const fullName = `${detail.student.firstName} ${detail.student.lastName}`.trim();
 
   return (
@@ -227,39 +241,58 @@ export default function RequestDetailsPage() {
                     This request has been{" "}
                     <span
                       className="font-bold"
-                      style={{ color: currentStatus === "APPROVED" ? tk.emerald : tk.rose }}
+                      style={{ color: currentStatus === "approved" ? tk.emerald : tk.rose }}
                     >
-                      {currentStatus === "APPROVED" ? "approved" : "rejected"}
+                      {currentStatus}
                     </span>{" "}
                     and can no longer be modified.
                   </p>
                 )}
               </div>
 
+              {/* ── Botones condicionales ─────────────────────────────── */}
               {!isTerminal && (
                 <div className="flex gap-2">
-                  <button
-                    disabled={updating}
-                    onClick={() => initiateStatusTransition("APPROVED")}
-                    className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white"
-                    style={{
-                      background: tk.emerald,
-                      boxShadow: "0 3px 12px rgba(5,150,105,.30)",
-                    }}
-                  >
-                    <CheckCircle2 size={13} /> Approve
-                  </button>
-                  <button
-                    disabled={updating}
-                    onClick={() => initiateStatusTransition("REJECTED")}
-                    className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white"
-                    style={{
-                      background: tk.rose,
-                      boxShadow: "0 3px 12px rgba(220,38,38,.25)",
-                    }}
-                  >
-                    <XCircle size={13} /> Reject
-                  </button>
+                  {currentStatus === "pending" && (
+                    <button
+                      disabled={updating}
+                      onClick={() => initiateStatusTransition("IN_REVIEW")}
+                      className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white"
+                      style={{
+                        background: tk.navyMid,
+                        boxShadow: "0 3px 12px rgba(26,82,168,.30)",
+                      }}
+                    >
+                      <RefreshCw size={13} /> Start Review
+                    </button>
+                  )}
+
+                  {currentStatus === "in_review" && (
+                    <>
+                      <button
+                        disabled={updating}
+                        onClick={() => initiateStatusTransition("APPROVED")}
+                        className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white"
+                        style={{
+                          background: tk.emerald,
+                          boxShadow: "0 3px 12px rgba(5,150,105,.30)",
+                        }}
+                      >
+                        <CheckCircle2 size={13} /> Approve
+                      </button>
+                      <button
+                        disabled={updating}
+                        onClick={() => initiateStatusTransition("REJECTED")}
+                        className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white"
+                        style={{
+                          background: tk.rose,
+                          boxShadow: "0 3px 12px rgba(220,38,38,.25)",
+                        }}
+                      >
+                        <XCircle size={13} /> Reject
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -371,7 +404,7 @@ export default function RequestDetailsPage() {
                 {/* Observations */}
                 <ObservationsPanel requestId={detail.id} />
 
-                {/* Reviewer notes */}
+                {/* Reviewer notes (solo si no es terminal) */}
                 {!isTerminal && (
                   <>
                     <Sep />
@@ -465,11 +498,11 @@ export default function RequestDetailsPage() {
           >
             <div
               className="w-11 h-11 flex items-center justify-center rounded-2xl mb-4"
-              style={{ background: pendingStatus === "APPROVED" ? tk.emeraldBg : tk.roseBg }}
+              style={{ background: pendingStatus === "APPROVED" ? tk.emeraldBg : pendingStatus === "REJECTED" ? tk.roseBg : tk.blueSoft }}
             >
               <AlertTriangle
                 size={20}
-                style={{ color: pendingStatus === "APPROVED" ? tk.emerald : tk.rose }}
+                style={{ color: pendingStatus === "APPROVED" ? tk.emerald : pendingStatus === "REJECTED" ? tk.rose : tk.navyMid }}
               />
             </div>
             <h3 className="text-base font-extrabold mb-1" style={{ color: tk.ink }}>
@@ -479,7 +512,7 @@ export default function RequestDetailsPage() {
               Mark this request as{" "}
               <span
                 className="font-extrabold uppercase"
-                style={{ color: pendingStatus === "APPROVED" ? tk.emerald : tk.rose }}
+                style={{ color: pendingStatus === "APPROVED" ? tk.emerald : pendingStatus === "REJECTED" ? tk.rose : tk.navyMid }}
               >
                 {pendingStatus}
               </span>
@@ -511,11 +544,13 @@ export default function RequestDetailsPage() {
                 disabled={updating}
                 className="flex-1 py-2.5 text-xs font-extrabold text-white rounded-xl transition-all active:scale-95 disabled:opacity-50"
                 style={{
-                  background: pendingStatus === "APPROVED" ? tk.emerald : tk.rose,
+                  background: pendingStatus === "APPROVED" ? tk.emerald : pendingStatus === "REJECTED" ? tk.rose : tk.navyMid,
                   boxShadow:
                     pendingStatus === "APPROVED"
                       ? "0 3px 12px rgba(5,150,105,.30)"
-                      : "0 3px 12px rgba(220,38,38,.25)",
+                      : pendingStatus === "REJECTED"
+                      ? "0 3px 12px rgba(220,38,38,.25)"
+                      : "0 3px 12px rgba(26,82,168,.25)",
                 }}
               >
                 {updating ? "Updating…" : "Yes, confirm"}
