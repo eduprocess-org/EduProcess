@@ -44,3 +44,11 @@ export const getAdminRequestHistory = async (id: string): Promise<AdminRequestHi
   const { data } = await apiClient.get(`/admin/requests/${id}/history`);
   return data.data;
 };
+
+export const updateAdminRequestStatus = async (
+  id: string,
+  status: string,
+  comment?: string
+): Promise<void> => {
+  await apiClient.patch(`/admin/requests/${id}/status`, { status, comment });
+};
