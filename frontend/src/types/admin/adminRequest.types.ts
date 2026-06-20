@@ -3,8 +3,8 @@ export type RequestStatus = "PENDING" | "IN_REVIEW" | "APPROVED" | "REJECTED";
 export const VALID_TRANSITIONS: Record<RequestStatus, RequestStatus[]> = {
   PENDING: ["IN_REVIEW", "APPROVED", "REJECTED"],
   IN_REVIEW: ["APPROVED", "REJECTED"],
-  APPROVED: [], 
-  REJECTED: [], 
+  APPROVED: [],
+  REJECTED: [],
 };
 
 export interface AdminRequestListItem {
@@ -14,7 +14,7 @@ export interface AdminRequestListItem {
   procedureName: string;
   career: string | null;
   semester: string | null;
-  status: string;
+  status: RequestStatus; 
   createdAt: string;
   updatedAt: string;
 }
@@ -44,7 +44,7 @@ export interface AdminRequestDetail {
   career: string | null;
   semester: string | null;
   reason: string | null;
-  status: string;
+  status: RequestStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -66,7 +66,7 @@ export interface AdminRequestHistoryEntry {
 }
 
 export interface AdminRequestFilters {
-  status?: string;
+  status?: RequestStatus;
   procedureTypeId?: string;
   career?: string;
   search?: string;

@@ -199,35 +199,35 @@ export default function RequestTableRow({
       </td>
 
       <td className="px-5 py-3.5">
-        <button
-          type="button"
-          onClick={onView}
-          style={{
-            padding: "5px 14px",
-            borderRadius: 7,
-            border: "0.5px solid #D9E3F0",
-            background: "#ffffff",
-            fontSize: ".75rem",
-            fontWeight: 500,
-            color: navy,
-            cursor: "pointer",
-            transition: "background .12s, border-color .12s, color .12s",
-          }}
-          onMouseEnter={(e) => {
-            const btn = e.currentTarget;
-            btn.style.background = "#EFF6FF";
-            btn.style.borderColor = "#BFDBFE";
-            btn.style.color = blue;
-          }}
-          onMouseLeave={(e) => {
-            const btn = e.currentTarget;
-            btn.style.background = "#ffffff";
-            btn.style.borderColor = "#D9E3F0";
-            btn.style.color = navy;
-          }}
-        >
-          View
-        </button>
+       <button
+        type="button"
+        onClick={onView}
+        style={{
+          padding: "5px 14px",
+          borderRadius: 7,
+          border: "0.5px solid #7c9fcc",
+          background: "#3065a1",
+          fontSize: ".75rem",
+          fontWeight: 500,
+          color: "white",
+          cursor: "pointer",
+          transition: "background .12s, border-color .12s, color .12s",
+        }}
+        onMouseEnter={(e) => {
+          const btn = e.currentTarget;
+          btn.style.background = "#1f4e7a";      // azul más oscuro
+          btn.style.borderColor = "#1f4e7a";     // mismo que fondo para fusión
+          btn.style.color = "white";             // texto sigue blanco
+        }}
+        onMouseLeave={(e) => {
+          const btn = e.currentTarget;
+          btn.style.background = "#3065a1";      // vuelve al normal
+          btn.style.borderColor = "#7c9fcc";     // vuelve al borde claro
+          btn.style.color = "white";             // vuelve a blanco
+        }}
+      >
+        View
+      </button>
       </td>
     </tr>
   );

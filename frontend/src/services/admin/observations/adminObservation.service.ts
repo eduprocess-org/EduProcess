@@ -15,12 +15,8 @@ export const createObservation = async (
   return response.data.data;
 };
 
-export const getObservationsByRequest = async (
-  requestId: string
-): Promise<AdminObservation[]> => {
-  const response = await apiClient.get(
-    `/admin/requests/${requestId}/observations`
-  );
+export const getObservationsByRequest = async (requestId: string): Promise<AdminObservation[]> => {
+  const response = await apiClient.get(`/admin/requests/${requestId}/observations`);
   return response.data.data;
 };
 
