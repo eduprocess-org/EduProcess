@@ -1,7 +1,7 @@
 import { apiClient } from "../../api/apiClient";
-import type { 
-  AdminObservation, 
-  CreateObservationRequest 
+import type {
+  AdminObservation,
+  CreateObservationRequest,
 } from "../../../types/admin/adminObservation.types";
 
 export const createObservation = async (

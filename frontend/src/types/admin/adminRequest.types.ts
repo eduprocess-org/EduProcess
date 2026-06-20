@@ -1,12 +1,14 @@
 export type RequestStatus = "PENDING" | "IN_REVIEW" | "APPROVED" | "REJECTED";
 
+// ─── Transiciones válidas del flujo de trabajo ──────────────────────────────
 export const VALID_TRANSITIONS: Record<RequestStatus, RequestStatus[]> = {
-  PENDING: ["IN_REVIEW", "APPROVED", "REJECTED"],
+  PENDING: ["IN_REVIEW"],
   IN_REVIEW: ["APPROVED", "REJECTED"],
-  APPROVED: [], 
-  REJECTED: [], 
+  APPROVED: [],
+  REJECTED: [],
 };
 
+// ─── Interfaces ──────────────────────────────────────────────────────────────
 export interface AdminRequestListItem {
   id: string;
   studentName: string;
@@ -14,7 +16,7 @@ export interface AdminRequestListItem {
   procedureName: string;
   career: string | null;
   semester: string | null;
-  status: string;
+  status: RequestStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -44,7 +46,7 @@ export interface AdminRequestDetail {
   career: string | null;
   semester: string | null;
   reason: string | null;
-  status: string;
+  status: RequestStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -66,7 +68,7 @@ export interface AdminRequestHistoryEntry {
 }
 
 export interface AdminRequestFilters {
-  status?: string;
+  status?: RequestStatus;
   procedureTypeId?: string;
   career?: string;
   search?: string;

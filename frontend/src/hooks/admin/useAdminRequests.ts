@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import { getAdminRequests } from "../../services/admin/requests/adminRequest.service";
-
 import type {
   AdminRequestListItem,
   AdminRequestFilters,
+  RequestStatus,
 } from "../../types/admin/adminRequest.types";
+
+const VALID_STATUSES: RequestStatus[] = ["PENDING", "IN_REVIEW", "APPROVED", "REJECTED"];
 
 interface UseAdminRequestsParams {
   page: number;
   limit: number;
   search: string;
-  status: string;
-  procedureTypeId: string; 
+  status: string; 
+  procedureTypeId: string;
   sortField: string;
   sortDirection: "asc" | "desc";
 }
@@ -34,8 +36,13 @@ export function useAdminRequests(params: UseAdminRequestsParams) {
       setLoading(true);
       setError(null);
 
+      // Validar que el status sea uno de los valores permitidos (en mayúsculas)
+      const validStatus = VALID_STATUSES.includes(status as RequestStatus)
+        ? (status as RequestStatus)
+        : undefined;
+
       const filters: AdminRequestFilters = {
-        status: status || undefined,
+        status: validStatus,
         search: search || undefined,
         procedureTypeId: procedureTypeId || undefined,
       };

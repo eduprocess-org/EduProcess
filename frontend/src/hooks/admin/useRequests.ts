@@ -3,17 +3,16 @@ import  {
   getRequests,
   type GetRequestsParams,
 } from "../../services/admin/requests/request.service";
-import type { ProcedureRequest } from "../../types/admin/request";
+import type { AdminRequestListItem } from '../../types/admin/adminRequest.types';
 
 export function useRequests(params: GetRequestsParams) {
-  const [requests, setRequests] = useState<
-    ProcedureRequest[]
-  >([]);
+ const [requests, setRequests] = useState<AdminRequestListItem[]>([]);
+
 
   const [total, setTotal] = useState(0);
 
   const [loading, setLoading] = useState(true);
-
+  
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -41,7 +40,7 @@ export function useRequests(params: GetRequestsParams) {
     params.limit,
     params.search,
     params.status,
-    params.procedure,
+    params.procedureTypeId,
   ]);
 
   return {
