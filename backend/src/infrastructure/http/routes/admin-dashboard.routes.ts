@@ -18,7 +18,6 @@ const procedureRepository = new PrismaProcedureRepository();
 const procedureService = new ProcedureService(procedureRepository);
 const procedureController = new ProcedureController(procedureService);
 
-// Dashboard stats
 router.get(
   "/admin/dashboard/stats",
   authMiddleware,
@@ -40,7 +39,6 @@ router.get(
   controller.getRequestsByProcedureType
 );
 
-// Request management
 router.get(
   "/admin/requests",
   authMiddleware,

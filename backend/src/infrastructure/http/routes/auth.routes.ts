@@ -15,7 +15,6 @@ authRouter.post('/register', authController.register);
 authRouter.post('/login', authController.login);
 authRouter.post('/refresh', authController.refresh);
 
-// Protected routes
 authRouter.get('/me', authMiddleware as any, authController.me);
 authRouter.post('/logout', authMiddleware as any, authController.logout);
 
