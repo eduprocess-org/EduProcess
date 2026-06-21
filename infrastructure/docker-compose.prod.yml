@@ -40,6 +40,10 @@ services:
     restart: always
     ports:
       - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.external-url=/prometheus/'
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./alert.rules.yml:/etc/prometheus/alert.rules.yml:ro
@@ -70,8 +74,12 @@ services:
     restart: always
     ports:
       - "3000:3000"
-      - grafana-prod-data:/var/lib/grafana
-      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+    environment:
+      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/ 
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true                            
+    volumes:
+      - grafana-prod-data:/var/lib/grafana                                 
+      - ./grafana-datasources.prod.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
       - ./grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro
       - ./dashboards/eduprocess_metrics.json:/var/lib/grafana/dashboards/eduprocess_metrics.json:ro
     networks:
