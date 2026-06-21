@@ -3,6 +3,7 @@ import { getAdminRequests } from "../../services/admin/requests/adminRequest.ser
 import type {
   AdminRequestListItem,
   AdminRequestFilters,
+  RequestStatus,
 } from "../../types/admin/adminRequest.types";
 
 const VALID_STATUSES = ["pending", "in_review", "approved", "rejected"] as const;
@@ -36,7 +37,7 @@ export function useAdminRequests(params: UseAdminRequestsParams) {
       setError(null);
 
       const validStatus = VALID_STATUSES.includes(status as typeof VALID_STATUSES[number])
-        ? status
+        ? (status as RequestStatus)
         : undefined;
 
       const filters: AdminRequestFilters = {

@@ -7,7 +7,7 @@ describe("RequestStatusBadge", () => {
   it("renders pending", () => {
     render(
       <RequestStatusBadge
-        status="PENDING"
+        status="pending"
       />
     );
 
@@ -19,7 +19,7 @@ describe("RequestStatusBadge", () => {
   it("renders approved", () => {
     render(
       <RequestStatusBadge
-        status="APPROVED"
+        status="approved"
       />
     );
 
@@ -31,7 +31,7 @@ describe("RequestStatusBadge", () => {
   it("renders rejected", () => {
     render(
       <RequestStatusBadge
-        status="REJECTED"
+        status="rejected"
       />
     );
 
