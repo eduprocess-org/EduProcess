@@ -10,7 +10,7 @@ const mockRequests: AdminRequestListItem[] = [
     studentName: "Vanessa Heredia",
     studentEmail: "vanessa.heredia@uce.edu.ec",
     procedureName: "Certificado de Matrícula",
-    status: "PENDING",
+    status: "pending",
     career: "Sistemas",      
     semester: "7",           
     createdAt: "2026-06-19T02:00:00.000Z", 

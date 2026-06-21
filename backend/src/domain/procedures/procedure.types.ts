@@ -25,7 +25,7 @@ export interface ObservationDTO {
     id: string;
     comment: string;
     createdAt: Date;
-    adminName?: string; // Optional: computed or fetched relation
+    adminName?: string;
 }
 
 export interface ProcedureRequestDTO {
@@ -43,8 +43,6 @@ export interface ProcedureRequestDTO {
     observations?: ObservationDTO[];
     auditLogs?: AuditLogEntryDTO[];
 }
-
-// Input Types
 
 export interface AuditLogEntryDTO {
     id: string;

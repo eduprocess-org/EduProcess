@@ -3,6 +3,7 @@ import type { RequestTracking } from "../../../types/student/request-tracking.ty
 import type {
   ApiResponse,
   ApiRequest,
+  ApiTimelineEntry,
 } from "../../../types/api.types";
 
 const STATUS_MAP: Record<
@@ -18,53 +19,30 @@ const STATUS_MAP: Record<
 export async function getRequestTracking(
   requestId: string
 ): Promise<RequestTracking> {
-  const response =
-    await apiClient.get<
-      ApiResponse<ApiRequest>
-    >(`/requests/${requestId}/tracking`);
+  const [trackingResponse, timelineResponse] = await Promise.all([
+    apiClient.get<ApiResponse<ApiRequest>>(`/requests/${requestId}/tracking`),
+    apiClient.get<ApiResponse<ApiTimelineEntry[]>>(`/requests/${requestId}/timeline`),
+  ]);
 
-  const item = response.data.data;
+  const item = trackingResponse.data.data;
+  const timelineEntries = timelineResponse.data.data ?? [];
 
-  const observations =
-    item.observations ?? [];
+  const observations = item.observations ?? [];
+  const lastObservation = observations[observations.length - 1];
 
-  const lastObservation =
-    observations[observations.length - 1];
-
-  const timeline = [
-    {
-      status: "Submitted",
-      date:
-        item.createdAt?.split("T")[0] ?? "",
-      description:
-        "Request submitted successfully.",
-    },
-  ];
-
-  observations.forEach((obs) => {
-    timeline.push({
-      status:
-        STATUS_MAP[item.status] ??
-        "Under Review",
-      date:
-        obs.createdAt?.split("T")[0] ?? "",
-      description: obs.comment,
-    });
-  });
+  const timeline = timelineEntries.map((entry) => ({
+    status: entry.status,
+    date: entry.date,
+    description: entry.description,
+  }));
 
   return {
     requestId: item.id,
-    procedureName:
-      item.procedure?.name ?? "",
-    status:
-      STATUS_MAP[item.status] ??
-      "Submitted",
-    submissionDate:
-      item.createdAt?.split("T")[0] ?? "",
-    lastUpdateDate:
-      item.updatedAt?.split("T")[0] ?? "",
-    administrativeComments:
-      lastObservation?.comment ?? "",
+    procedureName: item.procedure?.name ?? "",
+    status: STATUS_MAP[item.status] ?? "Submitted",
+    submissionDate: item.createdAt?.split("T")[0] ?? "",
+    lastUpdateDate: item.updatedAt?.split("T")[0] ?? "",
+    administrativeComments: lastObservation?.comment ?? "",
     timeline,
   };
 }

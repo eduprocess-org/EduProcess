@@ -11,7 +11,6 @@ const repository = new PrismaObservationRepository();
 const service = new ObservationService(repository);
 const controller = new ObservationController(service);
 
-// Create observation for a request (admin only)
 router.post(
     '/admin/requests/:requestId/observations',
     authMiddleware,
@@ -19,7 +18,6 @@ router.post(
     controller.createObservation
 );
 
-// Get all observations for a request (admin only)
 router.get(
     '/admin/requests/:requestId/observations',
     authMiddleware,
@@ -27,7 +25,6 @@ router.get(
     controller.getObservationsByRequest
 );
 
-// Get single observation by id (admin only)
 router.get(
     '/admin/observations/:id',
     authMiddleware,
@@ -35,7 +32,6 @@ router.get(
     controller.getObservationById
 );
 
-// Delete observation (admin only)
 router.delete(
     '/admin/observations/:id',
     authMiddleware,

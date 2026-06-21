@@ -55,6 +55,7 @@ describe(
 
           loading: false,
           error: "",
+          refresh: vi.fn(),
         });
 
         render(
@@ -93,6 +94,7 @@ describe(
           loading: false,
           error:
             "Failed to load tracking information.",
+          refresh: vi.fn(),
         });
 
         render(
@@ -130,6 +132,7 @@ describe(
           tracking: null,
           loading: false,
           error: "",
+          refresh: vi.fn(),
         });
 
         render(
