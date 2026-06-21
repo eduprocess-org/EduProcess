@@ -211,3 +211,28 @@ jobs:
             docker compose pull
             docker compose up -d --remove-orphans --force-recreate
             docker image prune -f
+  
+  orchestrate-release:
+    name: Automated Release Governance & Archival
+    runs-on: ubuntu-latest
+    needs: deploy-prod
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout Monorepo Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Authenticate to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Run Release Orchestration Script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: |
+          chmod +x ./infrastructure/scripts/orchestrate-release.sh
+          ./infrastructure/scripts/orchestrate-release.sh
