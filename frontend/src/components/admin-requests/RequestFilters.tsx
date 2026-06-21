@@ -1,4 +1,5 @@
 import React from "react";
+import { useProcedureTypes } from "../../hooks/admin/useProcedureTypes";
 
 interface Props {
   search: string;
@@ -86,6 +87,8 @@ export default function RequestFilters({
   onStatusChange,
   onProcedureChange,
 }: Props) {
+  const { procedureTypes } = useProcedureTypes();
+
   return (
     <div className="grid gap-3 md:grid-cols-3">
 
@@ -126,10 +129,11 @@ export default function RequestFilters({
         onChange={(e) => onProcedureChange(e.target.value)}
       >
         <option value="">All Procedures</option>
-        <option value="Academic Certificate">Academic Certificate</option>
-        <option value="Enrollment Certificate">Enrollment Certificate</option>
-        <option value="Grade Report">Grade Report</option>
-        <option value="Graduation Certificate">Graduation Certificate</option>
+        {procedureTypes.map((pt) => (
+          <option key={pt.id} value={pt.id}>
+            {pt.name}
+          </option>
+        ))}
       </FocusSelect>
 
     </div>

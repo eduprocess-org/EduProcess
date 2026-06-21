@@ -109,21 +109,18 @@ export default function RequestDetailsPage() {
   const initiateStatusTransition = (nextStatus: RequestStatus) => {
     if (!detail) return;
 
-    // El backend usa minúsculas, nosotros internamente usamos mayúsculas para los tipos,
-    // pero comparamos con el estado en minúsculas (que es lo que viene del backend).
-    const current = detail.status.toLowerCase(); // "pending", "in_review", etc.
+    const current = detail.status.toLowerCase();
 
-    // Reglas estrictas (coinciden con el backend)
     const allowed: Record<string, RequestStatus[]> = {
-      pending:   ["IN_REVIEW"],
-      in_review: ["APPROVED", "REJECTED"],
+      pending:   ["in_review"],
+      in_review: ["approved", "rejected"],
       approved:  [],
       rejected:  [],
     };
 
     const allowedList = allowed[current] || [];
     if (!allowedList.includes(nextStatus)) {
-      toast.error(`Cannot transition from ${current} to ${nextStatus.toLowerCase()}.`);
+      toast.error(`Cannot transition from ${current} to ${nextStatus}.`);
       return;
     }
 
@@ -134,7 +131,7 @@ export default function RequestDetailsPage() {
   const handleAction = async () => {
     if (!detail || !pendingStatus) return;
     setIsConfirmOpen(false);
-    const target = pendingStatus.toLowerCase(); // "approved" o "rejected" (o "in_review")
+    const target = pendingStatus;
     setPendingStatus(null);
     try {
       setUpdating(true);
@@ -256,7 +253,7 @@ export default function RequestDetailsPage() {
                   {currentStatus === "pending" && (
                     <button
                       disabled={updating}
-                      onClick={() => initiateStatusTransition("IN_REVIEW")}
+                      onClick={() => initiateStatusTransition("in_review")}
                       className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white"
                       style={{
                         background: tk.navyMid,
@@ -271,7 +268,7 @@ export default function RequestDetailsPage() {
                     <>
                       <button
                         disabled={updating}
-                        onClick={() => initiateStatusTransition("APPROVED")}
+                        onClick={() => initiateStatusTransition("approved")}
                         className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white"
                         style={{
                           background: tk.emerald,
@@ -282,7 +279,7 @@ export default function RequestDetailsPage() {
                       </button>
                       <button
                         disabled={updating}
-                        onClick={() => initiateStatusTransition("REJECTED")}
+                        onClick={() => initiateStatusTransition("rejected")}
                         className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white"
                         style={{
                           background: tk.rose,
@@ -498,11 +495,11 @@ export default function RequestDetailsPage() {
           >
             <div
               className="w-11 h-11 flex items-center justify-center rounded-2xl mb-4"
-              style={{ background: pendingStatus === "APPROVED" ? tk.emeraldBg : pendingStatus === "REJECTED" ? tk.roseBg : tk.blueSoft }}
+              style={{ background: pendingStatus === "approved" ? tk.emeraldBg : pendingStatus === "rejected" ? tk.roseBg : tk.blueSoft }}
             >
               <AlertTriangle
                 size={20}
-                style={{ color: pendingStatus === "APPROVED" ? tk.emerald : pendingStatus === "REJECTED" ? tk.rose : tk.navyMid }}
+                style={{ color: pendingStatus === "approved" ? tk.emerald : pendingStatus === "rejected" ? tk.rose : tk.navyMid }}
               />
             </div>
             <h3 className="text-base font-extrabold mb-1" style={{ color: tk.ink }}>
@@ -512,7 +509,7 @@ export default function RequestDetailsPage() {
               Mark this request as{" "}
               <span
                 className="font-extrabold uppercase"
-                style={{ color: pendingStatus === "APPROVED" ? tk.emerald : pendingStatus === "REJECTED" ? tk.rose : tk.navyMid }}
+                style={{ color: pendingStatus === "approved" ? tk.emerald : pendingStatus === "rejected" ? tk.rose : tk.navyMid }}
               >
                 {pendingStatus}
               </span>
@@ -544,11 +541,11 @@ export default function RequestDetailsPage() {
                 disabled={updating}
                 className="flex-1 py-2.5 text-xs font-extrabold text-white rounded-xl transition-all active:scale-95 disabled:opacity-50"
                 style={{
-                  background: pendingStatus === "APPROVED" ? tk.emerald : pendingStatus === "REJECTED" ? tk.rose : tk.navyMid,
+                  background: pendingStatus === "approved" ? tk.emerald : pendingStatus === "rejected" ? tk.rose : tk.navyMid,
                   boxShadow:
-                    pendingStatus === "APPROVED"
+                    pendingStatus === "approved"
                       ? "0 3px 12px rgba(5,150,105,.30)"
-                      : pendingStatus === "REJECTED"
+                      : pendingStatus === "rejected"
                       ? "0 3px 12px rgba(220,38,38,.25)"
                       : "0 3px 12px rgba(26,82,168,.25)",
                 }}
