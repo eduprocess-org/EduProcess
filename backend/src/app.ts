@@ -34,16 +34,16 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     next();
 });
 
-app.get('/api/v1/metrics', async (req: Request, res: Response) => {
-    res.setHeader('Content-Type', client.register.contentType);
-    res.send(await client.register.metrics());
-});
-
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1', procedureRouter);
 app.use('/api/v1', careerRouter);
 app.use('/api/v1', adminDashboardRouter);
 app.use('/api/v1', observationRouter);
+
+app.get('/api/v1/metrics', async (req: Request, res: Response) => {
+    res.setHeader('Content-Type', client.register.contentType);
+    res.send(await client.register.metrics());
+});
 
 app.get('/api/v1/health', (req: Request, res: Response) => {
     res.status(200).json({
