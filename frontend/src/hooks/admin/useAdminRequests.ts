@@ -6,7 +6,7 @@ import type {
   RequestStatus,
 } from "../../types/admin/adminRequest.types";
 
-const VALID_STATUSES: RequestStatus[] = ["PENDING", "IN_REVIEW", "APPROVED", "REJECTED"];
+const VALID_STATUSES = ["pending", "in_review", "approved", "rejected"] as const;
 
 interface UseAdminRequestsParams {
   page: number;
@@ -36,8 +36,7 @@ export function useAdminRequests(params: UseAdminRequestsParams) {
       setLoading(true);
       setError(null);
 
-      // Validar que el status sea uno de los valores permitidos (en mayúsculas)
-      const validStatus = VALID_STATUSES.includes(status as RequestStatus)
+      const validStatus = VALID_STATUSES.includes(status as typeof VALID_STATUSES[number])
         ? (status as RequestStatus)
         : undefined;
 

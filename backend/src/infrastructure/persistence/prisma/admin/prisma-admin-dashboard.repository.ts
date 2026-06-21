@@ -15,6 +15,10 @@ import {
   AdminRequestHistoryEntry,
 } from "../../../../domain/admin/admin.types";
 
+function isValidUUID(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
 export class PrismaAdminDashboardRepository implements AdminDashboardRepository {
   async getDashboardStats(): Promise<DashboardStatsDTO> {
     const [totalRequests, pendingRequests, approvedRequests, rejectedRequests] =
@@ -91,7 +95,7 @@ export class PrismaAdminDashboardRepository implements AdminDashboardRepository 
     if (filters.status) {
       where.status = filters.status;
     }
-    if (filters.procedureTypeId) {
+    if (filters.procedureTypeId && isValidUUID(filters.procedureTypeId)) {
       where.procedureTypeId = filters.procedureTypeId;
     }
     if (filters.career) {
