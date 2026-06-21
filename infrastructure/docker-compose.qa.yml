@@ -33,6 +33,58 @@ services:
       - backend
       - frontend
 
+  prometheus:
+    image: prom/prometheus:v2.51.1
+    container_name: eduprocess-prometheus-qa
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alert.rules.yml:/etc/prometheus/alert.rules.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - eduprocess-qa-network
+    depends_on:
+      - backend
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: eduprocess-cadvisor-qa
+    restart: always
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+    networks:
+      - eduprocess-qa-network
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: eduprocess-grafana-qa
+    restart: always
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+      - ./grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro
+      - ./dashboards/eduprocess_metrics.json:/var/lib/grafana/dashboards/eduprocess_metrics.json:ro
+    networks:
+      - eduprocess-qa-network
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
 networks:
   eduprocess-qa-network:
     driver: bridge

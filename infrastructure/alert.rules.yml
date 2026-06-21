@@ -1,0 +1,23 @@
+groups:
+  - name: EduProcessAlerts
+    rules:
+      # 1. CRITICAL ALERT: Backend Down
+      - alert: BackendDown
+        expr: up{job="eduprocess-backend-qa"} == 0
+        for: 1m # Triggers if it reports 0 for more than 1 minute
+        labels:
+          severity: critical
+        annotations:
+          summary: "CRITICAL ALERT: EduProcess Core Backend is down"
+          description: "The eduprocess-backend-qa container is not responding to Prometheus scraping in the QA environment."
+
+      # 2. WARNING ALERT: Excessive Docker RAM Usage (Free Tier constraints)
+      # Triggers if global Docker memory consumption exceeds 1.8 GB (close to the t2.micro EC2 limit)
+      - alert: HighContainerMemoryUsage
+        expr: container_memory_usage_bytes{id="/docker"} > 1800000000
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected in containers"
+          description: "Cumulative memory usage within the Docker environment has been above 1.8 GB for more than 2 minutes."
