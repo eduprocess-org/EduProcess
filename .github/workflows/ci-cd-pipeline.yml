@@ -157,7 +157,7 @@ jobs:
           host: ${{ secrets.QA_SSH_HOST }}
           username: ubuntu
           key: ${{ secrets.QA_SSH_KEY }}
-          source: "infrastructure/docker-compose.qa.yml,infrastructure/nginx.qa.conf,infrastructure/prometheus.yml,infrastructure/alert.rules.yml,infrastructure/grafana-datasources.yml,infrastructure/grafana-dashboards.yml,infrastructure/dashboards/eduprocess_metrics.json"
+          source: "infrastructure/docker-compose.qa.yml,infrastructure/nginx.qa.conf,infrastructure/prometheus.yml,infrastructure/alert.rules.yml,infrastructure/grafana-datasources.qa.yml,infrastructure/grafana-dashboards.yml,infrastructure/dashboards/eduprocess_metrics.json"
           target: "~/eduprocess-qa"
           strip_components: 1
 
@@ -171,6 +171,7 @@ jobs:
             cd ~/eduprocess-qa
             mv docker-compose.qa.yml docker-compose.yml 2>/dev/null || true
             mv nginx.qa.conf nginx.conf 2>/dev/null || true
+            mv grafana-datasources.qa.yml grafana-datasources.qa.yml 2>/dev/null || true
             sudo systemctl stop nginx 2>/dev/null || true
             sudo systemctl disable nginx 2>/dev/null || true
             docker compose pull
@@ -192,7 +193,7 @@ jobs:
           host: ${{ secrets.PROD_SSH_HOST }}
           username: ubuntu
           key: ${{ secrets.PROD_SSH_KEY }}
-          source: "infrastructure/docker-compose.prod.yml,infrastructure/nginx.prod.conf,infrastructure/prometheus.yml,infrastructure/alert.rules.yml,infrastructure/grafana-datasources.yml,infrastructure/grafana-dashboards.yml,infrastructure/dashboards/eduprocess_metrics.json"
+          source: "infrastructure/docker-compose.prod.yml,infrastructure/nginx.prod.conf,infrastructure/prometheus.yml,infrastructure/alert.rules.yml,infrastructure/grafana-datasources.prod.yml,infrastructure/grafana-dashboards.yml,infrastructure/dashboards/eduprocess_metrics.json"
           target: "~/eduprocess-prod"
           strip_components: 1
 
@@ -206,6 +207,7 @@ jobs:
             cd ~/eduprocess-prod
             mv docker-compose.prod.yml docker-compose.yml 2>/dev/null || true
             mv nginx.prod.conf nginx.conf 2>/dev/null || true
+            mv grafana-datasources.prod.yml grafana-datasources.prod.yml 2>/dev/null || true
             sudo systemctl stop nginx 2>/dev/null || true
             sudo systemctl disable nginx 2>/dev/null || true
             docker compose pull
