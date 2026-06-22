@@ -24,7 +24,6 @@ jobs:
           filters: |
             frontend_files:
               - 'frontend/**'
-              - 'infrastructure/**'
               - '.github/workflows/ci-cd-pipeline.yml'
 
       - name: Setup Node.js v24 Environment
@@ -60,7 +59,6 @@ jobs:
           filters: |
             backend_files:
               - 'backend/**'
-              - 'infrastructure/**'
               - '.github/workflows/ci-cd-pipeline.yml'
 
       - name: Setup Node.js v22 LTS Environment
@@ -103,10 +101,8 @@ jobs:
           filters: |
             backend:
               - 'backend/**'
-              - 'infrastructure/**'
             frontend:
               - 'frontend/**'
-              - 'infrastructure/**'
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -129,7 +125,7 @@ jobs:
           fi
 
       - name: Build and Push Backend Image
-        if: steps.docker-filter.outputs.backend == 'true' || github.run_attempt > 1
+        if: steps.docker-filter.outputs.backend == 'true'
         uses: docker/build-push-action@v6
         with:
           context: ./backend
@@ -138,7 +134,7 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/eduprocess-backend:${{ steps.get-tag.outputs.env_tag }}
 
       - name: Build and Push Frontend Image
-        if: steps.docker-filter.outputs.frontend == 'true' || github.run_attempt > 1
+        if: steps.docker-filter.outputs.frontend == 'true'
         uses: docker/build-push-action@v6
         with:
           context: ./frontend
@@ -239,6 +235,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          run: |
-            chmod +x ./infrastructure/scripts/orchestrate-release.sh
-            ./infrastructure/scripts/orchestrate-release.sh
+        run: |
+          chmod +x ./infrastructure/scripts/orchestrate-release.sh
+          ./infrastructure/scripts/orchestrate-release.sh
