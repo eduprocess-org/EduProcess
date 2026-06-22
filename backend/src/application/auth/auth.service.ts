@@ -17,7 +17,6 @@ export class AuthService {
     constructor(private readonly authRepository: AuthRepository) { }
 
     async registerStudent(request: RegisterAuthRequest): Promise<RegisterAuthResponse> {
-        // (debug logs removed)
         const email = this.normalizeEmail(request.email);
 
         this.validateStudentEmailDomain(email);
@@ -27,7 +26,6 @@ export class AuthService {
         if (existingUser) {
             throw new Error('A user with this email already exists');
         }
-        // Prefer explicit fields from frontend; fall back to splitting fullName for backward compatibility
         let firstName: string;
         let lastName: string;
 
@@ -46,6 +44,7 @@ export class AuthService {
             lastName,
             email,
             passwordHash,
+            careerId: request.careerId,
         };
 
         const createdUser = await this.authRepository.createStudentAccount(input);
@@ -85,6 +84,7 @@ export class AuthService {
             firstName: user.firstName,
             lastName: user.lastName,
             role: user.role,
+            career: (user as any).career?.name,
         };
 
         return {
@@ -103,7 +103,6 @@ export class AuthService {
         }
 
         try {
-            // This will throw if the token is invalid or expired
             const decoded = verifyRefreshToken(refreshToken) as { userId: string };
             const userId = decoded.userId;
 
@@ -131,6 +130,7 @@ export class AuthService {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 role: user.role,
+                career: (user as any).career?.name,
             };
 
             return {
@@ -147,8 +147,6 @@ export class AuthService {
     }
 
     async logout(): Promise<{ success: boolean; message: string }> {
-        // Since we are using stateless JWTs for MVP, server-side logout
-        // is simply acknowledging the request. The client will clear the tokens.
         return {
             success: true,
             message: 'Logged out successfully',
@@ -175,7 +173,6 @@ export class AuthService {
             return { firstName: `${parts[0]} ${parts[1]}`, lastName: parts[2] };
         }
 
-        // 4 or more: assume two given names and the rest as surnames
         return { firstName: `${parts[0]} ${parts[1]}`, lastName: parts.slice(2).join(' ') };
     }
 

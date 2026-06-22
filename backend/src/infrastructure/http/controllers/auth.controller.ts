@@ -4,6 +4,7 @@ import {
     LoginAuthRequest,
     RegisterAuthRequest,
 } from '../../../domain/auth/auth.types';
+import { handleError } from '../utils/error-handler';
 
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
@@ -23,7 +24,7 @@ export class AuthController {
 
             return res.status(201).json(result);
         } catch (error) {
-            return this.handleError(error, res);
+            return handleError(error, res, "AuthController") as any;
         }
     };
 
@@ -42,13 +43,12 @@ export class AuthController {
 
             return res.status(200).json(result);
         } catch (error) {
-            return this.handleError(error, res);
+            return handleError(error, res, "AuthController") as any;
         }
     };
 
     me = async (req: Request, res: Response): Promise<Response> => {
         try {
-            // req.user is injected by the authMiddleware
             const user = (req as any).user;
             
             if (!user) {
@@ -65,7 +65,7 @@ export class AuthController {
                 }
             });
         } catch (error) {
-            return this.handleError(error, res);
+            return handleError(error, res, "AuthController") as any;
         }
     };
 
@@ -84,7 +84,7 @@ export class AuthController {
 
             return res.status(200).json(result);
         } catch (error) {
-            return this.handleError(error, res);
+            return handleError(error, res, "AuthController") as any;
         }
     };
 
@@ -93,7 +93,7 @@ export class AuthController {
             const result = await this.authService.logout();
             return res.status(200).json(result);
         } catch (error) {
-            return this.handleError(error, res);
+            return handleError(error, res, "AuthController") as any;
         }
     };
 
@@ -122,44 +122,5 @@ export class AuthController {
             typeof body.email === 'string' &&
             typeof body.password === 'string'
         );
-    }
-
-    private handleError(error: unknown, res: Response): Response {
-        const message = error instanceof Error ? error.message : 'Unexpected error';
-
-        // (debug logs removed)
-
-        if (message === 'A user with this email already exists') {
-            return res.status(409).json({
-                success: false,
-                message,
-            });
-        }
-
-        if (message === 'Only institutional emails ending in @uce.edu.ec are allowed') {
-            return res.status(400).json({
-                success: false,
-                message,
-            });
-        }
-
-        if (message === 'Invalid credentials') {
-            return res.status(401).json({
-                success: false,
-                message,
-            });
-        }
-
-        if (message === 'Invalid or expired refresh token') {
-            return res.status(401).json({
-                success: false,
-                message,
-            });
-        }
-
-        return res.status(500).json({
-            success: false,
-            message: 'Internal server error',
-        });
     }
 }

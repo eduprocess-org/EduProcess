@@ -5,6 +5,7 @@ export interface CreateStudentAccountInput {
     lastName: string;
     email: string;
     passwordHash: string;
+    careerId?: string;
 }
 
 export interface AuthRepository {

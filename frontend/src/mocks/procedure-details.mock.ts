@@ -1,4 +1,4 @@
-import type { ProcedureDetails } from "../types/procedure-details.types";
+import type { ProcedureDetails } from "../types/procedures/procedure-details.types";
 
 export const mockProcedureDetails: ProcedureDetails[] = [
   {

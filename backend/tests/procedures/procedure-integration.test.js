@@ -24,7 +24,7 @@ class MockProcedureService {
         ];
     }
 
-    async getAllProcedures() {
+    async getAllProcedures(studentId) {
         return this.procedures;
     }
 

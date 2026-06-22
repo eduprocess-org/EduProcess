@@ -50,7 +50,8 @@ class MockStatusRepository {
         this.auditLogId = 1;
     }
 
-    async findAllActive() { return []; }
+    async findAllActive(userCareerId, userFacultyId) { return []; }
+    async findStudentCareer(studentId) { return { careerId: null, facultyId: null, careerName: null }; }
     async findById() { return null; }
     async createRequest(input) { return input; }
     async findRequestsByStudent() { return []; }

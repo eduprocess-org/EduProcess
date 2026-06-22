@@ -1,14 +1,22 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
-import Navbar from "../components/navigation/Navbar";
-import Sidebar from "../components/navigation/Sidebar";
+import StudentNavbar from "../components/navigation/student/StudentNavbar";
+import StudentSidebar from "../components/navigation/student/StudentSidebar";
+import AdminSidebar from "../components/navigation/admin/AdminSidebar";
+
+import { useAuth } from "../hooks/useAuth";
 
 function DashboardLayout() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] =
+    useState(false);
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] =
     useState(false);
+
+  const { user } = useAuth();
+
+  const isAdmin = user?.role === "admin";
 
   return (
     <div className="flex h-screen w-full bg-slate-100 overflow-hidden">
@@ -18,7 +26,13 @@ function DashboardLayout() {
         <div className="fixed inset-0 z-50 flex lg:hidden">
 
           <div className="w-64 h-full">
-            <Sidebar isCollapsed={false} />
+
+            {isAdmin ? (
+              <AdminSidebar isCollapsed={false} />
+            ) : (
+              <StudentSidebar isCollapsed={false} />
+            )}
+
           </div>
 
           <div
@@ -32,16 +46,22 @@ function DashboardLayout() {
       {/* DESKTOP SIDEBAR */}
       <div className="hidden lg:flex h-full flex-shrink-0">
 
-        <Sidebar
-          isCollapsed={isSidebarCollapsed}
-        />
+        {isAdmin ? (
+          <AdminSidebar
+            isCollapsed={isSidebarCollapsed}
+          />
+        ) : (
+          <StudentSidebar
+            isCollapsed={isSidebarCollapsed}
+          />
+        )}
 
       </div>
 
       {/* CONTENT */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
 
-        <Navbar
+        <StudentNavbar
           onMenuClick={() =>
             setIsSidebarOpen(true)
           }

@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
-import multer from 'multer';
 import { ProcedureService } from '../../../application/procedures/procedure.service';
-import { logger } from '../../config/logger.config';
+import { handleError } from '../utils/error-handler';
 
 interface AuthRequest extends Request {
     user?: {
@@ -14,12 +13,13 @@ interface AuthRequest extends Request {
 export class ProcedureController {
     constructor(private readonly procedureService: ProcedureService) {}
 
-    public getProcedures = async (req: Request, res: Response) => {
+    public getProcedures = async (req: AuthRequest, res: Response) => {
         try {
-            const procedures = await this.procedureService.getAllProcedures();
+            const studentId = req.user?.userId;
+            const procedures = await this.procedureService.getAllProcedures(studentId);
             res.status(200).json({ success: true, data: procedures });
         } catch (error) {
-            this.handleError(error, res);
+            handleError(error, res, "ProcedureController");
         }
     };
 
@@ -29,7 +29,7 @@ export class ProcedureController {
             const procedure = await this.procedureService.getProcedureDetails(id);
             res.status(200).json({ success: true, data: procedure });
         } catch (error) {
-            this.handleError(error, res);
+            handleError(error, res, "ProcedureController");
         }
     };
 
@@ -40,7 +40,7 @@ export class ProcedureController {
                 return res.status(401).json({ success: false, message: 'Unauthorized' });
             }
 
-            const { procedureId, career, semester, reason } = req.body;
+            const { procedureId, semester, reason } = req.body;
             if (!procedureId) {
                 return res.status(400).json({ success: false, message: 'procedureId is required' });
             }
@@ -50,10 +50,10 @@ export class ProcedureController {
                 return res.status(400).json({ success: false, message: 'At least one document is required' });
             }
 
-            const request = await this.procedureService.createRequest(studentId, procedureId, files, { career, semester, reason });
+            const request = await this.procedureService.createRequest(studentId, procedureId, files, { semester, reason });
             res.status(201).json({ success: true, data: request });
         } catch (error) {
-            this.handleError(error, res);
+            handleError(error, res, "ProcedureController");
         }
     };
 
@@ -67,7 +67,7 @@ export class ProcedureController {
             const requests = await this.procedureService.getStudentRequests(studentId);
             res.status(200).json({ success: true, data: requests });
         } catch (error) {
-            this.handleError(error, res);
+            handleError(error, res, "ProcedureController");
         }
     };
 
@@ -82,7 +82,7 @@ export class ProcedureController {
             const tracking = await this.procedureService.getRequestTracking(id, studentId);
             res.status(200).json({ success: true, data: tracking });
         } catch (error) {
-            this.handleError(error, res);
+            handleError(error, res, "ProcedureController");
         }
     };
 
@@ -111,7 +111,7 @@ export class ProcedureController {
 
             res.status(200).json({ success: true, data: request });
         } catch (error) {
-            this.handleError(error, res);
+            handleError(error, res, "ProcedureController");
         }
     };
 
@@ -126,7 +126,7 @@ export class ProcedureController {
             const timeline = await this.procedureService.getRequestTimeline(id, studentId);
             res.status(200).json({ success: true, data: timeline });
         } catch (error) {
-            this.handleError(error, res);
+            handleError(error, res, "ProcedureController");
         }
     };
 
@@ -136,42 +136,7 @@ export class ProcedureController {
             const timeline = await this.procedureService.adminGetRequestTimeline(id);
             res.status(200).json({ success: true, data: timeline });
         } catch (error) {
-            this.handleError(error, res);
+            handleError(error, res, "ProcedureController");
         }
     };
-
-    private handleError(error: unknown, res: Response) {
-        if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
-            return res.status(400).json({ success: false, message: 'File exceeds the 5MB size limit' });
-        }
-
-        const message = error instanceof Error ? error.message : 'Internal server error';
-
-        if (message.startsWith('Unsupported file type')) {
-            return res.status(400).json({ success: false, message });
-        }
-
-        if (message === 'Procedure not found' || message === 'Request not found or unauthorized') {
-            return res.status(404).json({ success: false, message });
-        }
-
-        if (message === 'Procedure is not available for new requests') {
-            return res.status(409).json({ success: false, message });
-        }
-
-        if (message === 'Failed to upload document') {
-            return res.status(502).json({ success: false, message });
-        }
-
-        if (message.startsWith('Invalid status transition')) {
-            return res.status(422).json({ success: false, message });
-        }
-
-        if (message === 'Only administrators can update request status') {
-            return res.status(403).json({ success: false, message });
-        }
-
-        logger.error('Unhandled error in ProcedureController', { error: message });
-        res.status(500).json({ success: false, message: 'Internal server error' });
-    }
 }

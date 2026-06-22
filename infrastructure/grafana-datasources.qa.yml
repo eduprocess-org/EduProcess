@@ -1,0 +1,10 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://eduprocess-prometheus-qa:9090/prometheus
+    isDefault: true
+    uid: prometheus-eduprocess 
+    editable: false
