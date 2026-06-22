@@ -25,7 +25,7 @@ jobs:
             frontend_files:
               - 'frontend/**'
               - 'infrastructure/**'
-              - '.github/workflows/qa-pipeline.yml'
+              - '.github/workflows/ci-cd-pipeline.yml'
 
       - name: Setup Node.js v24 Environment
         if: steps.filter-frontend.outputs.frontend_files == 'true'
@@ -61,7 +61,7 @@ jobs:
             backend_files:
               - 'backend/**'
               - 'infrastructure/**'
-              - '.github/workflows/qa-pipeline.yml'
+              - '.github/workflows/ci-cd-pipeline.yml'
 
       - name: Setup Node.js v22 LTS Environment
         if: steps.filter-backend.outputs.backend_files == 'true'
