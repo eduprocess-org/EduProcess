@@ -1,7 +1,12 @@
 import { Request, Response } from 'express';
+<<<<<<< HEAD
 import multer from 'multer';
 import { ProcedureService } from '../../../application/procedures/procedure.service';
 import { logger } from '../../config/logger.config';
+=======
+import { ProcedureService } from '../../../application/procedures/procedure.service';
+import { handleError } from '../utils/error-handler';
+>>>>>>> qa
 
 interface AuthRequest extends Request {
     user?: {
@@ -14,12 +19,22 @@ interface AuthRequest extends Request {
 export class ProcedureController {
     constructor(private readonly procedureService: ProcedureService) {}
 
+<<<<<<< HEAD
     public getProcedures = async (req: Request, res: Response) => {
         try {
             const procedures = await this.procedureService.getAllProcedures();
             res.status(200).json({ success: true, data: procedures });
         } catch (error) {
             this.handleError(error, res);
+=======
+    public getProcedures = async (req: AuthRequest, res: Response) => {
+        try {
+            const studentId = req.user?.userId;
+            const procedures = await this.procedureService.getAllProcedures(studentId);
+            res.status(200).json({ success: true, data: procedures });
+        } catch (error) {
+            handleError(error, res, "ProcedureController");
+>>>>>>> qa
         }
     };
 
@@ -29,7 +44,11 @@ export class ProcedureController {
             const procedure = await this.procedureService.getProcedureDetails(id);
             res.status(200).json({ success: true, data: procedure });
         } catch (error) {
+<<<<<<< HEAD
             this.handleError(error, res);
+=======
+            handleError(error, res, "ProcedureController");
+>>>>>>> qa
         }
     };
 
@@ -40,7 +59,11 @@ export class ProcedureController {
                 return res.status(401).json({ success: false, message: 'Unauthorized' });
             }
 
+<<<<<<< HEAD
             const { procedureId, career, semester, reason } = req.body;
+=======
+            const { procedureId, semester, reason } = req.body;
+>>>>>>> qa
             if (!procedureId) {
                 return res.status(400).json({ success: false, message: 'procedureId is required' });
             }
@@ -50,10 +73,17 @@ export class ProcedureController {
                 return res.status(400).json({ success: false, message: 'At least one document is required' });
             }
 
+<<<<<<< HEAD
             const request = await this.procedureService.createRequest(studentId, procedureId, files, { career, semester, reason });
             res.status(201).json({ success: true, data: request });
         } catch (error) {
             this.handleError(error, res);
+=======
+            const request = await this.procedureService.createRequest(studentId, procedureId, files, { semester, reason });
+            res.status(201).json({ success: true, data: request });
+        } catch (error) {
+            handleError(error, res, "ProcedureController");
+>>>>>>> qa
         }
     };
 
@@ -67,7 +97,11 @@ export class ProcedureController {
             const requests = await this.procedureService.getStudentRequests(studentId);
             res.status(200).json({ success: true, data: requests });
         } catch (error) {
+<<<<<<< HEAD
             this.handleError(error, res);
+=======
+            handleError(error, res, "ProcedureController");
+>>>>>>> qa
         }
     };
 
@@ -82,7 +116,11 @@ export class ProcedureController {
             const tracking = await this.procedureService.getRequestTracking(id, studentId);
             res.status(200).json({ success: true, data: tracking });
         } catch (error) {
+<<<<<<< HEAD
             this.handleError(error, res);
+=======
+            handleError(error, res, "ProcedureController");
+>>>>>>> qa
         }
     };
 
@@ -111,7 +149,11 @@ export class ProcedureController {
 
             res.status(200).json({ success: true, data: request });
         } catch (error) {
+<<<<<<< HEAD
             this.handleError(error, res);
+=======
+            handleError(error, res, "ProcedureController");
+>>>>>>> qa
         }
     };
 
@@ -126,7 +168,11 @@ export class ProcedureController {
             const timeline = await this.procedureService.getRequestTimeline(id, studentId);
             res.status(200).json({ success: true, data: timeline });
         } catch (error) {
+<<<<<<< HEAD
             this.handleError(error, res);
+=======
+            handleError(error, res, "ProcedureController");
+>>>>>>> qa
         }
     };
 
@@ -136,6 +182,7 @@ export class ProcedureController {
             const timeline = await this.procedureService.adminGetRequestTimeline(id);
             res.status(200).json({ success: true, data: timeline });
         } catch (error) {
+<<<<<<< HEAD
             this.handleError(error, res);
         }
     };
@@ -174,4 +221,9 @@ export class ProcedureController {
         logger.error('Unhandled error in ProcedureController', { error: message });
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
+=======
+            handleError(error, res, "ProcedureController");
+        }
+    };
+>>>>>>> qa
 }

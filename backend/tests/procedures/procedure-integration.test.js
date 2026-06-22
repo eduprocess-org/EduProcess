@@ -24,7 +24,11 @@ class MockProcedureService {
         ];
     }
 
+<<<<<<< HEAD
     async getAllProcedures() {
+=======
+    async getAllProcedures(studentId) {
+>>>>>>> qa
         return this.procedures;
     }
 

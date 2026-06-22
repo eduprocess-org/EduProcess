@@ -40,6 +40,12 @@ const buildMockRepository = () => {
                 lastName: input.lastName,
                 role: 'student',
                 createdAt: new Date(),
+<<<<<<< HEAD
+=======
+                career: input.careerId
+                    ? { id: input.careerId, name: 'Information Systems' }
+                    : null,
+>>>>>>> qa
             };
             db.set(input.email, user);
             return {
@@ -48,6 +54,10 @@ const buildMockRepository = () => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 role: user.role,
+<<<<<<< HEAD
+=======
+                career: user.career?.name,
+>>>>>>> qa
             };
         },
         _seed(user) {
@@ -359,3 +369,117 @@ test('POST /logout - rejects unauthenticated logout with 401', async () => {
 
     assert.equal(res.status, 401);
 });
+<<<<<<< HEAD
+=======
+
+// ─── Career field tests ─────────────────────────────────────────────────────
+
+test('POST /register - registers student with careerId successfully', async () => {
+    const repo = buildMockRepository();
+    const app = buildTestApp(repo);
+    const request = supertest(app);
+
+    const res = await request.post('/api/v1/auth/register').send({
+        firstName: 'Luis',
+        lastName: 'Mendoza',
+        email: 'luis.mendoza@uce.edu.ec',
+        password: 'SecurePass123',
+        careerId: 'career-uuid-123',
+    });
+
+    assert.equal(res.status, 201);
+    assert.equal(res.body.success, true);
+    assert.equal(res.body.data.career, 'Information Systems');
+});
+
+test('POST /register - registers student without careerId (optional)', async () => {
+    const repo = buildMockRepository();
+    const app = buildTestApp(repo);
+    const request = supertest(app);
+
+    const res = await request.post('/api/v1/auth/register').send({
+        firstName: 'Maria',
+        lastName: 'Garcia',
+        email: 'maria.garcia@uce.edu.ec',
+        password: 'SecurePass123',
+    });
+
+    assert.equal(res.status, 201);
+    assert.equal(res.body.success, true);
+    assert.equal(res.body.data.career, undefined);
+});
+
+test('POST /login - returns career in user data when career exists', async () => {
+    const repo = buildMockRepository();
+    repo._seed({
+        id: 'user-with-career',
+        email: 'career@uce.edu.ec',
+        passwordHash: bcrypt.hashSync('myPassword99', 10),
+        firstName: 'Career',
+        lastName: 'User',
+        role: 'student',
+        createdAt: new Date(),
+        career: { id: 'career-uuid-123', name: 'Civil Engineering' },
+    });
+
+    const app = buildTestApp(repo);
+    const request = supertest(app);
+
+    const res = await request.post('/api/v1/auth/login').send({
+        email: 'career@uce.edu.ec',
+        password: 'myPassword99',
+    });
+
+    assert.equal(res.status, 200);
+    assert.equal(res.body.data.user.career, 'Civil Engineering');
+});
+
+test('POST /login - returns undefined career when user has no career', async () => {
+    const repo = buildMockRepository();
+    repo._seed({
+        id: 'user-no-career',
+        email: 'nocareer@uce.edu.ec',
+        passwordHash: bcrypt.hashSync('myPassword99', 10),
+        firstName: 'No',
+        lastName: 'Career',
+        role: 'student',
+        createdAt: new Date(),
+        career: null,
+    });
+
+    const app = buildTestApp(repo);
+    const request = supertest(app);
+
+    const res = await request.post('/api/v1/auth/login').send({
+        email: 'nocareer@uce.edu.ec',
+        password: 'myPassword99',
+    });
+
+    assert.equal(res.status, 200);
+    assert.equal(res.body.data.user.career, undefined);
+});
+
+test('POST /refresh - returns career in user data', async () => {
+    const repo = buildMockRepository();
+    repo._seed({
+        id: 'user-refresh-career',
+        email: 'refreshcareer@uce.edu.ec',
+        passwordHash: 'hash',
+        firstName: 'Refresh',
+        lastName: 'Career',
+        role: 'student',
+        createdAt: new Date(),
+        career: { id: 'career-uuid-456', name: 'Industrial Engineering' },
+    });
+
+    const app = buildTestApp(repo);
+    const request = supertest(app);
+
+    const refreshToken = generateRefreshToken({ userId: 'user-refresh-career' });
+
+    const res = await request.post('/api/v1/auth/refresh').send({ refreshToken });
+
+    assert.equal(res.status, 200);
+    assert.equal(res.body.data.user.career, 'Industrial Engineering');
+});
+>>>>>>> qa

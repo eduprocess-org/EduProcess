@@ -16,10 +16,21 @@ class MockPrismaProcedureRepository {
         this.requests = [];
     }
 
+<<<<<<< HEAD
     async findAllActive() {
         return this.procedures.filter(p => p.isActive);
     }
 
+=======
+    async findAllActive(userCareerId, userFacultyId) {
+        return this.procedures.filter(p => p.isActive);
+    }
+
+    async findStudentCareer(studentId) {
+        return { careerId: null, facultyId: null, careerName: null };
+    }
+
+>>>>>>> qa
     async findById(id) {
         return this.procedures.find(p => p.id === id) || null;
     }

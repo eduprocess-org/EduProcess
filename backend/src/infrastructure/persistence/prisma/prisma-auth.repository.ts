@@ -9,12 +9,20 @@ export class PrismaAuthRepository implements AuthRepository {
     async findByEmail(email: string): Promise<UserModel | null> {
         return prisma.user.findUnique({
             where: { email },
+<<<<<<< HEAD
+=======
+            include: { career: true },
+>>>>>>> qa
         });
     }
 
     async findById(id: string): Promise<UserModel | null> {
         return prisma.user.findUnique({
             where: { id },
+<<<<<<< HEAD
+=======
+            include: { career: true },
+>>>>>>> qa
         });
     }
 
@@ -26,7 +34,13 @@ export class PrismaAuthRepository implements AuthRepository {
                 email: input.email,
                 passwordHash: input.passwordHash,
                 role: 'student',
+<<<<<<< HEAD
             },
+=======
+                careerId: input.careerId || null,
+            },
+            include: { career: true },
+>>>>>>> qa
         });
 
         return {
@@ -35,6 +49,10 @@ export class PrismaAuthRepository implements AuthRepository {
             firstName: createdUser.firstName,
             lastName: createdUser.lastName,
             role: createdUser.role,
+<<<<<<< HEAD
+=======
+            career: createdUser.career?.name,
+>>>>>>> qa
         };
     }
 }

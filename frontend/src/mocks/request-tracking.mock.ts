@@ -1,6 +1,10 @@
 import type {
   RequestTracking,
+<<<<<<< HEAD
 } from "../types/request-tracking.types";
+=======
+} from "../types/student/request-tracking.types";
+>>>>>>> qa
 
 export const mockRequestTracking: RequestTracking[] = [
   {

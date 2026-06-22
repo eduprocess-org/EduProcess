@@ -4,6 +4,10 @@ import {
     LoginAuthRequest,
     RegisterAuthRequest,
 } from '../../../domain/auth/auth.types';
+<<<<<<< HEAD
+=======
+import { handleError } from '../utils/error-handler';
+>>>>>>> qa
 
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
@@ -23,7 +27,11 @@ export class AuthController {
 
             return res.status(201).json(result);
         } catch (error) {
+<<<<<<< HEAD
             return this.handleError(error, res);
+=======
+            return handleError(error, res, "AuthController") as any;
+>>>>>>> qa
         }
     };
 
@@ -42,13 +50,20 @@ export class AuthController {
 
             return res.status(200).json(result);
         } catch (error) {
+<<<<<<< HEAD
             return this.handleError(error, res);
+=======
+            return handleError(error, res, "AuthController") as any;
+>>>>>>> qa
         }
     };
 
     me = async (req: Request, res: Response): Promise<Response> => {
         try {
+<<<<<<< HEAD
             // req.user is injected by the authMiddleware
+=======
+>>>>>>> qa
             const user = (req as any).user;
             
             if (!user) {
@@ -65,7 +80,11 @@ export class AuthController {
                 }
             });
         } catch (error) {
+<<<<<<< HEAD
             return this.handleError(error, res);
+=======
+            return handleError(error, res, "AuthController") as any;
+>>>>>>> qa
         }
     };
 
@@ -84,7 +103,11 @@ export class AuthController {
 
             return res.status(200).json(result);
         } catch (error) {
+<<<<<<< HEAD
             return this.handleError(error, res);
+=======
+            return handleError(error, res, "AuthController") as any;
+>>>>>>> qa
         }
     };
 
@@ -93,7 +116,11 @@ export class AuthController {
             const result = await this.authService.logout();
             return res.status(200).json(result);
         } catch (error) {
+<<<<<<< HEAD
             return this.handleError(error, res);
+=======
+            return handleError(error, res, "AuthController") as any;
+>>>>>>> qa
         }
     };
 
@@ -123,6 +150,7 @@ export class AuthController {
             typeof body.password === 'string'
         );
     }
+<<<<<<< HEAD
 
     private handleError(error: unknown, res: Response): Response {
         const message = error instanceof Error ? error.message : 'Unexpected error';
@@ -162,4 +190,6 @@ export class AuthController {
             message: 'Internal server error',
         });
     }
+=======
+>>>>>>> qa
 }

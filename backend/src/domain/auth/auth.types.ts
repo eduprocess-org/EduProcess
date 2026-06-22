@@ -1,12 +1,19 @@
 export type UserRole = 'student' | 'admin';
 
 export interface RegisterAuthRequest {
+<<<<<<< HEAD
     /** Prefer sending explicit names from frontend. Kept optional for backward compatibility. */
+=======
+>>>>>>> qa
     fullName?: string;
     firstName?: string;
     lastName?: string;
     email: string;
     password: string;
+<<<<<<< HEAD
+=======
+    careerId?: string;
+>>>>>>> qa
 }
 
 export interface LoginAuthRequest {
@@ -20,6 +27,10 @@ export interface AuthUserDTO {
     firstName: string;
     lastName: string;
     role: UserRole;
+<<<<<<< HEAD
+=======
+    career?: string;
+>>>>>>> qa
 }
 
 export interface AuthTokensDTO {

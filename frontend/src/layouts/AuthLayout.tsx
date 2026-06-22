@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom";
+<<<<<<< HEAD
 import logo from "../assets/images/Logo.jpeg";
 
 function AuthLayout() {
@@ -38,6 +39,13 @@ function AuthLayout() {
       <div className="flex-1 flex justify-center items-center p-6 bg-[#0B2D63]">        <Outlet />
       </div>
 
+=======
+
+function AuthLayout() {
+  return (
+    <div className="min-h-screen">
+      <Outlet />
+>>>>>>> qa
     </div>
   );
 }

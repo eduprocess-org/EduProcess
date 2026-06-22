@@ -24,7 +24,7 @@ jobs:
           filters: |
             frontend_files:
               - 'frontend/**'
-              - '.github/workflows/qa-pipeline.yml'
+              - '.github/workflows/ci-cd-pipeline.yml'
 
       - name: Setup Node.js v24 Environment
         if: steps.filter-frontend.outputs.frontend_files == 'true'
@@ -59,7 +59,7 @@ jobs:
           filters: |
             backend_files:
               - 'backend/**'
-              - '.github/workflows/qa-pipeline.yml'
+              - '.github/workflows/ci-cd-pipeline.yml'
 
       - name: Setup Node.js v22 LTS Environment
         if: steps.filter-backend.outputs.backend_files == 'true'
@@ -157,7 +157,7 @@ jobs:
           host: ${{ secrets.QA_SSH_HOST }}
           username: ubuntu
           key: ${{ secrets.QA_SSH_KEY }}
-          source: "infrastructure/docker-compose.qa.yml,infrastructure/nginx.qa.conf"
+          source: "infrastructure/docker-compose.qa.yml,infrastructure/nginx.qa.conf,infrastructure/prometheus.yml,infrastructure/alert.rules.yml,infrastructure/grafana-datasources.qa.yml,infrastructure/grafana-dashboards.yml,infrastructure/dashboards/eduprocess_metrics.json"
           target: "~/eduprocess-qa"
           strip_components: 1
 
@@ -171,6 +171,7 @@ jobs:
             cd ~/eduprocess-qa
             mv docker-compose.qa.yml docker-compose.yml 2>/dev/null || true
             mv nginx.qa.conf nginx.conf 2>/dev/null || true
+            mv grafana-datasources.qa.yml grafana-datasources.qa.yml 2>/dev/null || true
             sudo systemctl stop nginx 2>/dev/null || true
             sudo systemctl disable nginx 2>/dev/null || true
             docker compose pull
@@ -192,7 +193,7 @@ jobs:
           host: ${{ secrets.PROD_SSH_HOST }}
           username: ubuntu
           key: ${{ secrets.PROD_SSH_KEY }}
-          source: "infrastructure/docker-compose.prod.yml,infrastructure/nginx.prod.conf"
+          source: "infrastructure/docker-compose.prod.yml,infrastructure/nginx.prod.conf,infrastructure/prometheus.yml,infrastructure/alert.rules.yml,infrastructure/grafana-datasources.prod.yml,infrastructure/grafana-dashboards.yml,infrastructure/dashboards/eduprocess_metrics.json"
           target: "~/eduprocess-prod"
           strip_components: 1
 
@@ -204,14 +205,36 @@ jobs:
           key: ${{ secrets.PROD_SSH_KEY }}
           script: |
             cd ~/eduprocess-prod
-            
             mv docker-compose.prod.yml docker-compose.yml 2>/dev/null || true
             mv nginx.prod.conf nginx.conf 2>/dev/null || true
-            
+            mv grafana-datasources.prod.yml grafana-datasources.prod.yml 2>/dev/null || true
             sudo systemctl stop nginx 2>/dev/null || true
             sudo systemctl disable nginx 2>/dev/null || true
-            
             docker compose pull
             docker compose up -d --remove-orphans --force-recreate
-            
             docker image prune -f
+  
+  orchestrate-release:
+    name: Automated Release Governance & Archival
+    runs-on: ubuntu-latest
+    needs: deploy-prod
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout Monorepo Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Authenticate to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Run Release Orchestration Script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: |
+          chmod +x ./infrastructure/scripts/orchestrate-release.sh
+          ./infrastructure/scripts/orchestrate-release.sh

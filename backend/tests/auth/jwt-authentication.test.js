@@ -81,6 +81,10 @@ test('auth service returns both tokens on login', async () => {
                 lastName: 'User',
                 role: 'student',
                 createdAt: new Date(),
+<<<<<<< HEAD
+=======
+                career: { id: 'career-1', name: 'Information Systems' },
+>>>>>>> qa
             };
         },
         async createStudentAccount() {
@@ -97,6 +101,10 @@ test('auth service returns both tokens on login', async () => {
 
     assert.ok(loginResult.data.tokens.sessionToken.length > 0);
     assert.ok(loginResult.data.tokens.refreshToken.length > 0);
+<<<<<<< HEAD
+=======
+    assert.equal(loginResult.data.user.career, 'Information Systems');
+>>>>>>> qa
 });
 
 test('auth middleware accepts valid tokens and rejects invalid cases', () => {
@@ -159,6 +167,10 @@ test('auth service refreshes token correctly', async () => {
                 lastName: 'User',
                 role: 'student',
                 createdAt: new Date(),
+<<<<<<< HEAD
+=======
+                career: { id: 'career-1', name: 'Civil Engineering' },
+>>>>>>> qa
             };
         }
     };
@@ -171,6 +183,10 @@ test('auth service refreshes token correctly', async () => {
     assert.ok(refreshResult.data.tokens.sessionToken.length > 0);
     assert.ok(refreshResult.data.tokens.refreshToken.length > 0);
     assert.equal(refreshResult.data.user.email, payload.email);
+<<<<<<< HEAD
+=======
+    assert.equal(refreshResult.data.user.career, 'Civil Engineering');
+>>>>>>> qa
 
     try {
         await authService.refreshToken('invalid-token');

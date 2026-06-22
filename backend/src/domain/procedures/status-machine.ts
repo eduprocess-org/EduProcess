@@ -5,10 +5,23 @@ export const VALID_TRANSITIONS: Record<string, string[]> = {
   rejected: [],
 };
 
+<<<<<<< HEAD
 export function isTransitionValid(from: string, to: string): boolean {
   const allowed = VALID_TRANSITIONS[from];
   if (!allowed) return false;
   return allowed.includes(to);
+=======
+export function normalizeStatus(status: string): string {
+  return status.toLowerCase().trim();
+}
+
+export function isTransitionValid(from: string, to: string): boolean {
+  const normalizedFrom = normalizeStatus(from);
+  const normalizedTo = normalizeStatus(to);
+  const allowed = VALID_TRANSITIONS[normalizedFrom];
+  if (!allowed) return false;
+  return allowed.includes(normalizedTo);
+>>>>>>> qa
 }
 
 export function getNextPossibleStatuses(current: string): string[] {

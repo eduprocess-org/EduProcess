@@ -1,7 +1,11 @@
 import { ProcedureRepository } from '../../domain/procedures/procedure.repository';
 import { supabase } from '../../infrastructure/config/supabase.config';
 import { logger } from '../../infrastructure/config/logger.config';
+<<<<<<< HEAD
 import { isTransitionValid, STATUS_LABELS } from '../../domain/procedures/status-machine';
+=======
+import { isTransitionValid, normalizeStatus, STATUS_LABELS } from '../../domain/procedures/status-machine';
+>>>>>>> qa
 import { StatusHistoryService } from './status-history.service';
 
 export class ProcedureService {
@@ -11,8 +15,21 @@ export class ProcedureService {
         this.statusHistoryService = new StatusHistoryService();
     }
 
+<<<<<<< HEAD
     async getAllProcedures() {
         return this.procedureRepository.findAllActive();
+=======
+    async getAllProcedures(studentId?: string) {
+        if (!studentId) {
+            return this.procedureRepository.findAllActive();
+        }
+
+        const studentCareer = await this.procedureRepository.findStudentCareer(studentId);
+        return this.procedureRepository.findAllActive(
+            studentCareer?.careerId ?? undefined,
+            studentCareer?.facultyId ?? undefined
+        );
+>>>>>>> qa
     }
 
     async getProcedureDetails(id: string) {
@@ -81,11 +98,20 @@ export class ProcedureService {
             });
         }
 
+<<<<<<< HEAD
+=======
+        const studentCareer = await this.procedureRepository.findStudentCareer(studentId);
+
+>>>>>>> qa
         const request = await this.procedureRepository.createRequest({
             studentId,
             procedureTypeId: procedureId,
             documents: uploadedDocuments,
+<<<<<<< HEAD
             career: extra?.career,
+=======
+            career: studentCareer?.careerName ?? undefined,
+>>>>>>> qa
             semester: extra?.semester,
             reason: extra?.reason,
         });
@@ -123,7 +149,12 @@ export class ProcedureService {
         userRole: string,
         comment?: string
     ) {
+<<<<<<< HEAD
         logger.info('Status update attempt', { requestId, newStatus, userId, userRole });
+=======
+        const normalizedStatus = normalizeStatus(newStatus);
+        logger.info('Status update attempt', { requestId, newStatus: normalizedStatus, userId, userRole });
+>>>>>>> qa
 
         if (userRole !== 'admin') {
             logger.warn('Status update rejected: not authorized', { requestId, userId, userRole });
@@ -137,6 +168,7 @@ export class ProcedureService {
         }
 
         const currentStatus = request.status;
+<<<<<<< HEAD
         if (!isTransitionValid(currentStatus, newStatus)) {
             logger.warn('Status update rejected: invalid transition', {
                 requestId,
@@ -144,11 +176,24 @@ export class ProcedureService {
                 toStatus: newStatus,
             });
             throw new Error(`Invalid status transition from ${currentStatus} to ${newStatus}`);
+=======
+        if (!isTransitionValid(currentStatus, normalizedStatus)) {
+            logger.warn('Status update rejected: invalid transition', {
+                requestId,
+                fromStatus: currentStatus,
+                toStatus: normalizedStatus,
+            });
+            throw new Error(`Invalid status transition from ${currentStatus} to ${normalizedStatus}`);
+>>>>>>> qa
         }
 
         const updatedRequest = await this.procedureRepository.updateStatus({
             requestId,
+<<<<<<< HEAD
             newStatus,
+=======
+            newStatus: normalizedStatus,
+>>>>>>> qa
             userId,
             comment,
         });
@@ -158,20 +203,32 @@ export class ProcedureService {
             userId,
             'STATUS_CHANGE',
             currentStatus,
+<<<<<<< HEAD
             newStatus
+=======
+            normalizedStatus
+>>>>>>> qa
         );
 
         this.statusHistoryService.logStatusChange({
             requestId,
             fromStatus: currentStatus,
+<<<<<<< HEAD
             toStatus: newStatus,
+=======
+            toStatus: normalizedStatus,
+>>>>>>> qa
             userId,
         });
 
         logger.info('Request status updated successfully', {
             requestId,
             fromStatus: currentStatus,
+<<<<<<< HEAD
             toStatus: newStatus,
+=======
+            toStatus: normalizedStatus,
+>>>>>>> qa
             userId,
         });
 

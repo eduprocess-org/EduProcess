@@ -18,7 +18,11 @@ const ACCEPTED_MIME_TYPES = [
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
+<<<<<<< HEAD
         fileSize: 5 * 1024 * 1024, // 5MB per file — matches Supabase bucket policy
+=======
+        fileSize: 5 * 1024 * 1024,
+>>>>>>> qa
     },
     fileFilter: (_req, file, cb) => {
         if (ACCEPTED_MIME_TYPES.includes(file.mimetype)) {
@@ -39,26 +43,40 @@ const handleMulterError = (err: Error, _req: Request, res: Response, next: NextF
     next(err);
 };
 
+<<<<<<< HEAD
 // Dependency Injection
+=======
+>>>>>>> qa
 const repository = new PrismaProcedureRepository();
 const service = new ProcedureService(repository);
 const controller = new ProcedureController(service);
 
+<<<<<<< HEAD
 // Catalog Routes
 router.get('/procedures', authMiddleware, controller.getProcedures);
 router.get('/procedures/:id', authMiddleware, controller.getProcedureDetails);
 
 // Requests Routes
+=======
+router.get('/procedures', authMiddleware, controller.getProcedures);
+router.get('/procedures/:id', authMiddleware, controller.getProcedureDetails);
+
+>>>>>>> qa
 router.get('/requests', authMiddleware, controller.getStudentRequests);
 router.post('/requests', authMiddleware, upload.array('documents'), controller.createRequest);
 router.use(handleMulterError);
 router.get('/requests/:id/tracking', authMiddleware, controller.getRequestTracking);
 router.get('/requests/:id/timeline', authMiddleware, controller.getRequestTimeline);
 
+<<<<<<< HEAD
 // Status Management (admin only)
 router.patch('/requests/:id/status', authMiddleware, adminMiddleware, controller.updateRequestStatus);
 
 // Admin Timeline
+=======
+router.patch('/requests/:id/status', authMiddleware, adminMiddleware, controller.updateRequestStatus);
+
+>>>>>>> qa
 router.get('/admin/requests/:id/timeline', authMiddleware, adminMiddleware, controller.adminGetRequestTimeline);
 
 export default router;
