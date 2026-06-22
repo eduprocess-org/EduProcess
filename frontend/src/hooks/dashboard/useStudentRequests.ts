@@ -5,19 +5,11 @@ import {
 
 import {
   getStudentRequests,
-<<<<<<< HEAD
-} from "../../services/dashboard/studentRequests.service";
-
-import type {
-  StudentRequest,
-} from "../../types/studentRequest.types";
-=======
 } from "../../services/student/dashboard/studentRequests.service";
 
 import type {
   StudentRequest,
 } from "../../types/student/studentRequest.types";
->>>>>>> qa
 
 export function useStudentRequests() {
   const [requests, setRequests] =

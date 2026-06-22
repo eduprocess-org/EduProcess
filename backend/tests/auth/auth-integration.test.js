@@ -40,12 +40,9 @@ const buildMockRepository = () => {
                 lastName: input.lastName,
                 role: 'student',
                 createdAt: new Date(),
-<<<<<<< HEAD
-=======
                 career: input.careerId
                     ? { id: input.careerId, name: 'Information Systems' }
                     : null,
->>>>>>> qa
             };
             db.set(input.email, user);
             return {
@@ -54,10 +51,7 @@ const buildMockRepository = () => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 role: user.role,
-<<<<<<< HEAD
-=======
                 career: user.career?.name,
->>>>>>> qa
             };
         },
         _seed(user) {
@@ -369,8 +363,6 @@ test('POST /logout - rejects unauthenticated logout with 401', async () => {
 
     assert.equal(res.status, 401);
 });
-<<<<<<< HEAD
-=======
 
 // ─── Career field tests ─────────────────────────────────────────────────────
 
@@ -482,4 +474,3 @@ test('POST /refresh - returns career in user data', async () => {
     assert.equal(res.status, 200);
     assert.equal(res.body.data.user.career, 'Industrial Engineering');
 });
->>>>>>> qa

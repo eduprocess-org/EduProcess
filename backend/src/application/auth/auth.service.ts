@@ -17,10 +17,6 @@ export class AuthService {
     constructor(private readonly authRepository: AuthRepository) { }
 
     async registerStudent(request: RegisterAuthRequest): Promise<RegisterAuthResponse> {
-<<<<<<< HEAD
-        // (debug logs removed)
-=======
->>>>>>> qa
         const email = this.normalizeEmail(request.email);
 
         this.validateStudentEmailDomain(email);
@@ -30,10 +26,6 @@ export class AuthService {
         if (existingUser) {
             throw new Error('A user with this email already exists');
         }
-<<<<<<< HEAD
-        // Prefer explicit fields from frontend; fall back to splitting fullName for backward compatibility
-=======
->>>>>>> qa
         let firstName: string;
         let lastName: string;
 
@@ -52,10 +44,7 @@ export class AuthService {
             lastName,
             email,
             passwordHash,
-<<<<<<< HEAD
-=======
             careerId: request.careerId,
->>>>>>> qa
         };
 
         const createdUser = await this.authRepository.createStudentAccount(input);
@@ -95,10 +84,7 @@ export class AuthService {
             firstName: user.firstName,
             lastName: user.lastName,
             role: user.role,
-<<<<<<< HEAD
-=======
             career: (user as any).career?.name,
->>>>>>> qa
         };
 
         return {
@@ -117,10 +103,6 @@ export class AuthService {
         }
 
         try {
-<<<<<<< HEAD
-            // This will throw if the token is invalid or expired
-=======
->>>>>>> qa
             const decoded = verifyRefreshToken(refreshToken) as { userId: string };
             const userId = decoded.userId;
 
@@ -148,10 +130,7 @@ export class AuthService {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 role: user.role,
-<<<<<<< HEAD
-=======
                 career: (user as any).career?.name,
->>>>>>> qa
             };
 
             return {
@@ -168,11 +147,6 @@ export class AuthService {
     }
 
     async logout(): Promise<{ success: boolean; message: string }> {
-<<<<<<< HEAD
-        // Since we are using stateless JWTs for MVP, server-side logout
-        // is simply acknowledging the request. The client will clear the tokens.
-=======
->>>>>>> qa
         return {
             success: true,
             message: 'Logged out successfully',
@@ -199,10 +173,6 @@ export class AuthService {
             return { firstName: `${parts[0]} ${parts[1]}`, lastName: parts[2] };
         }
 
-<<<<<<< HEAD
-        // 4 or more: assume two given names and the rest as surnames
-=======
->>>>>>> qa
         return { firstName: `${parts[0]} ${parts[1]}`, lastName: parts.slice(2).join(' ') };
     }
 

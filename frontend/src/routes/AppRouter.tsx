@@ -1,25 +1,3 @@
-<<<<<<< HEAD
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from "react-router-dom";
-
-import AuthLayout from "../layouts/AuthLayout";
-import DashboardLayout from "../layouts/DashboardLayout";
-import StudentDashboardPage from "../pages/dashboard/StudentDashboardPage";
-import ProceduresCatalogPage from "../pages/procedures/ProceduresCatalogPage";
-import ProcedureDetailsPage from "../pages/procedures/ProcedureDetailsPage";
-import DashboardPage from "../pages/dashboard/StudentDashboardPage";
-import LoginPage from "../pages/auth/LoginPage";
-import RegisterPage from "../pages/auth/RegisterPage";
-import ProcedureRequestPage from "../pages/procedures/ProcedureRequestPage";
-import ProtectedRoute from "../components/auth/ProtectedRoute";
-import PublicRoute from "../components/auth/PublicRoute";
-import RequestTrackingPage
-  from "../pages/requests/RequestTrackingPage";
-  
-=======
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import AuthLayout from "../layouts/AuthLayout";
@@ -53,17 +31,12 @@ function RoleBasedRedirect() {
   return <Navigate to="/dashboard" replace />;
 }
 
->>>>>>> qa
 function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
 
-<<<<<<< HEAD
-        {/* AUTH */}
-=======
         {/* ================= AUTH ================= */}
->>>>>>> qa
         <Route element={<AuthLayout />}>
           <Route
             path="/login"
@@ -84,13 +57,6 @@ function AppRouter() {
           />
         </Route>
 
-<<<<<<< HEAD
-        {/* DASHBOARD */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-=======
         {/* ================= ROOT REDIRECT ================= */}
         <Route 
           path="/" 
@@ -105,41 +71,10 @@ function AppRouter() {
         <Route
           element={
             <ProtectedRoute roles={["student"]}>
->>>>>>> qa
               <DashboardLayout />
             </ProtectedRoute>
           }
         >
-<<<<<<< HEAD
-          <Route index element={<DashboardPage />} />
-          <Route
-            path="/requests"
-            element={<StudentDashboardPage />}
-          />
-          
-          <Route
-            path="/procedures"
-            element={<ProceduresCatalogPage />}
-          />
-
-          <Route
-            path="/procedures/:id"
-            element={<ProcedureDetailsPage />}
-          />
-
-          <Route
-            path="/procedures/:id/request"
-            element={<ProcedureRequestPage />}
-          />
-
-         <Route
-          path="/requests/:requestId/tracking"
-          element={<RequestTrackingPage />}
-        />
-
-        </Route>
-
-=======
           <Route path="dashboard" element={<StudentDashboardPage />} />
 
           <Route path="requests" element={<RequestTrackingPage />} /> 
@@ -177,7 +112,6 @@ function AppRouter() {
         {/* ================= FALLBACK ================= */}
         <Route path="*" element={<Navigate to="/" replace />} />
 
->>>>>>> qa
       </Routes>
     </BrowserRouter>
   );

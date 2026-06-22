@@ -9,14 +9,6 @@ import {
 } from '../../../domain/procedures/procedure.types';
 
 export class PrismaProcedureRepository implements ProcedureRepository {
-<<<<<<< HEAD
-    async findAllActive(): Promise<ProcedureTypeDTO[]> {
-        return prisma.procedureType.findMany({
-            where: { isActive: true },
-        });
-    }
-
-=======
     async findAllActive(userCareerId?: string, userFacultyId?: string): Promise<ProcedureTypeDTO[]> {
         const conditions: any[] = [
             { careerId: null, facultyId: null },
@@ -53,7 +45,6 @@ export class PrismaProcedureRepository implements ProcedureRepository {
         };
     }
 
->>>>>>> qa
     async findById(id: string): Promise<ProcedureTypeDTO | null> {
         const result = await prisma.procedureType.findUnique({
             where: { id },

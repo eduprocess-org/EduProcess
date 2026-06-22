@@ -28,11 +28,7 @@ class FullFlowMockService {
         this.observations = [];
     }
 
-<<<<<<< HEAD
-    async getAllProcedures() { return this.procedures; }
-=======
     async getAllProcedures(studentId) { return this.procedures; }
->>>>>>> qa
 
     async getProcedureDetails(id) {
         const proc = this.procedures.find(p => p.id === id);

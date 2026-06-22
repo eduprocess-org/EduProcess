@@ -1,27 +1,16 @@
 import {
   useEffect,
   useState,
-<<<<<<< HEAD
-=======
   useCallback,
->>>>>>> qa
 } from "react";
 
 import {
   getRequestTracking,
-<<<<<<< HEAD
-} from "../../services/requests/requestTracking.service";
-
-import type {
-  RequestTracking,
-} from "../../types/request-tracking.types";
-=======
 } from "../../services/student/requests/requestTracking.service";
 
 import type {
   RequestTracking,
 } from "../../types/student/request-tracking.types";
->>>>>>> qa
 
 export function
 useRequestTracking(
@@ -45,31 +34,6 @@ useRequestTracking(
     setError,
   ] = useState("");
 
-<<<<<<< HEAD
-  useEffect(() => {
-    const fetchTracking =
-      async () => {
-        try {
-          setLoading(true);
-
-          const data =
-            await getRequestTracking(
-              requestId
-            );
-
-          setTracking(data);
-        } catch {
-          setError(
-            "Failed to load tracking information."
-          );
-        } finally {
-          setLoading(false);
-        }
-      };
-
-    fetchTracking();
-  }, [requestId]);
-=======
   const fetchTracking =
     useCallback(async () => {
       try {
@@ -94,17 +58,11 @@ useRequestTracking(
   useEffect(() => {
     fetchTracking();
   }, [fetchTracking]);
->>>>>>> qa
 
   return {
     tracking,
     loading,
     error,
-<<<<<<< HEAD
-  };
-}
-=======
     refresh: fetchTracking,
   };
 }
->>>>>>> qa

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import type { ProcedureDetails } from "../types/procedure-details.types";
-=======
 import type { ProcedureDetails } from "../types/procedures/procedure-details.types";
->>>>>>> qa
 
 export const mockProcedureDetails: ProcedureDetails[] = [
   {

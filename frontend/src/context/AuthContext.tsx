@@ -10,10 +10,7 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
-<<<<<<< HEAD
-=======
   career?: string;
->>>>>>> qa
   role: string;
 }
 
@@ -37,10 +34,6 @@ export function AuthProvider({ children }: Props) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-<<<<<<< HEAD
-  // SAFE PARSE 
-=======
->>>>>>> qa
   const safeParseUser = (value: string | null): User | null => {
     if (!value) return null;
     try {
@@ -50,12 +43,6 @@ export function AuthProvider({ children }: Props) {
     }
   };
 
-<<<<<<< HEAD
-  // HYDRATION + SYNC INICIAL
-  useEffect(() => {
-    const storedUser = safeParseUser(localStorage.getItem("user"));
-    const storedToken = localStorage.getItem("sessionToken");
-=======
   // HYDRATION INICIAL
   useEffect(() => {
     const storedUser = safeParseUser(localStorage.getItem("user"));
@@ -63,7 +50,6 @@ export function AuthProvider({ children }: Props) {
     const storedToken =
       localStorage.getItem("sessionToken") ||
       localStorage.getItem("refreshToken"); // 🔥 FIX
->>>>>>> qa
 
     setUser(storedUser);
     setToken(storedToken);
@@ -71,13 +57,6 @@ export function AuthProvider({ children }: Props) {
     setLoading(false);
   }, []);
 
-<<<<<<< HEAD
-  //  SYNC ENTRE PESTAÑAS 
-  useEffect(() => {
-    const syncAuth = () => {
-      const storedUser = safeParseUser(localStorage.getItem("user"));
-      const storedToken = localStorage.getItem("sessionToken");
-=======
   // SYNC ENTRE PESTAÑAS
   useEffect(() => {
     const syncAuth = () => {
@@ -86,7 +65,6 @@ export function AuthProvider({ children }: Props) {
       const storedToken =
         localStorage.getItem("sessionToken") ||
         localStorage.getItem("refreshToken");
->>>>>>> qa
 
       setUser(storedUser);
       setToken(storedToken);
@@ -108,11 +86,7 @@ export function AuthProvider({ children }: Props) {
     setToken(sessionToken);
   };
 
-<<<<<<< HEAD
-  // LOGOUT 
-=======
   // LOGOUT
->>>>>>> qa
   const logout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("sessionToken");
@@ -128,11 +102,7 @@ export function AuthProvider({ children }: Props) {
         user,
         token,
         loading,
-<<<<<<< HEAD
-        isAuthenticated: !!token,
-=======
         isAuthenticated: !!user && !!token, // 🔥 FIX CLAVE
->>>>>>> qa
         login,
         logout,
       }}

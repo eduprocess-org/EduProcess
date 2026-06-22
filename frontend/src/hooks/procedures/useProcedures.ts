@@ -3,15 +3,9 @@ import {
   useState,
 } from "react";
 
-<<<<<<< HEAD
-import { getProcedures } from "../../services/procedures/procedures.service";
-
-import type { Procedure } from "../../types/procedure.types";
-=======
 import { getProcedures } from "../../services/student/procedures/procedures.service";
 
 import type { Procedure } from "../../types/procedures/procedure.types";
->>>>>>> qa
 
 export function useProcedures() {
   const [procedures, setProcedures] =

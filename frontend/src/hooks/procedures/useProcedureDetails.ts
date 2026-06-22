@@ -4,19 +4,11 @@ import {
 } from "react";
 
 import { getProcedureDetails }
-<<<<<<< HEAD
-  from "../../services/procedures/procedure-details.service";
-
-import type {
-  ProcedureDetails,
-} from "../../types/procedure-details.types";
-=======
   from "../../services/student/procedures/procedure-details.service";
 
 import type {
   ProcedureDetails,
 } from "../../types/procedures/procedure-details.types";
->>>>>>> qa
 
 export function useProcedureDetails(
   id: string

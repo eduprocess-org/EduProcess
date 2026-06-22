@@ -50,12 +50,9 @@ export interface ApiDocument {
   fileUrl: string;
   uploadedAt: string;
 }
-<<<<<<< HEAD
-=======
 
 export interface ApiTimelineEntry {
   status: string;
   date: string;
   description: string;
 }
->>>>>>> qa

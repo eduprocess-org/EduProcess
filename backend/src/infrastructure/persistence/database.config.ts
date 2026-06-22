@@ -21,11 +21,6 @@ if (process.env.NODE_ENV !== 'production') {
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-<<<<<<< HEAD
-// Create Supabase client only if environment variables are provided.
-// Export `null` when not configured to avoid runtime errors in local/dev without Supabase.
-=======
->>>>>>> qa
 export const supabase: any = (supabaseUrl && supabaseServiceKey)
     ? createClient(supabaseUrl, supabaseServiceKey, {
         auth: { persistSession: false, autoRefreshToken: false },
