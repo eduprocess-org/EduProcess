@@ -18,7 +18,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 3,
   "links": [],
   "panels": [
     {
@@ -95,7 +94,7 @@
             "uid": "prometheus-eduprocess"
           },
           "editorMode": "code",
-          "expr": "up{job=~\"eduprocess-backend.*\"}",
+          "expr": "up{job=\"eduprocess-backend-qa\", instance=\"backend:3000\"}",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -191,7 +190,7 @@
             "uid": "prometheus-eduprocess"
           },
           "editorMode": "code",
-          "expr": "sum(rate(container_cpu_usage_seconds_total{id=\"/docker\"}[1m])) * 100",
+          "expr": "sum(rate(container_cpu_usage_seconds_total{id!=\"\"}[1m])) * 100",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -287,7 +286,7 @@
             "uid": "prometheus-eduprocess"
           },
           "editorMode": "code",
-          "expr": "container_memory_usage_bytes{id=\"/docker\"}",
+          "expr": "sum(container_memory_usage_bytes{id!=\"\"})",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -408,6 +407,6 @@
   "timezone": "browser",
   "title": "EduProcess - General Metrics",
   "uid": "dfpttvyw0b5dsc",
-  "version": 5,
+  "version": 1,
   "weekStart": ""
 }
