@@ -5,6 +5,8 @@ import type { ProcedureStatus } from "../../../types/admin/procedures/procedures
 const PAGE_SIZE = 5;
 
 export function useProcedures() {
+  const [version, setVersion] = useState(0); 
+  
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"ALL" | ProcedureStatus>("ALL");
   const [page, setPage] = useState(1);
@@ -15,7 +17,6 @@ export function useProcedures() {
 
     if (search.trim()) {
       const value = search.toLowerCase();
-
       data = data.filter(
         (item) =>
           item.name.toLowerCase().includes(value) ||
@@ -33,14 +34,16 @@ export function useProcedures() {
     });
 
     return data;
-  }, [search, status, sortOrder]);
+  }, [search, status, sortOrder, version]); 
 
   const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
 
-  const paginatedData = filteredData.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE
-  );
+  const paginatedData = useMemo(() => {
+    return filteredData.slice(
+      (page - 1) * PAGE_SIZE,
+      page * PAGE_SIZE
+    );
+  }, [filteredData, page]);
 
   return {
     procedures: paginatedData,
@@ -58,5 +61,7 @@ export function useProcedures() {
 
     sortOrder,
     setSortOrder,
+
+    refresh: () => setVersion((v) => v + 1),
   };
 }
