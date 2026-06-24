@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { Plus } from 'lucide-react-native';
+import { Plus, LogOut } from 'lucide-react-native'; // Importamos LogOut para el diseño institucional
 
 // Lógica y Datos (Capa Core)
 import { useStudentRequests } from '../../core/hooks/useStudentRequests';
+import { useAuth } from '../../core/context/AuthContext'; // <--- Traemos el contexto de autenticación
 
 // Elementos de la Jerarquía Atómica (Componentes)
 import DashboardSummary from '../organisms/DashboardSummary';
@@ -20,14 +21,12 @@ interface StudentDashboardPageProps {
 }
 
 export default function StudentDashboardPage({ navigation }: StudentDashboardPageProps) {
-  // Consumo del Hook Lógico del Commit 3
   const { requests, loading, error } = useStudentRequests();
+  const { logout, user } = useAuth(); // <--- Extraemos logout y opcionalmente los datos del usuario
 
-  // Estados locales de filtrado idénticos a tu versión web
   const [status, setStatus] = useState<string>("ALL");
   const [sort, setSort] = useState<string>("NEWEST");
 
-  // Filtrado y ordenamiento optimizado en memoria para dispositivos móviles
   const filteredRequests = useMemo(() => {
     let result = [...(requests || [])];
 
@@ -44,16 +43,39 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
     return result;
   }, [requests, status, sort]);
 
-  // Renderizados condicionales según el estado de la UI
+  // Si da error 401, renderizamos el DashboardError pero permitimos que el usuario salga limpiamente
+  if (error) {
+    return (
+      <SafeAreaView style={[styles.container, styles.centerError]}>
+        <DashboardError message={error} />
+        <TouchableOpacity 
+          style={styles.errorLogoutButton} 
+          onPress={logout}
+          activeOpacity={0.8}
+        >
+          <LogOut size={16} color="#ffffff" />
+          <Text style={styles.errorLogoutText}>Cerrar Sesión Expirada</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
+
   if (loading) return <DashboardLoading />;
-  if (error) return <DashboardError message={error} />;
   
-  // Si no hay trámites en absoluto, disparamos el organismo vacío pasándole el callback nativo
   if (!requests || !requests.length) {
     return (
-      <DashboardEmpty 
-        onBrowseProcedures={() => navigation.navigate("Procedures")} 
-      />
+      <SafeAreaView style={styles.container}>
+        <View style={{ padding: 20, gap: 16 }}>
+          {/* Conservamos botón de salida en el estado vacío por si acaso */}
+          <TouchableOpacity style={styles.inlineLogout} onPress={logout}>
+            <LogOut size={14} color="#64748b" />
+            <Text style={styles.inlineLogoutText}>Sign Out</Text>
+          </TouchableOpacity>
+          <DashboardEmpty 
+            onBrowseProcedures={() => navigation.navigate("Procedures")} 
+          />
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -65,10 +87,21 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
         
-        // Agrupamos la cabecera completa dentro de la FlatList para evitar conflictos de scroll
         ListHeaderComponent={
           <View style={styles.headerGroup}>
             
+            {/* Fila de Utilidades Superiores (Bienvenida + Botón de Salida) */}
+            <View style={styles.topBar}>
+              <Text style={styles.welcomeText}>Hola, {user?.firstName || 'Estudiante'}</Text>
+              <TouchableOpacity 
+                style={styles.logoutIconButton} 
+                onPress={logout}
+                accessibilityLabel="Cerrar sesión"
+              >
+                <LogOut size={16} color="#64748b" />
+              </TouchableOpacity>
+            </View>
+
             {/* Título de la sección y botón de acción */}
             <View style={styles.headerRow}>
               <View style={styles.titleWrapper}>
@@ -82,18 +115,14 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
                 style={styles.newRequestButton}
                 onPress={() => navigation.navigate("Procedures")}
                 activeOpacity={0.8}
-                accessibilityRole="button"
-                accessibilityLabel="Create a new procedure request"
               >
                 <Plus size={14} color="#ffffff" />
                 <Text style={styles.buttonText}>New Request</Text>
               </TouchableOpacity>
             </View>
 
-            {/* Organismo: Tarjetas cuantitativas */}
             <DashboardSummary requests={requests} />
 
-            {/* Organismo: Filtros interactivos */}
             <DashboardFilters
               status={status}
               setStatus={setStatus}
@@ -104,7 +133,6 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
           </View>
         }
         
-        // Renderizado molecular de cada trámite inyectando las acciones nativas
         renderItem={({ item }) => (
           <RequestCard 
             request={item} 
@@ -113,7 +141,6 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
           />
         )}
         
-        // Separador vertical limpio entre celdas
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </SafeAreaView>
@@ -125,15 +152,39 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8fafc',
   },
+  centerError: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+    gap: 20,
+  },
   scrollContainer: {
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: 12,
     paddingBottom: 32,
   },
   headerGroup: {
     flexDirection: 'column',
-    gap: 20,
+    gap: 16,
     marginBottom: 16,
+  },
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+    paddingBottom: 8,
+  },
+  welcomeText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#64748b',
+  },
+  logoutIconButton: {
+    padding: 6,
+    borderRadius: 8,
+    backgroundColor: '#f1f5f9',
   },
   headerRow: {
     flexDirection: 'row',
@@ -160,7 +211,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#0B2D63',
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     paddingVertical: 9,
     borderRadius: 10,
   },
@@ -172,4 +223,30 @@ const styles = StyleSheet.create({
   separator: {
     height: 10,
   },
+  errorLogoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#ef4444',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  errorLogoutText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  inlineLogout: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-end',
+    gap: 6,
+    padding: 6,
+  },
+  inlineLogoutText: {
+    fontSize: 12,
+    color: '#64748b',
+    fontWeight: '500',
+  }
 });

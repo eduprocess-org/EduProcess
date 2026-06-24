@@ -1,27 +1,15 @@
 import React from 'react';
-import { StyleSheet, View, Text, Image } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import LoginForm from '../organisms/LoginForm';
 import { useAuthLogin } from '../../core/hooks/useAuthLogin';
 
-interface LoginPageProps {
-  navigation: {
-    replace: (screenName: string) => void;
-  };
-}
+export default function LoginPage() {
+  const handleSuccess = () => {
 
-
-export default function LoginPage({ navigation }: LoginPageProps) {
-
-  const handleNavigation = (role: string) => {
-    if (role === 'admin') {
-      navigation.replace('AdminDashboard');
-    } else {
-      navigation.replace('Home');
-    }
   };
 
-  const { control, handleSubmit, onSubmit, isLoading } = useAuthLogin(handleNavigation);
+  const { control, handleSubmit, onSubmit, isLoading } = useAuthLogin(handleSuccess);
 
   return (
     <LinearGradient
@@ -30,7 +18,6 @@ export default function LoginPage({ navigation }: LoginPageProps) {
     >
       <View style={styles.innerContainer}>
         <View style={styles.brandContainer}>
-          {/* <Image source={logo} style={styles.logo} /> */}
           <Text style={styles.brandText}>EduProcess</Text>
         </View>
 
@@ -57,7 +44,6 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   innerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 },
   brandContainer: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 32 },
-  logo: { width: 44, height: 44, borderRadius: 10, resizeMode: 'contain' },
   brandText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
   card: { backgroundColor: '#fff', width: '100%', maxWidth: 400, borderRadius: 24, padding: 28, elevation: 10 },
   headerTextContainer: { marginBottom: 24 },
