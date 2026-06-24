@@ -1,4 +1,4 @@
-import { apiClient } from "../../core/api/apiClient";
+import { apiClient } from "../api/apiClient";
 import type { LoginRequest, LoginResponse } from "../types/authTypes"; // Ajusta la ruta a tus tipos globales
 
 export const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
