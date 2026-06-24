@@ -23,6 +23,7 @@ import RequestDetailsPage from "../pages/admin/requests/RequestDetailsPage";
 import { useAuth } from "../hooks/useAuth"; 
 import ProceduresManagementPage from "../pages/admin/procedures/ProceduresManagementPage";
 import ProcedureCreationPage from "../pages/admin/procedures/ProcedureCreationPage";
+import ProcedureEditPage from "../pages/admin/procedures/ProcedureEditPage";
 
 function RoleBasedRedirect() {
   const { user } = useAuth(); 
@@ -111,8 +112,8 @@ function AppRouter() {
           <Route path="requests" element={<RequestManagementPage />} />
           <Route path="requests/:id" element={<RequestDetailsPage />} />
           <Route path="procedures" element={<ProceduresManagementPage />} />
-          {/* Tu ruta de creación queda perfectamente integrada bajo el scope de administrador */}
           <Route path="procedures/create" element={<ProcedureCreationPage />} />
+          <Route path="procedures/edit/:id" element={<ProcedureEditPage />} />
         </Route>
 
         {/* ================= FALLBACK ================= */}
