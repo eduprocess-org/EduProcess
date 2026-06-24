@@ -49,7 +49,6 @@ export class AuthController {
 
     me = async (req: Request, res: Response): Promise<Response> => {
         try {
-            // req.user is injected by the authMiddleware
             const user = (req as any).user;
             
             if (!user) {

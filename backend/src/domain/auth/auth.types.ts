@@ -1,7 +1,6 @@
 export type UserRole = 'student' | 'admin';
 
 export interface RegisterAuthRequest {
-    /** Prefer sending explicit names from frontend. Kept optional for backward compatibility. */
     fullName?: string;
     firstName?: string;
     lastName?: string;

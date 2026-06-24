@@ -1,11 +1,18 @@
-export type RequestStatus = "PENDING" | "IN_REVIEW" | "APPROVED" | "REJECTED";
+export type RequestStatus = "pending" | "in_review" | "approved" | "rejected";
 
 // ─── Transiciones válidas del flujo de trabajo ──────────────────────────────
 export const VALID_TRANSITIONS: Record<RequestStatus, RequestStatus[]> = {
+<<<<<<< HEAD
   PENDING: ["IN_REVIEW"],
   IN_REVIEW: ["APPROVED", "REJECTED"],
   APPROVED: [],
   REJECTED: [],
+=======
+  pending: ["in_review"],
+  in_review: ["approved", "rejected"],
+  approved: [],
+  rejected: [],
+>>>>>>> cab71563bdcfa8c43f5c2a27e33ea37bfeed05ec
 };
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────

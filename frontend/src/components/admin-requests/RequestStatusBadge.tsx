@@ -5,7 +5,7 @@ interface Props {
 }
 
 const styles: Record<
-  AdminRequestListItem["status"],
+  string, // Se cambia temporalmente a string o un sub-tipo para permitir la indexación con la normalización
   { bg: string; color: string; border: string; dot: string; label: string }
 > = {
   PENDING: {
@@ -60,8 +60,8 @@ const PING_STYLE = `
 `;
 
 export default function RequestStatusBadge({ status }: Props) {
-  // 🔥 Normalizar a mayúsculas para que coincida con las claves de styles
-  const normalizedStatus = status.toUpperCase() as keyof typeof styles;
+  const normalizedStatus = status.toUpperCase();
+  
   const s = styles[normalizedStatus] ?? {
     bg: "#F3F4F6",
     color: "#374151",

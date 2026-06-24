@@ -11,7 +11,7 @@ const mockRequest: AdminRequestListItem = {
   studentName: "Vanessa Heredia",
   studentEmail: "vanessa@test.com",
   procedureName: "Academic Certificate",
-  status: "PENDING",
+  status: "pending",
   career: "Sistemas",
   semester: "7",
   createdAt: "2026-06-15T10:00:00Z",

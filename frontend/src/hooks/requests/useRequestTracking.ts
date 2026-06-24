@@ -1,6 +1,7 @@
 import {
   useEffect,
   useState,
+  useCallback,
 } from "react";
 
 import {
@@ -33,33 +34,35 @@ useRequestTracking(
     setError,
   ] = useState("");
 
-  useEffect(() => {
-    const fetchTracking =
-      async () => {
-        try {
-          setLoading(true);
+  const fetchTracking =
+    useCallback(async () => {
+      try {
+        setLoading(true);
 
-          const data =
-            await getRequestTracking(
-              requestId
-            );
-
-          setTracking(data);
-        } catch {
-          setError(
-            "Failed to load tracking information."
+        const data =
+          await getRequestTracking(
+            requestId
           );
-        } finally {
-          setLoading(false);
-        }
-      };
 
+        setTracking(data);
+        setError("");
+      } catch {
+        setError(
+          "Failed to load tracking information."
+        );
+      } finally {
+        setLoading(false);
+      }
+    }, [requestId]);
+
+  useEffect(() => {
     fetchTracking();
-  }, [requestId]);
+  }, [fetchTracking]);
 
   return {
     tracking,
     loading,
     error,
+    refresh: fetchTracking,
   };
 }
