@@ -1,5 +1,5 @@
 import { apiClient } from '../api/apiClient';
-import { StudentRequest } from '../../core/types/studentDashboardTypes';
+import { StudentRequest } from '../types/studentDashboardTypes';
 
 // Tipado rápido para la respuesta cruda del backend si no quieres arrastrar api.types
 interface BackendRequest {
