@@ -1,5 +1,5 @@
 import axios from "axios";
-import { authStorage } from "../storage/authStorage"
+import { authStorage } from "../storage/authStorage";
 
 // 1. Configuración de la IP fija para el desarrollo en red local
 const API_BASE_URL = "http://192.168.100.63:3000";
@@ -19,16 +19,19 @@ export const setUnauthorizedCallback = (callback: () => void) => {
 };
 
 // 2. Interceptor de Peticiones (Asíncrono para SecureStore)
-apiClient.interceptors.request.use(async (config) => {
-  // En mobile recuperamos el token desde el almacenamiento seguro
-  const token = await authStorage.getToken();
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
+apiClient.interceptors.request.use(
+  async (config) => {
+    // En mobile recuperamos el token desde el almacenamiento seguro
+    const token = await authStorage.getToken();
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
+);
 
 // Gestión de la cola de refresco
 let isRefreshing = false;
@@ -58,13 +61,14 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Caso A: El token expiró pero es renovable
     if (
-      error.response?.status === 401 && 
-      error.response?.data?.code === "TOKEN_EXPIRED" && 
+      error.response?.status === 401 &&
+      error.response?.data?.code === "TOKEN_EXPIRED" &&
       !originalRequest._retry
     ) {
       // Intentamos recuperar el token desde el SecureStore móvil
-      const refreshToken = await authStorage.getToken(); // O maneja una clave exclusiva para refresh si decides guardarlos por separado
+      const refreshToken = await authStorage.getToken();
 
       if (!refreshToken) {
         await handleCleanExit();
@@ -74,10 +78,14 @@ apiClient.interceptors.response.use(
       if (isRefreshing) {
         return new Promise<string>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return apiClient(originalRequest);
-        });
+        })
+          .then((token) => {
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+            }
+            return apiClient(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
@@ -92,7 +100,9 @@ apiClient.interceptors.response.use(
 
         processQueue(null, newSessionToken);
 
-        originalRequest.headers.Authorization = `Bearer ${newSessionToken}`;
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${newSessionToken}`;
+        }
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
@@ -101,6 +111,12 @@ apiClient.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
+    }
+
+    // Caso B: Escape de seguridad para 401 definitivo (Credenciales inválidas, firma corrupta o usuario inexistente)
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      console.warn("QA Log: 401 definitivo detectado (No fue por TOKEN_EXPIRED). Forzando limpieza del estado de autenticación.");
+      await handleCleanExit();
     }
 
     return Promise.reject(error);
