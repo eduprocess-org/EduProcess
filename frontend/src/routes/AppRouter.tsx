@@ -1,3 +1,4 @@
+// src/routes/AppRouter.tsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import AuthLayout from "../layouts/AuthLayout";
@@ -110,6 +111,7 @@ function AppRouter() {
           <Route path="requests" element={<RequestManagementPage />} />
           <Route path="requests/:id" element={<RequestDetailsPage />} />
           <Route path="procedures" element={<ProceduresManagementPage />} />
+          {/* Tu ruta de creación queda perfectamente integrada bajo el scope de administrador */}
           <Route path="procedures/create" element={<ProcedureCreationPage />} />
         </Route>
 
