@@ -48,8 +48,8 @@ export function useRequestDetailsUI() {
 
     const current = detail.status.toLowerCase();
     const allowed: Record<string, RequestStatus[]> = {
-      pending: ["IN_REVIEW"],
-      in_review: ["APPROVED", "REJECTED"],
+      pending: ["in_review"],
+      in_review: ["approved", "rejected"],
       approved: [],
       rejected: [],
     };

@@ -13,8 +13,8 @@ interface StatusChangeModalProps {
 export function StatusChangeModal({ isOpen, pendingStatus, comment, updating, onConfirm, onCancel }: StatusChangeModalProps) {
   if (!isOpen || !pendingStatus) return null;
 
-  const isApproved = pendingStatus === "APPROVED";
-  const isRejected = pendingStatus === "REJECTED";
+  const isApproved = pendingStatus === "approved";
+  const isRejected = pendingStatus === "rejected";
   const color = isApproved ? "#059669" : isRejected ? "#DC2626" : "#1A52A8";
   const bg = isApproved ? "#ECFDF5" : isRejected ? "#FEF2F2" : "#EFF6FF";
 

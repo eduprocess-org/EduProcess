@@ -72,9 +72,9 @@ export function RequestDetailsTemplate({
               isTerminal={isTerminal}
               currentStatus={currentStatus}
               updating={updating}
-              onStartReview={() => initiateStatusTransition("IN_REVIEW")}
-              onApprove={() => initiateStatusTransition("APPROVED")}
-              onReject={() => initiateStatusTransition("REJECTED")}
+              onStartReview={() => initiateStatusTransition("in_review")}
+              onApprove={() => initiateStatusTransition("approved")}
+              onReject={() => initiateStatusTransition("rejected")}
             />
             <Divider />
             <div className="grid gap-8 md:grid-cols-5">
