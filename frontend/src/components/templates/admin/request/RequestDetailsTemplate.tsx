@@ -1,14 +1,14 @@
 import { ArrowLeft } from "lucide-react";
-import { Divider } from "../common/atoms/Divider";
-import { LoadingSpinner } from "../common/atoms/LoadingSpinner";
-import { ErrorDisplay } from "../common/molecules/ErrorDisplay";
-import { AuditHistory } from "../common/molecules/AuditHistory";
-import { RequestDetailsHeader } from "../admin-requests/RequestDetailsHeader";
-import { StudentInfoCard } from "../admin-requests/StudentInfoCard";
-import { DocumentsList } from "../admin-requests/DocumentsList";
-import { StatusChangeModal } from "../admin-requests/StatusChangeModal";
-import ObservationsPanel from "../admin-requests/ObservationsPanel";
-import type { AdminRequestDetail, RequestStatus } from "../../types/admin/adminRequest.types";
+import { Divider } from "../../../common/atoms/Divider";
+import { LoadingSpinner } from "../../../common/atoms/LoadingSpinner";
+import { ErrorDisplay } from "../../../common/molecules/ErrorDisplay";
+import { AuditHistory } from "../../../common/molecules/AuditHistory";
+import { RequestDetailsHeader } from "../../../admin-requests/RequestDetailsHeader";
+import { StudentInfoCard } from "../../../admin-requests/StudentInfoCard";
+import { DocumentsList } from "../../../admin-requests/DocumentsList";
+import { StatusChangeModal } from "../../../admin-requests/StatusChangeModal";
+import ObservationsPanel from "../../../admin-requests/ObservationsPanel";
+import type { AdminRequestDetail, RequestStatus } from "../../../../types/admin/adminRequest.types";
 
 interface RequestDetailsTemplateProps {
   detail: AdminRequestDetail | undefined | null; // ✅ Aceptar undefined

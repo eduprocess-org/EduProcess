@@ -1,7 +1,7 @@
-import RequestFilters from "../admin-requests/RequestFilters";
-import RequestTable from "../admin-requests/RequestTable";
-import { DataShell } from "../common/molecules/DataShell";
-import { Pagination } from "../common/molecules/Pagination";
+import RequestFilters from "../../../admin-requests/RequestFilters";
+import RequestTable from "../../../admin-requests/RequestTable";
+import { DataShell } from "../../../common/molecules/DataShell";
+import { Pagination } from "../../../common/molecules/Pagination";
 
 interface RequestManagementTemplateProps {
   // Datos

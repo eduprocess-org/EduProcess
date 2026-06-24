@@ -21,6 +21,7 @@ import PublicRoute from "../components/auth/PublicRoute";
 import RequestDetailsPage from "../pages/admin/requests/RequestDetailsPage";
 import { useAuth } from "../hooks/useAuth"; 
 import ProceduresManagementPage from "../pages/admin/procedures/ProceduresManagementPage";
+import ProcedureCreationPage from "../pages/admin/procedures/ProcedureCreationPage";
 
 function RoleBasedRedirect() {
   const { user } = useAuth(); 
@@ -109,7 +110,7 @@ function AppRouter() {
           <Route path="requests" element={<RequestManagementPage />} />
           <Route path="requests/:id" element={<RequestDetailsPage />} />
           <Route path="procedures" element={<ProceduresManagementPage />} />
-
+          <Route path="procedures/create" element={<ProcedureCreationPage />} />
         </Route>
 
         {/* ================= FALLBACK ================= */}
