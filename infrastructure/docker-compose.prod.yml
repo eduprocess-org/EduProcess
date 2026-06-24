@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     image: xfrixonl/eduprocess-backend:prod
@@ -33,6 +31,69 @@ services:
     depends_on:
       - backend
       - frontend
+
+  prometheus:
+    image: prom/prometheus:v2.51.1
+    container_name: eduprocess-prometheus-prod
+    restart: always
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.external-url=/prometheus/'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alert.rules.yml:/etc/prometheus/alert.rules.yml:ro
+      - prometheus-prod-data:/prometheus
+    networks:
+      - eduprocess-prod-network
+    depends_on:
+      - backend
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: eduprocess-cadvisor-prod
+    restart: always
+    user: root
+    privileged: true    
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    devices:
+      - /dev/kmsg
+    command:
+      - '--docker_only=true'
+    networks:
+      - eduprocess-prod-network
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: eduprocess-grafana-prod
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/ 
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true                                            
+    volumes:
+      - grafana-prod-data:/var/lib/grafana                                                 
+      - ./grafana-datasources.prod.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+      - ./grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro
+      - ./dashboards/eduprocess_metrics.json:/var/lib/grafana/dashboards/eduprocess_metrics.json:ro
+    networks:
+      - eduprocess-prod-network
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus-prod-data:
+    driver: local
+  grafana-prod-data:
+    driver: local
 
 networks:
   eduprocess-prod-network:

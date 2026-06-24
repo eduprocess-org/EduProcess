@@ -19,8 +19,6 @@ export interface RequestsByProcedureTypeDTO {
   count: number;
 }
 
-// ─── Admin Request Management Types ──────────────────────────────────────────
-
 export interface AdminRequestFilters {
   status?: string;
   procedureTypeId?: string;
