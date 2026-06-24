@@ -1,86 +1,96 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Eye, MapPin, Calendar, FileText, FileCheck, Receipt, GraduationCap } from 'lucide-react-native';
-import { StudentRequest } from '../../core/types/studentDashboardTypes';
-import StatusBadge from '../atoms/StatusBadge';
+import { FileText, Eye } from 'lucide-react-native';
 
 interface RequestCardProps {
-  request: StudentRequest;
+  request: {
+    id: string;
+    title?: string;       // Mapeado según el nombre del trámite (ej. "Constancia de Estudios")
+    procedureName?: string; // Alternativa según la estructura de tu modelo
+    status: 'PENDING' | 'APPROVED' | 'REJECTED' | string;
+    createdAt: string;
+  };
   onTrack: (id: string) => void;
-  onView: (procedureId: string) => void;
 }
 
-// Configuración de colores para la barra de estado lateral herederos del diseño web
-const barConfig: Record<string, string> = {
-  PENDING: '#EF9F27',
-  APPROVED: '#1D9E75',
-  REJECTED: '#E24B4A',
-};
+export default function RequestCard({ request, onTrack }: RequestCardProps) {
+  // Manejo dinámico de estilos según el estado del trámite para el tag visual
+  const getStatusStyles = (status: string) => {
+    switch (status.toUpperCase()) {
+      case 'APPROVED':
+        return {
+          container: styles.statusApproved,
+          text: styles.textApproved,
+          dot: styles.dotApproved,
+          label: 'Approved',
+          indicator: styles.indicatorApproved
+        };
+      case 'REJECTED':
+        return {
+          container: styles.statusRejected,
+          text: styles.textRejected,
+          dot: styles.dotRejected,
+          label: 'Rejected',
+          indicator: styles.indicatorRejected
+        };
+      default:
+        return {
+          container: styles.statusPending,
+          text: styles.textPending,
+          dot: styles.dotPending,
+          label: 'Pending',
+          indicator: styles.indicatorPending
+        };
+    }
+  };
 
-// Configuración de colores de fondo e icono para el bloque decorativo del trámite
-const iconConfig: Record<string, { bg: string; color: string }> = {
-  PENDING: { bg: '#FAEEDA', color: '#854F0B' },
-  APPROVED: { bg: '#E1F5EE', color: '#0F6E56' },
-  REJECTED: { bg: '#FCEBEB', color: '#A32D2D' },
-};
+  const statusStyle = getStatusStyles(request.status);
+  const displayTitle = request.title || request.procedureName || "Trámite Universitario";
 
-function getProcedureIcon(name: string) {
-  const lower = name.toLowerCase();
-  if (lower.includes('enrollment')) return FileCheck;
-  if (lower.includes('tuition') || lower.includes('payment')) return Receipt;
-  if (lower.includes('grade') || lower.includes('academic')) return GraduationCap;
-  return FileText;
-}
-
-export default function RequestCard({ request, onTrack, onView }: RequestCardProps) {
-  const sideBarColor = barConfig[request.status] || '#cbd5e1';
-  const iconTheme = iconConfig[request.status] || { bg: '#f1f5f9', color: '#64748b' };
-  const ProcedureIcon = getProcedureIcon(request.procedureName);
+  // Formateo básico de la fecha (puedes adaptarlo si usas date-fns o similar)
+  const displayDate = request.createdAt ? request.createdAt.split('T')[0] : '';
 
   return (
-    <View style={styles.card} accessibilityRole="summary">
-      {/* Barra de estado lateral */}
-      <View style={[styles.statusBar, { backgroundColor: sideBarColor }]} />
+    <View style={styles.card}>
+      {/* Barra indicadora lateral de color según estado */}
+      <View style={[styles.stateIndicator, statusStyle.indicator]} />
 
-      {/* Contenedor del Icono del Trámite */}
-      <View style={[styles.iconContainer, { backgroundColor: iconTheme.bg }]}>
-        <ProcedureIcon size={16} color={iconTheme.color} />
-      </View>
+      {/* Contenido Izquierdo: Icono + Textos */}
+      <View style={styles.contentContainer}>
+        <View style={styles.iconWrapper}>
+          <FileText size={20} color="#475569" />
+        </View>
 
-      {/* Cuerpo de la Información */}
-      <View style={styles.body}>
-        <Text style={styles.title} numberOfLines={1}>
-          {request.procedureName}
-        </Text>
-        <View style={styles.metaRow}>
-          {/* Reutilización del Átomo de Estado */}
-          <StatusBadge status={request.status} />
-          
-          <View style={styles.dateBadge}>
-            <Calendar size={11} color="#94a3b8" />
-            <Text style={styles.dateText}>{request.createdAt}</Text>
+        <View style={styles.infoWrapper}>
+          <Text style={styles.titleText} numberOfLines={1}>
+            {displayTitle}
+          </Text>
+
+          <View style={styles.metaRow}>
+            {/* Badge de Estado */}
+            <View style={[styles.statusBadge, statusStyle.container]}>
+              <View style={[styles.statusDot, statusStyle.dot]} />
+              <Text style={[styles.statusText, statusStyle.text]}>
+                {statusStyle.label}
+              </Text>
+            </View>
+
+            {/* Fecha de Creación */}
+            {displayDate ? <Text style={styles.dateText}>{displayDate}</Text> : null}
           </View>
         </View>
       </View>
 
-      {/* Bloque Lateral de Acciones Rápidas */}
-      <View style={styles.actionsColumn}>
+      {/* Contenido Derecho: Única Acción Autorizada (Track) */}
+      <View style={styles.actionsContainer}>
         <TouchableOpacity
           style={styles.trackButton}
           onPress={() => onTrack(request.id)}
           activeOpacity={0.7}
+          accessibilityLabel={`Track request ${displayTitle}`}
         >
-          <MapPin size={12} color="#64748b" />
-          <Text style={styles.trackText}>Track</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.viewButton}
-          onPress={() => onView(request.procedureId)}
-          activeOpacity={0.7}
-        >
-          <Eye size={12} color="#ffffff" />
-          <Text style={styles.viewText}>View</Text>
+          <Eye size={14} color="#475569" style={styles.trackIcon} />
+          <Text style={styles.trackButtonText}>Track</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -89,99 +99,115 @@ export default function RequestCard({ request, onTrack, onView }: RequestCardPro
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#ffffff',
     borderRadius: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    position: 'relative',
+    overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#f1f5f9',
-    paddingHorizontal: 12,
-    paddingVertical: 14,
-    // Sombras nativas
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 2,
     elevation: 2,
+    shadowColor: '#0f172a',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
-  statusBar: {
-    height: 40,
-    width: 3,
-    borderRadius: 2,
-    marginRight: 10,
+  stateIndicator: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 4,
   },
-  iconContainer: {
-    height: 36,
-    width: 36,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
-  body: {
+  contentContainer: {
     flex: 1,
-    minWidth: 0,
-    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingRight: 8,
   },
-  title: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#0f172a',
-    marginBottom: 4,
+  iconWrapper: {
+    backgroundColor: '#f1f5f9',
+    padding: 10,
+    borderRadius: 12,
+  },
+  infoWrapper: {
+    flex: 1,
+    gap: 6,
+  },
+  titleText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1e293b',
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    flexWrap: 'wrap',
+    gap: 10,
   },
-  dateBadge: {
+  statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 20,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  statusText: {
+    fontSize: 11,
+    fontWeight: '600',
   },
   dateText: {
     fontSize: 11,
     color: '#94a3b8',
   },
-  actionsColumn: {
-    flexDirection: 'column',
-    gap: 6,
-    marginLeft: 8,
+  actionsContainer: {
     justifyContent: 'center',
+    alignItems: 'flex-end',
+    minWidth: 78,
   },
   trackButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 4,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
     backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
     borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    minWidth: 65,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    width: '100%',
   },
-  trackText: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: '#64748b',
+  trackIcon: {
+    marginTop: 1,
   },
-  viewButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-    backgroundColor: '#0B2D63',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    minWidth: 65,
+  trackButtonText: {
+    color: '#475569',
+    fontSize: 12,
+    fontWeight: '600',
   },
-  viewText: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: '#ffffff',
-  },
+  /* Variantes de Color por Estado */
+  indicatorPending: { backgroundColor: '#eab308' },
+  statusPending: { backgroundColor: '#fef9c3' },
+  textPending: { color: '#854d0e' },
+  dotPending: { backgroundColor: '#ca8a04' },
+
+  indicatorApproved: { backgroundColor: '#22c55e' },
+  statusApproved: { backgroundColor: '#dcfce7' },
+  textApproved: { color: '#166534' },
+  dotApproved: { backgroundColor: '#16a34a' },
+
+  indicatorRejected: { backgroundColor: '#ef4444' },
+  statusRejected: { backgroundColor: '#fee2e2' },
+  textRejected: { color: '#991b1b' },
+  dotRejected: { backgroundColor: '#dc2626' },
 });

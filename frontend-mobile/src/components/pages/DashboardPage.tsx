@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { SafeAreaView, View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { Plus, LogOut } from 'lucide-react-native'; // Importamos LogOut para el diseño institucional
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LogOut } from 'lucide-react-native';
 
 // Lógica y Datos (Capa Core)
 import { useStudentRequests } from '../../core/hooks/useStudentRequests';
-import { useAuth } from '../../core/context/AuthContext'; // <--- Traemos el contexto de autenticación
+import { useAuth } from '../../core/context/AuthContext';
 
 // Elementos de la Jerarquía Atómica (Componentes)
 import DashboardSummary from '../organisms/DashboardSummary';
@@ -22,7 +23,7 @@ interface StudentDashboardPageProps {
 
 export default function StudentDashboardPage({ navigation }: StudentDashboardPageProps) {
   const { requests, loading, error } = useStudentRequests();
-  const { logout, user } = useAuth(); // <--- Extraemos logout y opcionalmente los datos del usuario
+  const { logout, user } = useAuth();
 
   const [status, setStatus] = useState<string>("ALL");
   const [sort, setSort] = useState<string>("NEWEST");
@@ -43,7 +44,7 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
     return result;
   }, [requests, status, sort]);
 
-  // Si da error 401, renderizamos el DashboardError pero permitimos que el usuario salga limpiamente
+  // Manejo de Error Expirado o del Backend (Modo QA Recovery)
   if (error) {
     return (
       <SafeAreaView style={[styles.container, styles.centerError]}>
@@ -62,11 +63,11 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
 
   if (loading) return <DashboardLoading />;
   
+  // Estado Vacío (Sin trámites en base de datos)
   if (!requests || !requests.length) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={{ padding: 20, gap: 16 }}>
-          {/* Conservamos botón de salida en el estado vacío por si acaso */}
           <TouchableOpacity style={styles.inlineLogout} onPress={logout}>
             <LogOut size={14} color="#64748b" />
             <Text style={styles.inlineLogoutText}>Sign Out</Text>
@@ -80,7 +81,7 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <FlatList
         data={filteredRequests}
         keyExtractor={(item) => item.id}
@@ -90,7 +91,7 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
         ListHeaderComponent={
           <View style={styles.headerGroup}>
             
-            {/* Fila de Utilidades Superiores (Bienvenida + Botón de Salida) */}
+            {/* Fila de Utilidades Superiores (Saludo + LogOut bajado del notch) */}
             <View style={styles.topBar}>
               <Text style={styles.welcomeText}>Hola, {user?.firstName || 'Estudiante'}</Text>
               <TouchableOpacity 
@@ -102,7 +103,7 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
               </TouchableOpacity>
             </View>
 
-            {/* Título de la sección y botón de acción */}
+            {/* Título de la sección limpio y sin saturación de botones */}
             <View style={styles.headerRow}>
               <View style={styles.titleWrapper}>
                 <Text style={styles.mainTitle}>My Requests Dashboard</Text>
@@ -110,15 +111,6 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
                   Track all your submitted procedure requests.
                 </Text>
               </View>
-
-              <TouchableOpacity
-                style={styles.newRequestButton}
-                onPress={() => navigation.navigate("Procedures")}
-                activeOpacity={0.8}
-              >
-                <Plus size={14} color="#ffffff" />
-                <Text style={styles.buttonText}>New Request</Text>
-              </TouchableOpacity>
             </View>
 
             <DashboardSummary requests={requests} />
@@ -137,7 +129,6 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
           <RequestCard 
             request={item} 
             onTrack={(id) => navigation.navigate("RequestTracking", { id })}
-            onView={(procedureId) => navigation.navigate("ProcedureDetails", { procedureId })}
           />
         )}
         
@@ -160,7 +151,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     paddingHorizontal: 20,
-    paddingTop: 12,
+    paddingTop: 4,
     paddingBottom: 32,
   },
   headerGroup: {
@@ -174,29 +165,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9',
-    paddingBottom: 8,
+    paddingTop: 10,
+    paddingBottom: 12,
   },
   welcomeText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '500',
-    color: '#64748b',
+    color: '#475569',
   },
   logoutIconButton: {
-    padding: 6,
+    padding: 8,
     borderRadius: 8,
     backgroundColor: '#f1f5f9',
   },
   headerRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'flex-start',
-    gap: 12,
   },
   titleWrapper: {
     flex: 1,
   },
   mainTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700',
     color: '#0f172a',
     letterSpacing: -0.5,
@@ -204,21 +195,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     color: '#64748b',
-    marginTop: 2,
-  },
-  newRequestButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#0B2D63',
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: '600',
+    marginTop: 4,
   },
   separator: {
     height: 10,
