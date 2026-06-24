@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, Text, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import LoginForm from '../../components/organisms/LoginForm';
-import { useAuthLogin } from '../hooks/useAuthLogin';
+import LoginForm from '../organisms/LoginForm';
+import { useAuthLogin } from '../../core/hooks/useAuthLogin';
 
 interface LoginPageProps {
   navigation: {

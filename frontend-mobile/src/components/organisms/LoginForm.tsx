@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Control, UseFormHandleSubmit } from 'react-hook-form';
-import { LoginFormData } from '../../auth/utils/validators';
+import { LoginFormData } from '../../core/utils/validators';
 import FormField from '../molecules/FormField';
 import Button from '../atoms/Button';
 

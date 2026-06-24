@@ -3,9 +3,9 @@ import { useForm, Control, UseFormHandleSubmit } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert } from 'react-native';
 import { login as apiLogin } from '../services/authService'; 
-import { authStorage } from '../../core/storage/authStorage';
+import { authStorage } from '../storage/authStorage';
 import { loginSchema, LoginFormData } from '../utils/validators';
-import { useAuth } from '../../core/context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 interface UseAuthLoginReturn {
   control: Control<LoginFormData>;

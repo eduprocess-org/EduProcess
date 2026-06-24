@@ -2,7 +2,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { AuthProvider, useAuth } from './src/core/context/AuthContext';
-import LoginPage from './src/auth/pages/LoginPage';
+import LoginPage from './src/components/pages/LoginPage';
 import Button from './src/components/atoms/Button';
 
 function RootNavigation() {
