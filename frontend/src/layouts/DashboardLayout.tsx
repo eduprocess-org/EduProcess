@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-
 import StudentNavbar from "../components/navigation/student/StudentNavbar";
 import StudentSidebar from "../components/navigation/student/StudentSidebar";
 import AdminSidebar from "../components/navigation/admin/AdminSidebar";
@@ -19,7 +18,7 @@ function DashboardLayout() {
   const isAdmin = user?.role === "admin";
 
   return (
-    <div className="flex h-screen w-full bg-slate-100 overflow-hidden">
+    <div className="flex h-screen w-full bg-slate-100 overflow-hidden dark:bg-slate-950 transition-colors">
 
       {/* MOBILE SIDEBAR */}
       {isSidebarOpen && (
@@ -72,9 +71,17 @@ function DashboardLayout() {
           }
         />
 
-        <main className="flex-1 p-8 overflow-y-auto">
-          <div className="max-w-7xl mx-auto">
-            <Outlet />
+        <main
+          className="
+            flex-1
+            overflow-y-auto
+            p-8
+            bg-slate-100
+            dark:bg-slate-900
+            transition-colors
+          "
+        >
+        <div className="max-w-7xl mx-auto text-slate-900 dark:text-slate-100">            <Outlet />
           </div>
         </main>
 

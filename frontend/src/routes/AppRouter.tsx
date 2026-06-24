@@ -20,6 +20,7 @@ import ProtectedRoute from "../components/auth/ProtectedRoute";
 import PublicRoute from "../components/auth/PublicRoute";
 import RequestDetailsPage from "../pages/admin/requests/RequestDetailsPage";
 import { useAuth } from "../hooks/useAuth"; 
+import ProceduresManagementPage from "../pages/admin/procedures/ProceduresManagementPage";
 
 function RoleBasedRedirect() {
   const { user } = useAuth(); 
@@ -107,6 +108,8 @@ function AppRouter() {
 
           <Route path="requests" element={<RequestManagementPage />} />
           <Route path="requests/:id" element={<RequestDetailsPage />} />
+          <Route path="procedures" element={<ProceduresManagementPage />} />
+
         </Route>
 
         {/* ================= FALLBACK ================= */}
