@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest"; 
 import ProceduresTable from "../ProceduresTable";
 
 const mockData = [
@@ -9,17 +9,18 @@ const mockData = [
     code: "PROC-001",
     name: "Academic Certificate",
     description: "Test description",
-    status: "ACTIVE",
-    createdAt: "2026-01-01",
+    status: "ACTIVE", 
     updatedAt: "2026-01-02",
   },
 ];
 
 describe("ProceduresTable", () => {
+  const mockRefresh = vi.fn(); 
+
   it("should render procedure name", () => {
     render(
       <BrowserRouter>
-        <ProceduresTable procedures={mockData as any} />
+        <ProceduresTable procedures={mockData as any} onRefreshList={mockRefresh} />
       </BrowserRouter>
     );
 
@@ -29,7 +30,8 @@ describe("ProceduresTable", () => {
   it("should render code", () => {
     render(
       <BrowserRouter>
-        <ProceduresTable procedures={mockData as any} />
+        {/* Pasamos onRefreshList como propiedad */}
+        <ProceduresTable procedures={mockData as any} onRefreshList={mockRefresh} />
       </BrowserRouter>
     );
 
