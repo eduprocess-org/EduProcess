@@ -123,11 +123,11 @@ const styles = StyleSheet.create({
     width: 4,
   },
   contentContainer: {
-    flex: 1,
+    flex: 1,                   // 🚀 Ocupa todo el espacio sobrante de la izquierda
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingRight: 8,
+    paddingRight: 12,          // Margen de seguridad para que no choque con el botón
   },
   iconWrapper: {
     backgroundColor: '#f1f5f9',
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   actionsContainer: {
     justifyContent: 'center',
     alignItems: 'flex-end',
-    minWidth: 78,
+    width: 85,                 // 🚀 Fijamos un ancho estricto para el área del botón
   },
   trackButton: {
     flexDirection: 'row',
@@ -183,9 +183,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#cbd5e1',
     borderRadius: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 7,
-    width: '100%',
+    width: '100%',             // Ahora se estirará de forma segura hasta los 85px fijos
   },
   trackIcon: {
     marginTop: 1,
