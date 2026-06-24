@@ -1,12 +1,13 @@
 import { Eye, Pencil, ArrowUpDown } from "lucide-react";
 import type { Procedure } from "../../../types/admin/procedures/procedures.types";
 import ProcedureStatusBadge from "./ProcedureStatusBadge";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   procedures: Procedure[];
 }
-
 function ProceduresTable({ procedures }: Props) {
+  const navigate = useNavigate();
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700/60 dark:bg-slate-900">
       <div className="overflow-x-auto">
@@ -100,17 +101,10 @@ function ProceduresTable({ procedures }: Props) {
                     >
                       <Eye size={16} />
                     </button>
-
                     <button
-                      className="
-                        rounded-lg p-2
-                        text-slate-400 hover:text-indigo-600
-                        hover:bg-indigo-50
-                        dark:text-slate-500 dark:hover:text-indigo-400
-                        dark:hover:bg-indigo-950/50
-                        transition-all duration-150
-                      "
-                      aria-label="Edit procedure"
+                      onClick={() => navigate(`/admin/procedures/edit/${procedure.id}`)}
+                      className="text-slate-400 hover:text-blue-600 p-1 transition-colors"
+                      title="Edit Procedure"
                     >
                       <Pencil size={16} />
                     </button>

@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { BrowserRouter } from "react-router-dom";
 import { describe, it, expect } from "vitest";
 import ProceduresTable from "../ProceduresTable";
 
@@ -16,13 +17,21 @@ const mockData = [
 
 describe("ProceduresTable", () => {
   it("should render procedure name", () => {
-    render(<ProceduresTable procedures={mockData as any} />);
+    render(
+      <BrowserRouter>
+        <ProceduresTable procedures={mockData as any} />
+      </BrowserRouter>
+    );
 
     expect(screen.getByText("Academic Certificate")).toBeInTheDocument();
   });
 
   it("should render code", () => {
-    render(<ProceduresTable procedures={mockData as any} />);
+    render(
+      <BrowserRouter>
+        <ProceduresTable procedures={mockData as any} />
+      </BrowserRouter>
+    );
 
     expect(screen.getByText("PROC-001")).toBeInTheDocument();
   });
