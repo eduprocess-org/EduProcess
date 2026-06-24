@@ -24,7 +24,6 @@ describe("EDUPR-231: Procedure Edit Module - Unit Tests", () => {
   it("should display a loading layout initially and then render the atomic form", async () => {
     const { container } = render(<ProcedureEditPage />);
     
-    // Encuentra el spinner de Lucide usando su clase CSS de animación sin importar la accesibilidad
     const loader = container.querySelector(".animate-spin");
     expect(loader).toBeInTheDocument();
 
