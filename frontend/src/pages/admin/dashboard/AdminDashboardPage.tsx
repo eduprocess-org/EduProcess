@@ -4,7 +4,6 @@ import AdminQuickActions from "../../../components/dashboard/admin/AdminQuickAct
 import AdminDashboardLoading from "../../../components/dashboard/admin/AdminDashboardLoading";
 import AdminDashboardError from "../../../components/dashboard/admin/AdminDashboardError";
 import { useAdminDashboard } from "../../../hooks/admin/useAdminDashboard";
-// Importamos BarChart2 para la nueva sección de distribución
 import { Zap, ListChecks, BarChart2 } from "lucide-react"; 
 
 const navy   = "#1B2B5E";
