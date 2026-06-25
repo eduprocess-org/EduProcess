@@ -31,6 +31,7 @@ export class StatusHistoryService {
 
       for (const log of sortedAuditLogs) {
         if (log.action !== 'STATUS_CHANGE') continue;
+        if (log.oldValue === null) continue;
 
         const newStatusLabel = statusLabels[log.newValue ?? ''] ?? log.newValue ?? 'Unknown';
         timeline.push({
