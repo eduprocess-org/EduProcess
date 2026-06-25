@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS } from '../../core/theme/colors';
+import { COLORS } from '../../../core/theme/colors';
 
 interface DashboardHeaderProps {
   user: any;
@@ -11,12 +11,10 @@ export default function DashboardHeader({ user }: DashboardHeaderProps) {
 
   return (
     <View style={styles.headerGroup}>
-      {/* Saludo dinámico al estudiante */}
       <View style={styles.welcomeRow}>
         <Text style={styles.welcomeText}>Welcome, {displayName}</Text>
       </View>
 
-      {/* Título de sección del Dashboard */}
       <View style={styles.headerRow}>
         <View style={styles.titleWrapper}>
           <Text style={styles.mainTitle}>My Requests Dashboard</Text>

@@ -1,43 +1,47 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Text, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { RefreshCw } from 'lucide-react-native'; // Usamos lucide-react-native
+import { RefreshCw } from 'lucide-react-native';
+import { COLORS } from '../../core/theme/colors';
 
-// Importación de todos los Organismos y la Molécula que migramos paso a paso
-import RequestTrackingHeader from '../organisms/RequestTrackingHeader';
-import StatusTimeline from '../organisms/StatusTimeline';
-import AdministrativeComments from '../organisms/AdministrativeComments';
-import RequestTrackingSkeleton from '../organisms/RequestTrackingSkeleton';
-import RequestTrackingError from '../organisms/RequestTrackingError';
-import RequestTrackingNotFound from '../organisms/RequestTrackingNotFound';
+import RequestTrackingHeader from '../organisms/track/RequestTrackingHeader';
+import StatusTimeline from '../organisms/track/StatusTimeline';
+import AdministrativeComments from '../organisms/track/AdministrativeComments';
+import RequestTrackingError from '../organisms/track/RequestTrackingError';
+import RequestTrackingNotFound from '../organisms/track/RequestTrackingNotFound';
 
-// Custom Hook de la capa Core / Hooks
+import RequestTrackingSkeleton from '../organisms/track/RequestTrackingSkeleton';
+
 import { useRequestTracking } from '../../core/hooks/useRequestTracking';
+
+import { RequestStatus } from '../../core/types/studentDashboardTypes';
+
+const mapToRequestStatus = (status: string): RequestStatus => {
+  const normalized = status?.trim().toUpperCase();
+  if (normalized === 'UNDER REVIEW' || normalized === 'PENDING') return 'PENDING';
+  if (normalized === 'APPROVED') return 'APPROVED';
+  if (normalized === 'REJECTED') return 'REJECTED';
+  return 'PENDING'; // Tu estado por defecto seguro
+};
 
 interface RequestTrackingPageProps {
   route: {
     params: {
-      requestId?: string; // Captura el parámetro enviado desde la navegación nativa
+      requestId?: string;
     };
   };
 }
 
 export default function RequestTrackingPage({ route }: RequestTrackingPageProps) {
-  // 🚀 Reemplazo estricto de useParams() por route.params de React Navigation
   const { requestId } = route.params ?? {};
-
   const { tracking, loading, error, refresh } = useRequestTracking(requestId ?? "");
 
-  // Renderizado condicional de los organismos de estado (Fiel a tu lógica web)
-  if (loading && !tracking) return <SafeAreaView style={styles.safeContainer}><RequestTrackingSkeleton /></SafeAreaView>;
   if (error) return <SafeAreaView style={styles.safeContainer}><RequestTrackingError message={error} /></SafeAreaView>;
-  if (!tracking) return <SafeAreaView style={styles.safeContainer}><RequestTrackingNotFound /></SafeAreaView>;
+  if (!tracking && !loading) return <SafeAreaView style={styles.safeContainer}><RequestTrackingNotFound /></SafeAreaView>;
 
   return (
-    // Conserva los márgenes seguros en todas las direcciones contra notch y barras del sistema
     <SafeAreaView style={styles.safeContainer} edges={['top', 'left', 'right', 'bottom']}>
       
-      {/* 🚀 Top Action Row: Fila superior con el botón dinámico de Refresh */}
       <View style={styles.topActionsBar}>
         <View style={styles.flexSpacer} />
         <TouchableOpacity
@@ -55,28 +59,36 @@ export default function RequestTrackingPage({ route }: RequestTrackingPageProps)
         </TouchableOpacity>
       </View>
 
-      {/* Contenedor con soporte de Scroll nativo para desplazar la UI cómodamente */}
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.layoutGroup}>
-          
-          {/* Organismo Encabezado */}
-          <RequestTrackingHeader
-            procedureName={tracking.procedureName}
-            status={tracking.status}
-            submissionDate={tracking.submissionDate}
-            lastUpdateDate={tracking.lastUpdateDate}
+        refreshControl={
+          <RefreshControl 
+            refreshing={loading && !!tracking} 
+            onRefresh={refresh} 
+            colors={[COLORS.primary || '#0B2D63']} 
+            tintColor="#475569"
           />
+        }
+      >
+        {loading && !tracking ? (
+          <RequestTrackingSkeleton />
+        ) : (
+          tracking && (
+            <View style={styles.layoutGroup}>
+              <RequestTrackingHeader
+                procedureName={tracking.procedureName}
+                status={mapToRequestStatus(tracking.status)}
+                submissionDate={tracking.submissionDate}
+                lastUpdateDate={tracking.lastUpdateDate}
+              />
 
-          {/* Organismo Línea de Tiempo */}
-          <StatusTimeline timeline={tracking.timeline} />
+              <StatusTimeline timeline={tracking.timeline} />
 
-          {/* Organismo Observaciones Administrativas */}
-          <AdministrativeComments comments={tracking.administrativeComments} />
-
-        </View>
+              <AdministrativeComments comments={tracking.administrativeComments} />
+            </View>
+          )
+        )}
       </ScrollView>
 
     </SafeAreaView>
@@ -86,7 +98,7 @@ export default function RequestTrackingPage({ route }: RequestTrackingPageProps)
 const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
-    backgroundColor: '#ffffff', // Fondo limpio que engloba toda la página
+    backgroundColor: '#ffffff',
   },
   topActionsBar: {
     flexDirection: 'row',
@@ -95,7 +107,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   flexSpacer: {
-    flex: 1, // Desplaza el botón hacia la extrema derecha simulando el justify-between + flex-1 web
+    flex: 1,
   },
   refreshButton: {
     flexDirection: 'row',
@@ -103,25 +115,25 @@ const styles = StyleSheet.create({
     gap: 8,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#e2e8f0', // border-slate-200
+    borderColor: '#e2e8f0',
     backgroundColor: '#ffffff',
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
   refreshButtonText: {
-    fontSize: 12, // text-xs
-    fontWeight: '500', // font-medium
-    color: '#475569', // text-slate-600
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#475569',
   },
   disabledButton: {
     opacity: 0.5,
   },
   scrollContainer: {
     paddingHorizontal: 24,
-    paddingBottom: 32, // Espaciado de seguridad ergonómico en la parte inferior de la pantalla
+    paddingBottom: 32,
   },
   layoutGroup: {
     flexDirection: 'column',
-    gap: 20, // Equivalente matemático al space-y-5 (20px) de Tailwind
+    gap: 20,
   },
 });

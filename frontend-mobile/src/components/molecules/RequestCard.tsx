@@ -1,61 +1,36 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { FileText, Eye } from 'lucide-react-native';
+import StatusBadge from '../atoms/StatusBadge';
+import { StudentRequest } from '../../core/types/studentDashboardTypes';
+import { STATUS_CONFIG } from '../../core/types/status.types'; 
 
 interface RequestCardProps {
-  request: {
-    id: string;
-    title?: string;       // Mapeado según el nombre del trámite (ej. "Constancia de Estudios")
-    procedureName?: string; // Alternativa según la estructura de tu modelo
-    status: 'PENDING' | 'APPROVED' | 'REJECTED' | string;
-    createdAt: string;
-  };
+  request: StudentRequest; 
   onTrack: (id: string) => void;
 }
 
+const getValidStatusKey = (status: string): keyof typeof STATUS_CONFIG => {
+  const normalized = status?.trim().toUpperCase();
+  if (normalized === 'SUBMITTED') return 'SUBMITTED';
+  if (normalized === 'UNDER REVIEW' || normalized === 'PENDING') return 'PENDING';
+  if (normalized === 'APPROVED') return 'APPROVED';
+  if (normalized === 'REJECTED') return 'REJECTED';
+  return 'PENDING';
+};
+
 export default function RequestCard({ request, onTrack }: RequestCardProps) {
-  // Manejo dinámico de estilos según el estado del trámite para el tag visual
-  const getStatusStyles = (status: string) => {
-    switch (status.toUpperCase()) {
-      case 'APPROVED':
-        return {
-          container: styles.statusApproved,
-          text: styles.textApproved,
-          dot: styles.dotApproved,
-          label: 'Approved',
-          indicator: styles.indicatorApproved
-        };
-      case 'REJECTED':
-        return {
-          container: styles.statusRejected,
-          text: styles.textRejected,
-          dot: styles.dotRejected,
-          label: 'Rejected',
-          indicator: styles.indicatorRejected
-        };
-      default:
-        return {
-          container: styles.statusPending,
-          text: styles.textPending,
-          dot: styles.dotPending,
-          label: 'Pending',
-          indicator: styles.indicatorPending
-        };
-    }
-  };
-
-  const statusStyle = getStatusStyles(request.status);
-  const displayTitle = request.title || request.procedureName || "Trámite Universitario";
-
-  // Formateo básico de la fecha (puedes adaptarlo si usas date-fns o similar)
   const displayDate = request.createdAt ? request.createdAt.split('T')[0] : '';
+  
+  const statusKey = getValidStatusKey(request.status);
+  const currentStatusConfig = STATUS_CONFIG[statusKey];
+
+  const displayTitle = request.procedureName || 'Unassigned Procedure';
 
   return (
     <View style={styles.card}>
-      {/* Barra indicadora lateral de color según estado */}
-      <View style={[styles.stateIndicator, statusStyle.indicator]} />
+      <View style={[styles.stateIndicator, { backgroundColor: currentStatusConfig.dot }]} />
 
-      {/* Contenido Izquierdo: Icono + Textos */}
       <View style={styles.contentContainer}>
         <View style={styles.iconWrapper}>
           <FileText size={20} color="#475569" />
@@ -67,21 +42,13 @@ export default function RequestCard({ request, onTrack }: RequestCardProps) {
           </Text>
 
           <View style={styles.metaRow}>
-            {/* Badge de Estado */}
-            <View style={[styles.statusBadge, statusStyle.container]}>
-              <View style={[styles.statusDot, statusStyle.dot]} />
-              <Text style={[styles.statusText, statusStyle.text]}>
-                {statusStyle.label}
-              </Text>
-            </View>
+            <StatusBadge status={request.status} />
 
-            {/* Fecha de Creación */}
             {displayDate ? <Text style={styles.dateText}>{displayDate}</Text> : null}
           </View>
         </View>
       </View>
 
-      {/* Contenido Derecho: Única Acción Autorizada (Track) */}
       <View style={styles.actionsContainer}>
         <TouchableOpacity
           style={styles.trackButton}
@@ -123,11 +90,11 @@ const styles = StyleSheet.create({
     width: 4,
   },
   contentContainer: {
-    flex: 1,                   // 🚀 Ocupa todo el espacio sobrante de la izquierda
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingRight: 12,          // Margen de seguridad para que no choque con el botón
+    paddingRight: 12,
   },
   iconWrapper: {
     backgroundColor: '#f1f5f9',
@@ -148,23 +115,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
   },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 20,
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  statusText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
   dateText: {
     fontSize: 11,
     color: '#94a3b8',
@@ -172,7 +122,7 @@ const styles = StyleSheet.create({
   actionsContainer: {
     justifyContent: 'center',
     alignItems: 'flex-end',
-    width: 85,                 // 🚀 Fijamos un ancho estricto para el área del botón
+    width: 85,
   },
   trackButton: {
     flexDirection: 'row',
@@ -185,7 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 7,
-    width: '100%',             // Ahora se estirará de forma segura hasta los 85px fijos
+    width: '100%',
   },
   trackIcon: {
     marginTop: 1,
@@ -195,19 +145,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-  /* Variantes de Color por Estado */
-  indicatorPending: { backgroundColor: '#eab308' },
-  statusPending: { backgroundColor: '#fef9c3' },
-  textPending: { color: '#854d0e' },
-  dotPending: { backgroundColor: '#ca8a04' },
-
-  indicatorApproved: { backgroundColor: '#22c55e' },
-  statusApproved: { backgroundColor: '#dcfce7' },
-  textApproved: { color: '#166534' },
-  dotApproved: { backgroundColor: '#16a34a' },
-
-  indicatorRejected: { backgroundColor: '#ef4444' },
-  statusRejected: { backgroundColor: '#fee2e2' },
-  textRejected: { color: '#991b1b' },
-  dotRejected: { backgroundColor: '#dc2626' },
 });

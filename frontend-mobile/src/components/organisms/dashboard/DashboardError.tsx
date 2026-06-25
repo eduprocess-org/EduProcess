@@ -1,27 +1,35 @@
+// src/components/molecules/DashboardError.tsx
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { AlertTriangle } from 'lucide-react-native';
+import Button from '../../atoms/Button'; // 🚀 Reutilización de tu átomo centralizado
 
 interface DashboardErrorProps {
   message: string;
+  onRetry?: () => void;
 }
 
-export default function DashboardError({ message }: DashboardErrorProps) {
+export default function DashboardError({ message, onRetry }: DashboardErrorProps) {
   return (
     <View style={styles.container} accessibilityRole="alert">
       
-      {/* Contenedor del Icono de Advertencia */}
       <View style={styles.iconWrapper}>
         <AlertTriangle size={22} color="#ef4444" />
       </View>
 
-      {/* Título del Error */}
       <Text style={styles.title}>Something went wrong</Text>
 
-      {/* Mensaje dinámico proveniente del Hook */}
       <Text style={styles.message}>
         {message}
       </Text>
+
+      {onRetry && (
+        <Button
+          label="Try Again"
+          onPress={onRetry}
+          style={styles.retryButton}
+        />
+      )}
       
     </View>
   );
@@ -60,5 +68,11 @@ const styles = StyleSheet.create({
     color: '#ef4444',
     textAlign: 'center',
     lineHeight: 20,
+  },
+  retryButton: {
+    marginTop: 20,
+    paddingHorizontal: 24,
+    backgroundColor: '#b91c1c',
+    width: 'auto',
   },
 });

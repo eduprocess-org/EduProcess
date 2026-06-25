@@ -1,8 +1,9 @@
+// src/components/templates/DashboardLoading.tsx
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
+import { COLORS } from '../../../core/theme/colors';
 
 export default function DashboardLoading() {
-  // Animación nativa de opacidad para el efecto "pulse"
   const pulseAnim = useRef(new Animated.Value(0.6)).current;
 
   useEffect(() => {
@@ -25,13 +26,11 @@ export default function DashboardLoading() {
   return (
     <Animated.View style={[styles.container, { opacity: pulseAnim }]}>
       
-      {/* Header skeleton */}
       <View style={styles.headerGroup}>
         <View style={styles.skeletonTitle} />
         <View style={styles.skeletonSubtitle} />
       </View>
 
-      {/* Summary grid skeleton (2x2 para móviles) */}
       <View style={styles.grid}>
         {[...Array(4)].map((_, i) => (
           <View key={i} style={styles.cardSkeleton}>
@@ -44,7 +43,6 @@ export default function DashboardLoading() {
         ))}
       </View>
 
-      {/* List cards skeleton */}
       <View style={styles.listGroup}>
         {[...Array(3)].map((_, i) => (
           <View key={i} style={styles.listCardSkeleton}>
@@ -79,13 +77,13 @@ const styles = StyleSheet.create({
   skeletonTitle: {
     height: 24,
     width: 200,
-    backgroundColor: '#e2e8f0',
+    backgroundColor: COLORS.textMuted || '#e2e8f0',
     borderRadius: 8,
   },
   skeletonSubtitle: {
     height: 16,
     width: 260,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: COLORS.border || '#f1f5f9',
     borderRadius: 6,
   },
   grid: {
@@ -100,7 +98,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderColor: COLORS.border || '#f1f5f9',
     padding: 14,
   },
   rowHeader: {
@@ -112,19 +110,19 @@ const styles = StyleSheet.create({
   skeletonLabel: {
     height: 12,
     width: 60,
-    backgroundColor: '#e2e8f0',
+    backgroundColor: COLORS.textMuted || '#e2e8f0',
     borderRadius: 4,
   },
   skeletonIcon: {
     height: 28,
     width: 28,
     borderRadius: 8,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: COLORS.border || '#f1f5f9',
   },
   skeletonValue: {
     height: 32,
     width: 48,
-    backgroundColor: '#e2e8f0',
+    backgroundColor: COLORS.textMuted || '#e2e8f0',
     borderRadius: 6,
   },
   listGroup: {
@@ -138,7 +136,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderColor: COLORS.border || '#f1f5f9',
     paddingHorizontal: 14,
     paddingVertical: 16,
   },
@@ -150,13 +148,13 @@ const styles = StyleSheet.create({
   skeletonItemTitle: {
     height: 14,
     width: '75%',
-    backgroundColor: '#e2e8f0',
+    backgroundColor: COLORS.textMuted || '#e2e8f0',
     borderRadius: 4,
   },
   skeletonItemMeta: {
     height: 12,
     width: '45%',
-    backgroundColor: '#f1f5f9',
+    backgroundColor: COLORS.border || '#f1f5f9',
     borderRadius: 4,
   },
   actionsRow: {
@@ -167,13 +165,13 @@ const styles = StyleSheet.create({
   skeletonBtnSmall: {
     height: 26,
     width: 55,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: COLORS.border || '#f1f5f9',
     borderRadius: 8,
   },
   skeletonBtnLarge: {
     height: 26,
     width: 65,
-    backgroundColor: '#e2e8f0',
+    backgroundColor: COLORS.textMuted || '#e2e8f0',
     borderRadius: 8,
   },
 });

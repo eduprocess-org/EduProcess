@@ -1,39 +1,37 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-import { SearchX } from 'lucide-react-native'; // Usamos lucide-react-native
-import { useNavigation } from '@react-navigation/native';
-import { COLORS } from '../../core/theme/colors';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { SearchX } from 'lucide-react-native'; 
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import Button from '../../atoms/Button';
+
+type RootStackParamList = {
+  Procedures: undefined;
+};
 
 const { height: screenHeight } = Dimensions.get('window');
 
 export default function RequestTrackingNotFound() {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   return (
     <View style={styles.centerWrapper}>
       <View style={styles.card}>
         
-        {/* Icon Wrapper Gris */}
         <View style={styles.iconCircle}>
           <SearchX size={26} color="#94a3b8" />
         </View>
 
-        {/* Título de Estado Vacío */}
         <Text style={styles.title}>Tracking information not found</Text>
 
-        {/* Mensaje Informativo */}
         <Text style={styles.subtitle}>
           The requested tracking information does not exist or may have been removed.
         </Text>
 
-        {/* Botón Nativo de Regreso al Catálogo */}
-        <TouchableOpacity
-          style={styles.catalogButton}
+        <Button
+          label="Back to Catalog"
           onPress={() => navigation.navigate("Procedures")}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.catalogButtonText}>Back to Catalog</Text>
-        </TouchableOpacity>
+          style={styles.catalogButton}
+        />
 
       </View>
     </View>
@@ -42,14 +40,14 @@ export default function RequestTrackingNotFound() {
 
 const styles = StyleSheet.create({
   centerWrapper: {
-    minHeight: screenHeight * 0.6, // Equivalente estricto a min-h-[60vh]
+    minHeight: screenHeight * 0.6, 
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
   },
   card: {
     width: '100%',
-    maxWidth: 340, // max-w-md adaptado a UI móvil
+    maxWidth: 340, 
     backgroundColor: '#ffffff',
     borderRadius: 24,
     borderWidth: 1,
@@ -66,7 +64,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#f8fafc', // slate-100 de fondo
+    backgroundColor: '#f8fafc', 
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
@@ -74,29 +72,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#0f172a', // slate-900
+    color: '#0f172a', 
     textAlign: 'center',
   },
   subtitle: {
     marginTop: 8,
     fontSize: 14,
-    color: '#64748b', // slate-500
+    color: '#64748b', 
     textAlign: 'center',
     lineHeight: 20,
   },
   catalogButton: {
     marginTop: 24,
-    backgroundColor: '#0B2D63', // El azul principal UCE
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
-    width: '100%', // En móvil los botones anchos son más fáciles de presionar
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  catalogButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '600',
+    width: '100%',
   },
 });

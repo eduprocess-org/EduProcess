@@ -1,31 +1,37 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import { AlertTriangle } from 'lucide-react-native'; // Usamos lucide-react-native
-import { COLORS } from '../../core/theme/colors';
+import { AlertTriangle } from 'lucide-react-native'; 
+import { COLORS } from '../../../core/theme/colors';
+import Button from '../../atoms/Button'; 
 
-interface Props {
+interface RequestTrackingErrorProps {
   message: string;
+  onRetry?: () => void;
 }
 
-// Obtenemos la altura de la pantalla para calcular el equivalente al min-h-[60vh] de la web
 const { height: screenHeight } = Dimensions.get('window');
 
-export default function RequestTrackingError({ message }: Props) {
+export default function RequestTrackingError({ message, onRetry }: RequestTrackingErrorProps) {
   return (
     <View style={styles.centerWrapper}>
       <View style={styles.errorCard}>
-        {/* Icon Wrapper Círculo Rojo */}
         <View style={styles.iconCircle}>
-          <AlertTriangle size={26} color={COLORS.rejected.indicator} />
+          <AlertTriangle size={26} color={COLORS.rejected?.indicator || '#ef4444'} />
         </View>
 
-        {/* Título de Error */}
         <Text style={styles.errorTitle}>Something went wrong</Text>
 
-        {/* Mensaje dinámico del Backend */}
         <Text style={styles.errorSubtitle}>
           {message}
         </Text>
+
+        {onRetry && (
+          <Button
+            label="Try Again"
+            onPress={onRetry}
+            style={styles.retryButton}
+          />
+        )}
       </View>
     </View>
   );
@@ -33,18 +39,18 @@ export default function RequestTrackingError({ message }: Props) {
 
 const styles = StyleSheet.create({
   centerWrapper: {
-    minHeight: screenHeight * 0.6, // 🚀 Equivalente estricto a min-h-[60vh] para centrar verticalmente en el celular
+    minHeight: screenHeight * 0.6, 
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
   },
   errorCard: {
     width: '100%',
-    maxWidth: 340, // max-w-md adaptado a proporciones móviles cómodas
+    maxWidth: 340, 
     backgroundColor: '#ffffff',
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: '#fee2e2', // red-100 sutil para denotar el estado de error
+    borderColor: '#fee2e2', 
     padding: 32,
     alignItems: 'center',
     elevation: 2,
@@ -57,7 +63,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#fee2e2', // red-50 de fondo
+    backgroundColor: '#fee2e2', 
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
@@ -65,14 +71,19 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#0f172a', // slate-900
+    color: '#0f172a', 
     textAlign: 'center',
   },
   errorSubtitle: {
     marginTop: 8,
     fontSize: 14,
-    color: '#64748b', // slate-500
+    color: '#64748b', 
     textAlign: 'center',
     lineHeight: 20,
+  },
+  retryButton: {
+    marginTop: 24,
+    width: '100%',
+    backgroundColor: COLORS.rejected?.indicator || '#b91c1c',
   },
 });

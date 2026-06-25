@@ -1,17 +1,25 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { 
+  TouchableOpacity, 
+  Text, 
+  StyleSheet, 
+  ActivityIndicator, 
+  StyleProp,   
+  ViewStyle   
+} from 'react-native';
 
 interface ButtonProps {
   label: string;
   onPress: () => void;
   loading?: boolean;
   disabled?: boolean;
+  style?: StyleProp<ViewStyle>; 
 }
 
-export default function Button({ label, onPress, loading, disabled }: ButtonProps) {
+export default function Button({ label, onPress, loading, disabled, style }: ButtonProps) {
   return (
     <TouchableOpacity 
-      style={[styles.button, (disabled || loading) && styles.disabled]} 
+      style={[styles.button, style, (disabled || loading) && styles.disabled]} 
       onPress={onPress} 
       disabled={disabled || loading}
     >
@@ -30,7 +38,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 8,
     elevation: 5,
   },
   disabled: { backgroundColor: '#94a3b8' },

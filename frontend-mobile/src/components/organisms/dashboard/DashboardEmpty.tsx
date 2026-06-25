@@ -1,9 +1,10 @@
+// src/components/molecules/DashboardEmpty.tsx
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { FolderOpen } from 'lucide-react-native';
+import Button from '../../atoms/Button';
 
 interface DashboardEmptyProps {
-  // Callback para desacoplar la navegación de la Web (React Router)
   onBrowseProcedures: () => void;
 }
 
@@ -11,29 +12,21 @@ export default function DashboardEmpty({ onBrowseProcedures }: DashboardEmptyPro
   return (
     <View style={styles.container} accessibilityRole="summary">
       
-      {/* Contenedor del Icono Central */}
       <View style={styles.iconWrapper}>
         <FolderOpen size={26} color="#94a3b8" />
       </View>
 
-      {/* Título Principal */}
       <Text style={styles.title}>No Requests Found</Text>
 
-      {/* Descripción Secundaria */}
       <Text style={styles.subtitle}>
         You have not submitted any procedure requests yet.
       </Text>
 
-      {/* Botón de Acción Táctil Nivel Átomo */}
-      <TouchableOpacity
-        style={styles.button}
+      <Button 
+        label="Browse Procedures"
         onPress={onBrowseProcedures}
-        activeOpacity={0.8}
-        accessibilityLabel="Browse available procedures"
-        accessibilityRole="button"
-      >
-        <Text style={styles.buttonText}>Browse Procedures</Text>
-      </TouchableOpacity>
+        style={styles.buttonSpacing}
+      />
       
     </View>
   );
@@ -50,7 +43,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     paddingVertical: 64,
     paddingHorizontal: 24,
-    // Sombras multiplataforma (iOS & Android)
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -79,19 +71,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-  button: {
-    marginTop: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 12,
-    backgroundColor: '#0B2D63',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '500',
+  buttonSpacing: {
+    marginTop: 24, 
+    width: '100%', 
   },
 });
