@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { AdminProcedureController } from '../controllers/admin-procedure.controller';
-import { AdminProcedureService } from '../../../application/admin/procedures/admin-procedure.service';
-import { PrismaAdminProcedureRepository } from '../../persistence/prisma/admin/prisma-admin-procedure.repository';
-import { authMiddleware } from '../middlewares/auth.middleware';
-import { adminMiddleware } from '../middlewares/admin.middleware';
+import { AdminProcedureController } from '../../controllers/admin/procedure.controller';
+import { AdminProcedureService } from '../../../../application/admin/procedures/admin-procedure.service';
+import { PrismaAdminProcedureRepository } from '../../../persistence/prisma/admin/prisma-admin-procedure.repository';
+import { authMiddleware } from '../../middlewares/auth.middleware';
+import { adminMiddleware } from '../../middlewares/admin.middleware';
 
 const router = Router();
 

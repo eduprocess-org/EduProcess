@@ -1,12 +1,12 @@
-import { prisma } from '../database.config';
-import { ProcedureRepository } from '../../../domain/procedures/procedure.repository';
+import { prisma } from '../../database.config';
+import { ProcedureRepository } from '../../../../domain/procedures/procedure.repository';
 import {
     CreateRequestInput,
     ProcedureRequestDTO,
     ProcedureTypeDTO,
     UpdateStatusInput,
     AuditLogEntryDTO,
-} from '../../../domain/procedures/procedure.types';
+} from '../../../../domain/procedures/procedure.types';
 
 export class PrismaProcedureRepository implements ProcedureRepository {
     async findAllActive(userCareerId?: string, userFacultyId?: string): Promise<ProcedureTypeDTO[]> {

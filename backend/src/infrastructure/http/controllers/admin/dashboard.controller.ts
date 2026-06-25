@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { AdminDashboardService } from "../../../application/admin/admin-dashboard.service";
-import { handleError } from "../utils/error-handler";
+import { AdminDashboardService } from "../../../../application/admin/admin-dashboard.service";
+import { handleError } from "../../utils/error-handler";
 
 export class AdminDashboardController {
   constructor(private readonly adminDashboardService: AdminDashboardService) {}
