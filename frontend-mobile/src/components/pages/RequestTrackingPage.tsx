@@ -12,7 +12,7 @@ import RequestTrackingError from '../organisms/RequestTrackingError';
 import RequestTrackingNotFound from '../organisms/RequestTrackingNotFound';
 
 // Custom Hook de la capa Core / Hooks
-import { useRequestTracking } from '../../../hooks/requests/useRequestTracking';
+import { useRequestTracking } from '../../core/hooks/useRequestTracking';
 
 interface RequestTrackingPageProps {
   route: {
