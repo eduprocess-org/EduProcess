@@ -1,9 +1,6 @@
 import { ChevronDown } from "lucide-react";
-import type { ProcedureStatus } from "../../../types/admin/procedures/procedures.types";
 
 interface Props {
-  status: "ALL" | ProcedureStatus;
-  onStatusChange: (value: "ALL" | ProcedureStatus) => void;
   sortOrder: "asc" | "desc";
   onSortChange: (value: "asc" | "desc") => void;
 }
@@ -49,27 +46,11 @@ const selectClass = `
 `;
 
 function ProceduresFilters({
-  status,
-  onStatusChange,
   sortOrder,
   onSortChange,
 }: Props) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-
-      <SelectWrapper>
-        <select
-          value={status}
-          onChange={(e) => onStatusChange(e.target.value as "ALL" | ProcedureStatus)}
-          className={selectClass}
-        >
-          <option value="ALL">All Status</option>
-          <option value="ACTIVE">Active</option>
-          <option value="DRAFT">Draft</option>
-          <option value="INACTIVE">Inactive</option>
-        </select>
-      </SelectWrapper>
-
       <SelectWrapper>
         <select
           value={sortOrder}
@@ -80,7 +61,6 @@ function ProceduresFilters({
           <option value="desc">Name (Z → A)</option>
         </select>
       </SelectWrapper>
-
     </div>
   );
 }

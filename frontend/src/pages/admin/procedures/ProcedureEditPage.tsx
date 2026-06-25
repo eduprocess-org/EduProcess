@@ -7,8 +7,8 @@ export default function ProcedureEditPage() {
     name, setName,
     description, setDescription,
     requirements,
-    estimatedTime, setEstimatedTime,
-    status, setStatus,
+    requirementsText, setRequirementsText,
+    isActive, setIsActive,
     errors, isLoadingData, isUpdating,
     handleAddRequirement, handleRequirementChange, handleRemoveRequirement,
     handleSubmit, navigate,
@@ -25,7 +25,7 @@ export default function ProcedureEditPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-6 px-6 transition-colors duration-200">
       <div className="mx-auto max-w-2xl space-y-4">
-        
+
         {/* BACK ACTION */}
         <button
           onClick={() => navigate("/admin/procedures")}
@@ -45,8 +45,8 @@ export default function ProcedureEditPage() {
 
         {/* ATOMIC FORM COMPONENT */}
         <ProcedureEditForm
-          formData={{ name, description, requirements, estimatedTime, status }}
-          setters={{ setName, setDescription, setEstimatedTime, setStatus }}
+          formData={{ name, description, requirements, requirementsText, isActive }}
+          setters={{ setName, setDescription, setRequirementsText, setIsActive }}
           errors={errors}
           isUpdating={isUpdating}
           onAddRequirement={handleAddRequirement}

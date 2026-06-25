@@ -5,14 +5,14 @@ interface ProcedureFormProps {
     name: string;
     description: string;
     requirements: string[];
-    estimatedTime: string;
-    status: "active" | "draft";
+    requirementsText: string;
+    isActive: boolean;
   };
   setters: {
     setName: (v: string) => void;
     setDescription: (v: string) => void;
-    setEstimatedTime: (v: string) => void;
-    setStatus: (v: "active" | "draft") => void;
+    setRequirementsText: (v: string) => void;
+    setIsActive: (v: boolean) => void;
   };
   errors: Record<string, string>;
   isUpdating: boolean;
@@ -62,7 +62,19 @@ export default function ProcedureEditForm({
         {errors.description && <p className="text-xs text-red-500 font-medium">{errors.description}</p>}
       </div>
 
-      {/* REQUIREMENTS */}
+      {/* REQUIREMENTS TEXT */}
+      <div className="flex flex-col gap-1">
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Requirements Summary</span>
+        <textarea
+          rows={2}
+          placeholder="Brief summary of requirements..."
+          value={formData.requirementsText}
+          onChange={(e) => setters.setRequirementsText(e.target.value)}
+          className="w-full px-4 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-all resize-none"
+        />
+      </div>
+
+      {/* REQUIREMENTS LIST */}
       <div className="flex flex-col gap-1.5">
         <div className="flex justify-between items-center">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Requirements</span>
@@ -89,31 +101,20 @@ export default function ProcedureEditForm({
         {errors.requirements && <p className="text-xs text-red-500 font-medium">{errors.requirements}</p>}
       </div>
 
-      {/* GRID CONFIGURATION */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Estimated Time</span>
+      {/* STATUS */}
+      <div className="flex flex-col gap-1">
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Status</span>
+        <label className="flex items-center gap-2 cursor-pointer">
           <input
-            type="text"
-            placeholder="e.g., 5 business days"
-            value={formData.estimatedTime}
-            onChange={(e) => setters.setEstimatedTime(e.target.value)}
-            className="w-full px-4 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition-all"
+            type="checkbox"
+            checked={formData.isActive}
+            onChange={(e) => setters.setIsActive(e.target.checked)}
+            className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
           />
-          {errors.estimatedTime && <p className="text-xs text-red-500 font-medium">{errors.estimatedTime}</p>}
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Status</span>
-          <select
-            value={formData.status}
-            onChange={(e) => setters.setStatus(e.target.value as "active" | "draft")}
-            className="w-full px-4 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 cursor-pointer transition-all"
-          >
-            <option value="active">Active</option>
-            <option value="draft">Draft</option>
-          </select>
-        </div>
+          <span className="text-sm text-slate-700 dark:text-slate-300">
+            {formData.isActive ? "Active" : "Inactive"}
+          </span>
+        </label>
       </div>
 
       {/* FORM ACTIONS */}

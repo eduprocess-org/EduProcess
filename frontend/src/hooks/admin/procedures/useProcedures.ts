@@ -1,54 +1,48 @@
-import { useMemo, useState } from "react";
-import { proceduresMock } from "../../../mocks/admin/procedures.mock";
-import type { ProcedureStatus } from "../../../types/admin/procedures/procedures.types";
+import { useState, useEffect, useCallback } from "react";
+import { toast } from "sonner";
+import { adminProceduresApi, type ProcedureListItem } from "../../../services/admin/procedures/procedures.service";
 
 const PAGE_SIZE = 5;
 
 export function useProcedures() {
-  const [version, setVersion] = useState(0); 
-  
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<"ALL" | ProcedureStatus>("ALL");
+  const [procedures, setProcedures] = useState<ProcedureListItem[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  const filteredData = useMemo(() => {
-    let data = [...proceduresMock];
-
-    if (search.trim()) {
-      const value = search.toLowerCase();
-      data = data.filter(
-        (item) =>
-          item.name.toLowerCase().includes(value) ||
-          item.code.toLowerCase().includes(value)
-      );
+  const fetchProcedures = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await adminProceduresApi.getAll({
+        page,
+        limit: PAGE_SIZE,
+        search: search.trim() || undefined,
+        sortBy: "name",
+        order: sortOrder,
+      });
+      setProcedures(response.data);
+      setTotalItems(response.pagination.total);
+      setTotalPages(response.pagination.totalPages);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Error loading procedures");
+    } finally {
+      setIsLoading(false);
     }
+  }, [page, search, sortOrder]);
 
-    if (status !== "ALL") {
-      data = data.filter((item) => item.status === status);
-    }
-
-    data.sort((a, b) => {
-      const comparison = a.name.localeCompare(b.name);
-      return sortOrder === "asc" ? comparison : -comparison;
-    });
-
-    return data;
-  }, [search, status, sortOrder, version]); 
-
-  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
-
-  const paginatedData = useMemo(() => {
-    return filteredData.slice(
-      (page - 1) * PAGE_SIZE,
-      page * PAGE_SIZE
-    );
-  }, [filteredData, page]);
+  useEffect(() => {
+    fetchProcedures();
+  }, [fetchProcedures]);
 
   return {
-    procedures: paginatedData,
-    totalItems: filteredData.length,
+    procedures,
+    totalItems,
     totalPages,
+    isLoading,
 
     page,
     setPage,
@@ -56,12 +50,9 @@ export function useProcedures() {
     search,
     setSearch,
 
-    status,
-    setStatus,
-
     sortOrder,
     setSortOrder,
 
-    refresh: () => setVersion((v) => v + 1),
+    refresh: fetchProcedures,
   };
 }
