@@ -113,7 +113,8 @@ const styles = StyleSheet.create({
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
+    flexWrap: 'wrap',
   },
   dateText: {
     fontSize: 11,
@@ -123,6 +124,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'flex-end',
     width: 85,
+    marginLeft: 12,
   },
   trackButton: {
     flexDirection: 'row',
@@ -133,7 +135,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#cbd5e1',
     borderRadius: 8,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 7,
     width: '100%',
   },
