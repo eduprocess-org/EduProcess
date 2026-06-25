@@ -95,6 +95,10 @@ class MockAdminProcedureRepository {
         return careerId === 'car-valid';
     }
 
+    async countActiveRequests(procedureTypeId) {
+        return procedureTypeId === 'proc-1' ? 1 : 0;
+    }
+
     async create(input) {
         const newProc = {
             id: `proc-${this.nextId++}`,
@@ -178,6 +182,10 @@ class MockAdminProcedureRepositoryEmpty {
         return false;
     }
 
+    async countActiveRequests() {
+        return 0;
+    }
+
     async create() {
         throw new Error('Should not be called');
     }
@@ -197,6 +205,7 @@ class MockAdminProcedureRepositoryError {
     async findByName() { throw new Error('Database connection failed'); }
     async existsFaculty() { throw new Error('Database connection failed'); }
     async existsCareer() { throw new Error('Database connection failed'); }
+    async countActiveRequests() { throw new Error('Database connection failed'); }
     async create() { throw new Error('Database connection failed'); }
     async update() { throw new Error('Database connection failed'); }
     async delete() { throw new Error('Database connection failed'); }
@@ -652,9 +661,9 @@ test('AdminProcedureService - deleteProcedure soft-deletes (sets isActive false)
     const repo = new MockAdminProcedureRepository();
     const service = new AdminProcedureService(repo);
 
-    await service.deleteProcedure('proc-1');
+    await service.deleteProcedure('proc-2');
 
-    const result = await service.getProcedureById('proc-1');
+    const result = await service.getProcedureById('proc-2');
     assert.equal(result.isActive, false);
 });
 
@@ -676,4 +685,24 @@ test('AdminProcedureService - deleteProcedure throws on repository error', async
         () => service.deleteProcedure('anything'),
         { message: 'Database connection failed' }
     );
+});
+
+test('AdminProcedureService - deleteProcedure throws when there are active requests', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.deleteProcedure('proc-1'),
+        { message: 'Cannot delete procedure with active requests' }
+    );
+});
+
+test('AdminProcedureService - deleteProcedure succeeds when no active requests', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await service.deleteProcedure('proc-2');
+
+    const result = await service.getProcedureById('proc-2');
+    assert.equal(result.isActive, false);
 });

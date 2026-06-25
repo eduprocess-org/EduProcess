@@ -28,5 +28,7 @@ export interface AdminProcedureRepository {
 
     update(id: string, input: UpdateProcedureInput): Promise<AdminProcedureDetail>;
 
+    countActiveRequests(procedureTypeId: string): Promise<number>;
+
     delete(id: string): Promise<void>;
 }

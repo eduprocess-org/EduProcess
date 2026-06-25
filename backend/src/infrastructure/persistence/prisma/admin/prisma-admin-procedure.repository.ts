@@ -196,6 +196,15 @@ export class PrismaAdminProcedureRepository implements AdminProcedureRepository 
         return this.mapToDetail(procedure);
     }
 
+    async countActiveRequests(procedureTypeId: string): Promise<number> {
+        return prisma.procedureRequest.count({
+            where: {
+                procedureTypeId,
+                status: { in: ['pending', 'in_review'] },
+            },
+        });
+    }
+
     async delete(id: string): Promise<void> {
         await prisma.procedureType.update({
             where: { id },
