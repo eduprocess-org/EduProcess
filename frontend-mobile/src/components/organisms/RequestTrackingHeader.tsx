@@ -2,8 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Calendar, RefreshCw, ArrowLeft, FileText } from 'lucide-react-native'; // Usamos lucide-react-native
 import { useNavigation } from '@react-navigation/native'; // Hook para resolver el Link web
-import StatusBadge from './StatusBadge'; // Molécula hija
-import { COLORS } from '../../core/theme/colors';
+import StatusBadge from '../molecules/StatusBadge'; // Molécula hija
 
 interface Props {
   procedureName: string;
