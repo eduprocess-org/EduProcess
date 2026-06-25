@@ -75,7 +75,7 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
       <FlatList
         data={filteredRequests}
         keyExtractor={(item) => item.id}
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     paddingHorizontal: 20,
     paddingTop: 4,
-    paddingBottom: 32,
+    paddingBottom: 20,
   },
   headerGroupWrapper: {
     flexDirection: 'column',
