@@ -133,6 +133,40 @@ class MockAdminProcedureService {
         if (this.shouldFail) throw new Error('Database error');
         const p = this.procedures.find((p) => p.id === id);
         if (!p) throw new Error('Procedure not found');
+
+        if (input.name !== undefined) {
+            const name = input.name ? input.name.trim() : '';
+            if (!name) throw new Error('Procedure name is required');
+            if (name.length < 3) throw new Error('Procedure name must be at least 3 characters');
+            if (name.length > 200) throw new Error('Procedure name must not exceed 200 characters');
+            const duplicate = this.procedures.find((proc) => proc.name.toLowerCase() === name.toLowerCase() && proc.id !== id);
+            if (duplicate) throw new Error('Procedure with this name already exists');
+            input.name = name;
+        }
+
+        if (input.description !== undefined) {
+            const description = input.description ? input.description.trim() : '';
+            if (!description) throw new Error('Procedure description is required');
+            if (description.length > 2000) throw new Error('Procedure description must not exceed 2000 characters');
+            input.description = description;
+        }
+
+        if (input.facultyId !== undefined && input.facultyId !== null && input.facultyId !== 'fac-valid') {
+            throw new Error('Specified faculty does not exist');
+        }
+
+        if (input.careerId !== undefined && input.careerId !== null && input.careerId !== 'car-valid') {
+            throw new Error('Specified career does not exist');
+        }
+
+        if (input.requirements && input.requirements.length) {
+            for (const req of input.requirements) {
+                if (!req.name || !req.name.trim()) {
+                    throw new Error('Each requirement must have a name');
+                }
+            }
+        }
+
         return { ...p, ...input, updatedAt: new Date().toISOString() };
     }
 
@@ -483,6 +517,99 @@ test('PUT /admin/procedures/:id - rejects student role', async () => {
         .send({ name: 'Test' });
 
     assert.equal(res.status, 403);
+});
+
+test('PUT /admin/procedures/:id - returns 400 when name is empty', async () => {
+    const service = new MockAdminProcedureService();
+    const app = buildApp(service);
+    const token = createAdminToken();
+
+    const res = await supertest(app)
+        .put('/api/v1/admin/procedures/proc-1')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: '' });
+
+    assert.equal(res.status, 400);
+});
+
+test('PUT /admin/procedures/:id - returns 409 when duplicate name', async () => {
+    const service = new MockAdminProcedureService();
+    const app = buildApp(service);
+    const token = createAdminToken();
+
+    const res = await supertest(app)
+        .put('/api/v1/admin/procedures/proc-2')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'Transcript Request' });
+
+    assert.equal(res.status, 409);
+});
+
+test('PUT /admin/procedures/:id - allows keeping the same name', async () => {
+    const service = new MockAdminProcedureService();
+    const app = buildApp(service);
+    const token = createAdminToken();
+
+    const res = await supertest(app)
+        .put('/api/v1/admin/procedures/proc-1')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'Transcript Request', description: 'Updated description' });
+
+    assert.equal(res.status, 200);
+});
+
+test('PUT /admin/procedures/:id - returns 400 when faculty does not exist', async () => {
+    const service = new MockAdminProcedureService();
+    const app = buildApp(service);
+    const token = createAdminToken();
+
+    const res = await supertest(app)
+        .put('/api/v1/admin/procedures/proc-1')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ facultyId: 'fac-invalid' });
+
+    assert.equal(res.status, 400);
+});
+
+test('PUT /admin/procedures/:id - returns 400 when career does not exist', async () => {
+    const service = new MockAdminProcedureService();
+    const app = buildApp(service);
+    const token = createAdminToken();
+
+    const res = await supertest(app)
+        .put('/api/v1/admin/procedures/proc-1')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ careerId: 'car-invalid' });
+
+    assert.equal(res.status, 400);
+});
+
+test('PUT /admin/procedures/:id - returns 400 when requirement has no name', async () => {
+    const service = new MockAdminProcedureService();
+    const app = buildApp(service);
+    const token = createAdminToken();
+
+    const res = await supertest(app)
+        .put('/api/v1/admin/procedures/proc-1')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ requirements: [{ name: '', description: 'Some req', isMandatory: true }] });
+
+    assert.equal(res.status, 400);
+});
+
+test('PUT /admin/procedures/:id - partial update works', async () => {
+    const service = new MockAdminProcedureService();
+    const app = buildApp(service);
+    const token = createAdminToken();
+
+    const res = await supertest(app)
+        .put('/api/v1/admin/procedures/proc-1')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ description: 'Just updating the description' });
+
+    assert.equal(res.status, 200);
+    assert.equal(res.body.data.description, 'Just updating the description');
+    assert.equal(res.body.data.name, 'Transcript Request');
 });
 
 // ─── Tests: DELETE /admin/procedures/:id ──────────────────────────────────

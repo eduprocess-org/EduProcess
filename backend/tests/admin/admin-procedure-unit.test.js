@@ -534,6 +534,118 @@ test('AdminProcedureService - updateProcedure throws on repository error', async
     );
 });
 
+test('AdminProcedureService - updateProcedure throws when name is empty', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.updateProcedure('proc-1', { name: '' }),
+        { message: 'Procedure name is required' }
+    );
+});
+
+test('AdminProcedureService - updateProcedure throws when name is too short', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.updateProcedure('proc-1', { name: 'AB' }),
+        { message: 'Procedure name must be at least 3 characters' }
+    );
+});
+
+test('AdminProcedureService - updateProcedure throws when name is too long', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.updateProcedure('proc-1', { name: 'A'.repeat(201) }),
+        { message: 'Procedure name must not exceed 200 characters' }
+    );
+});
+
+test('AdminProcedureService - updateProcedure throws when description is empty', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.updateProcedure('proc-1', { description: '' }),
+        { message: 'Procedure description is required' }
+    );
+});
+
+test('AdminProcedureService - updateProcedure throws when description is too long', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.updateProcedure('proc-1', { description: 'A'.repeat(2001) }),
+        { message: 'Procedure description must not exceed 2000 characters' }
+    );
+});
+
+test('AdminProcedureService - updateProcedure throws when name already exists on another procedure', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.updateProcedure('proc-2', { name: 'Transcript Request' }),
+        { message: 'Procedure with this name already exists' }
+    );
+});
+
+test('AdminProcedureService - updateProcedure allows keeping the same name', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    const result = await service.updateProcedure('proc-1', { name: 'Transcript Request' });
+
+    assert.equal(result.name, 'Transcript Request');
+});
+
+test('AdminProcedureService - updateProcedure throws when faculty does not exist', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.updateProcedure('proc-1', { facultyId: 'fac-invalid' }),
+        { message: 'Specified faculty does not exist' }
+    );
+});
+
+test('AdminProcedureService - updateProcedure throws when career does not exist', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.updateProcedure('proc-1', { careerId: 'car-invalid' }),
+        { message: 'Specified career does not exist' }
+    );
+});
+
+test('AdminProcedureService - updateProcedure throws when requirement has no name', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.updateProcedure('proc-1', {
+            requirements: [{ name: '', description: 'Some desc', isMandatory: true }],
+        }),
+        { message: 'Each requirement must have a name' }
+    );
+});
+
+test('AdminProcedureService - updateProcedure partial update works', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    const result = await service.updateProcedure('proc-1', { description: 'Just updating description' });
+
+    assert.equal(result.id, 'proc-1');
+    assert.equal(result.name, 'Transcript Request');
+    assert.equal(result.description, 'Just updating description');
+});
+
 // ─── Tests: deleteProcedure ──────────────────────────────────────────────────
 
 test('AdminProcedureService - deleteProcedure soft-deletes (sets isActive false)', async () => {
