@@ -82,6 +82,19 @@ class MockAdminProcedureRepository {
         return this.procedures.find((p) => p.id === id) || null;
     }
 
+    async findByName(name) {
+        const lower = name.toLowerCase();
+        return this.procedures.find((p) => p.name.toLowerCase() === lower) || null;
+    }
+
+    async existsFaculty(facultyId) {
+        return facultyId === 'fac-valid';
+    }
+
+    async existsCareer(careerId) {
+        return careerId === 'car-valid';
+    }
+
     async create(input) {
         const newProc = {
             id: `proc-${this.nextId++}`,
@@ -153,6 +166,18 @@ class MockAdminProcedureRepositoryEmpty {
         return null;
     }
 
+    async findByName() {
+        return null;
+    }
+
+    async existsFaculty() {
+        return false;
+    }
+
+    async existsCareer() {
+        return false;
+    }
+
     async create() {
         throw new Error('Should not be called');
     }
@@ -169,6 +194,9 @@ class MockAdminProcedureRepositoryEmpty {
 class MockAdminProcedureRepositoryError {
     async findAll() { throw new Error('Database connection failed'); }
     async findById() { throw new Error('Database connection failed'); }
+    async findByName() { throw new Error('Database connection failed'); }
+    async existsFaculty() { throw new Error('Database connection failed'); }
+    async existsCareer() { throw new Error('Database connection failed'); }
     async create() { throw new Error('Database connection failed'); }
     async update() { throw new Error('Database connection failed'); }
     async delete() { throw new Error('Database connection failed'); }
@@ -341,6 +369,95 @@ test('AdminProcedureService - createProcedure throws when description is empty',
         () => service.createProcedure({ name: 'Valid Name', description: '' }),
         { message: 'Procedure description is required' }
     );
+});
+
+test('AdminProcedureService - createProcedure throws when name is too short', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.createProcedure({ name: 'AB', description: 'Valid description' }),
+        { message: 'Procedure name must be at least 3 characters' }
+    );
+});
+
+test('AdminProcedureService - createProcedure throws when name is too long', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.createProcedure({ name: 'A'.repeat(201), description: 'Valid description' }),
+        { message: 'Procedure name must not exceed 200 characters' }
+    );
+});
+
+test('AdminProcedureService - createProcedure throws when description is too long', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.createProcedure({ name: 'Valid Name', description: 'A'.repeat(2001) }),
+        { message: 'Procedure description must not exceed 2000 characters' }
+    );
+});
+
+test('AdminProcedureService - createProcedure throws when name already exists', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.createProcedure({ name: 'Transcript Request', description: 'Some desc' }),
+        { message: 'Procedure with this name already exists' }
+    );
+});
+
+test('AdminProcedureService - createProcedure throws when faculty does not exist', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.createProcedure({ name: 'New Procedure', description: 'Desc', facultyId: 'fac-invalid' }),
+        { message: 'Specified faculty does not exist' }
+    );
+});
+
+test('AdminProcedureService - createProcedure throws when career does not exist', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.createProcedure({ name: 'New Procedure', description: 'Desc', careerId: 'car-invalid' }),
+        { message: 'Specified career does not exist' }
+    );
+});
+
+test('AdminProcedureService - createProcedure throws when requirement has no name', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    await assert.rejects(
+        () => service.createProcedure({
+            name: 'New Procedure',
+            description: 'Desc',
+            requirements: [{ name: '', description: 'Some desc', isMandatory: true }],
+        }),
+        { message: 'Each requirement must have a name' }
+    );
+});
+
+test('AdminProcedureService - createProcedure with valid facultyId and careerId passes', async () => {
+    const repo = new MockAdminProcedureRepository();
+    const service = new AdminProcedureService(repo);
+
+    const result = await service.createProcedure({
+        name: 'New Procedure',
+        description: 'New procedure description',
+        facultyId: 'fac-valid',
+        careerId: 'car-valid',
+    });
+
+    assert.equal(result.name, 'New Procedure');
+    assert.equal(result.description, 'New procedure description');
 });
 
 test('AdminProcedureService - createProcedure trims whitespace', async () => {
