@@ -1,5 +1,5 @@
 import { apiClient } from "../api/apiClient";
-import type { LoginRequest, LoginResponse } from "../types/authTypes"; // Ajusta la ruta a tus tipos globales
+import type { LoginRequest, LoginResponse } from "../types/auth.types"; // Ajusta la ruta a tus tipos globales
 
 export const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
   // Le pega exactamente al mismo endpoint del backend Express
