@@ -1,36 +1,22 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { LogOut } from 'lucide-react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { COLORS } from '../../core/theme/colors';
-import {AppBrandHeader} from '../molecules/AppBrandHeader'; // 🚀 Importamos la nueva marca
 
 interface DashboardHeaderProps {
   user: any;
-  onLogout: () => void;
 }
 
-export default function DashboardHeader({ user, onLogout }: DashboardHeaderProps) {
+export default function DashboardHeader({ user }: DashboardHeaderProps) {
   const displayName = user?.firstName || user?.name || user?.lastName?.split(' ')[0] || 'Estudiante';
 
   return (
     <View style={styles.headerGroup}>
-      
-      <View style={styles.navBar}>
-        <AppBrandHeader />
-        <TouchableOpacity 
-          style={styles.logoutIconButton} 
-          onPress={onLogout}
-          activeOpacity={0.7}
-          accessibilityLabel="Cerrar sesión"
-        >
-          <LogOut size={16} color={COLORS.textMuted} />
-        </TouchableOpacity>
-      </View>
-
+      {/* Saludo dinámico al estudiante */}
       <View style={styles.welcomeRow}>
         <Text style={styles.welcomeText}>Welcome, {displayName}</Text>
       </View>
 
+      {/* Título de sección del Dashboard */}
       <View style={styles.headerRow}>
         <View style={styles.titleWrapper}>
           <Text style={styles.mainTitle}>My Requests Dashboard</Text>
@@ -46,21 +32,9 @@ export default function DashboardHeader({ user, onLogout }: DashboardHeaderProps
 const styles = StyleSheet.create({
   headerGroup: {
     flexDirection: 'column',
-    gap: 14,
-    marginBottom: 10,
-  },
-  navBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  logoutIconButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: COLORS.border,
+    gap: 10,
+    marginTop: 12,
+    marginBottom: 4,
   },
   welcomeRow: {
     paddingTop: 4,
@@ -74,7 +48,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
-    marginTop: 4,
   },
   titleWrapper: {
     flex: 1,

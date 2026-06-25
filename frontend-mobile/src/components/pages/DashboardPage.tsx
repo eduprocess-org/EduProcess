@@ -75,7 +75,7 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <FlatList
         data={filteredRequests}
         keyExtractor={(item) => item.id}
@@ -87,7 +87,6 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
             {/* 🚀 Componentización perfecta evaluada por el docente */}
             <DashboardHeader
               user={user}
-              onLogout={logout}
             />
 
             <DashboardSummary requests={requests} />

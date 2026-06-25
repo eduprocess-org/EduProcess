@@ -1,8 +1,13 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LayoutDashboard, FileText, Search, Bell } from 'lucide-react-native';
+import { LayoutDashboard, FileText, Search, Bell, LogOut } from 'lucide-react-native';
+import { COLORS } from '../core/theme/colors';
+
+// 🚀 Importaciones añadidas de marca y sesión global
+import { AppBrandHeader } from '../components/molecules/AppBrandHeader'; 
+import { useAuth } from '../core/context/AuthContext';
 
 // 🚀 Tu página real
 import StudentDashboardPage from '../components/pages/DashboardPage';
@@ -11,7 +16,7 @@ import StudentDashboardPage from '../components/pages/DashboardPage';
 function ProceduresCatalogPage() {
   return (
     <View style={styles.center}>
-      <Text style={styles.mockText}>Historial y Catálogo de Trámites (Próximamente)</Text>
+      <Text style={styles.mockText}>Catalog of Procedures (Coming Soon)</Text>
     </View>
   );
 }
@@ -19,7 +24,7 @@ function ProceduresCatalogPage() {
 function SearchProceduresPage() {
   return (
     <View style={styles.center}>
-      <Text style={styles.mockText}>Buscador de Requisitos Académicos (Próximamente)</Text>
+      <Text style={styles.mockText}>Academic Procedures Search (Coming Soon)</Text>
     </View>
   );
 }
@@ -27,7 +32,7 @@ function SearchProceduresPage() {
 function NotificationsPage() {
   return (
     <View style={styles.center}>
-      <Text style={styles.mockText}>Alertas del Decanato (Próximamente)</Text>
+      <Text style={styles.mockText}>Notifications (Coming Soon)</Text>
     </View>
   );
 }
@@ -36,6 +41,7 @@ const Tab = createBottomTabNavigator();
 
 export default function AppTabs() {
   const insets = useSafeAreaInsets();
+  const { logout } = useAuth(); // 🚀 Consumo del estado global de cierre de sesión
 
   // 🎨 Identidad visual EduProcess (Paleta UCE)
   const ACTIVE_COLOR = '#0B2D63';         // Azul institucional
@@ -45,7 +51,33 @@ export default function AppTabs() {
   return (
     <Tab.Navigator
       screenOptions={{
-        headerShown: false,
+        // 🚀 HEADER GLOBAL COMPARTIDO: Visible en cada pestaña
+        headerShown: true,
+        headerTitle: () => <AppBrandHeader />,
+        headerTitleAlign: 'left',
+        headerRight: () => (
+          <TouchableOpacity 
+            style={styles.logoutIconButton} 
+            onPress={logout}
+            activeOpacity={0.7}
+            accessibilityLabel="Cerrar sesión"
+          >
+            <LogOut size={16} color={COLORS.textMuted} />
+          </TouchableOpacity>
+        ),
+        headerStyle: {
+          backgroundColor: '#ffffff',
+          borderBottomWidth: 1,
+          borderBottomColor: COLORS.border,
+          elevation: 0,      // Elimina línea de sombra dura en Android
+          shadowOpacity: 0,  // Elimina línea de sombra dura en iOS
+        },
+        headerLeftContainerStyle: {
+          paddingLeft: 20,
+        },
+        headerRightContainerStyle: {
+          paddingRight: 20,
+        },
         tabBarActiveTintColor: '#0B2D63',     // Texto azul al estar activo
         tabBarInactiveTintColor: '#64748b',   // Gris para las pestañas inactivas
         tabBarLabelStyle: styles.tabLabel,
@@ -53,7 +85,6 @@ export default function AppTabs() {
           backgroundColor: '#ffffff',
           borderTopWidth: 1,
           borderTopColor: '#f1f5f9',
-          // Ajuste dinámico de área segura para evitar colisiones en Android/iOS
           height: 68 + (insets.bottom > 0 ? insets.bottom : 10),
           paddingBottom: insets.bottom > 0 ? insets.bottom + 6 : 12,
           paddingTop: 8,
@@ -114,13 +145,6 @@ export default function AppTabs() {
               <Bell size={22} color={focused ? ACTIVE_COLOR : color} />
             </View>
           ),
-          tabBarBadge: 3,
-          tabBarBadgeStyle: {
-            backgroundColor: BADGE_COLOR, 
-            color: '#ffffff',
-            fontSize: 10,
-            lineHeight: 14,
-          }
         }}
       />
     </Tab.Navigator>
@@ -150,10 +174,10 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#64748b',
   },
-  logoutButton: {
-    paddingHorizontal: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+  logoutIconButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: COLORS.border,
   },
   iconWrapper: {
     width: 64,
