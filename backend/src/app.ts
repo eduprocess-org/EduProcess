@@ -7,8 +7,10 @@ import procedureRouter from './infrastructure/http/routes/procedure.routes';
 import careerRouter from './infrastructure/http/routes/career.routes';
 import adminDashboardRouter from './infrastructure/http/routes/admin-dashboard.routes';
 import observationRouter from './infrastructure/http/routes/observation.routes';
+import { initializeWebSocket } from './infrastructure/websocket/init';
 
 const app: Application = express();
+const { httpServer } = initializeWebSocket(app);
 
 app.use(express.json());
 app.use(cors());
@@ -57,7 +59,7 @@ export default app;
 
 if (require.main === module) {
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
     });
 }

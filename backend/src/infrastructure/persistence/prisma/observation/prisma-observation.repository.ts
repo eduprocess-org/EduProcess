@@ -14,6 +14,9 @@ export class PrismaObservationRepository implements ObservationRepository {
                 admin: {
                     select: { firstName: true, lastName: true },
                 },
+                request: {
+                    select: { studentId: true },
+                },
             },
         });
 
@@ -24,6 +27,7 @@ export class PrismaObservationRepository implements ObservationRepository {
             comment: observation.comment,
             createdAt: observation.createdAt,
             adminName: `${observation.admin.firstName} ${observation.admin.lastName}`,
+            studentId: observation.request.studentId,
         };
     }
 

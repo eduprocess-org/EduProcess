@@ -5,6 +5,7 @@ import { ProcedureService } from '../../../application/procedures/procedure.serv
 import { PrismaProcedureRepository } from '../../persistence/prisma/prisma-procedure.repository';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { adminMiddleware } from '../middlewares/admin.middleware';
+import { getSocketEvents } from '../../websocket';
 
 const router = Router();
 
@@ -40,7 +41,8 @@ const handleMulterError = (err: Error, _req: Request, res: Response, next: NextF
 };
 
 const repository = new PrismaProcedureRepository();
-const service = new ProcedureService(repository);
+const socketEvents = getSocketEvents();
+const service = new ProcedureService(repository, socketEvents ?? undefined);
 const controller = new ProcedureController(service);
 
 router.get('/procedures', authMiddleware, controller.getProcedures);

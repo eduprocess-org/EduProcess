@@ -3,11 +3,15 @@ import { supabase } from '../../infrastructure/config/supabase.config';
 import { logger } from '../../infrastructure/config/logger.config';
 import { isTransitionValid, normalizeStatus, STATUS_LABELS } from '../../domain/procedures/status-machine';
 import { StatusHistoryService } from './status-history.service';
+import { SocketEvents } from '../../infrastructure/websocket';
 
 export class ProcedureService {
     private readonly statusHistoryService: StatusHistoryService;
 
-    constructor(private readonly procedureRepository: ProcedureRepository) {
+    constructor(
+        private readonly procedureRepository: ProcedureRepository,
+        private readonly socketEvents?: SocketEvents
+    ) {
         this.statusHistoryService = new StatusHistoryService();
     }
 
@@ -110,6 +114,18 @@ export class ProcedureService {
 
         logger.info('Procedure request created successfully', { requestId: request.id, studentId, procedureId });
 
+        if (this.socketEvents) {
+            const student = await this.procedureRepository.findStudentCareer(studentId);
+            this.socketEvents.notifyNewRequest({
+                requestId: request.id,
+                studentName: student?.careerName ?? 'Estudiante',
+                procedureName: procedure.name,
+                career: student?.careerName ?? '',
+                status: 'pending',
+                createdAt: request.createdAt?.toISOString() ?? new Date().toISOString(),
+            });
+        }
+
         return request;
     }
 
@@ -185,6 +201,17 @@ export class ProcedureService {
             toStatus: normalizedStatus,
             userId,
         });
+
+        if (this.socketEvents) {
+            this.socketEvents.notifyStatusChange({
+                requestId,
+                studentId: request.studentId ?? '',
+                oldStatus: currentStatus,
+                newStatus: normalizedStatus,
+                procedureName: request.procedure?.name ?? 'Trámite',
+                updatedAt: new Date().toISOString(),
+            });
+        }
 
         return updatedRequest;
     }

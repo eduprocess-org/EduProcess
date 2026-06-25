@@ -4,11 +4,13 @@ import { ObservationService } from '../../../application/observations/observatio
 import { PrismaObservationRepository } from '../../persistence/prisma/observation/prisma-observation.repository';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { adminMiddleware } from '../middlewares/admin.middleware';
+import { getSocketEvents } from '../../websocket';
 
 const router = Router();
 
 const repository = new PrismaObservationRepository();
-const service = new ObservationService(repository);
+const socketEvents = getSocketEvents();
+const service = new ObservationService(repository, socketEvents ?? undefined);
 const controller = new ObservationController(service);
 
 router.post(
