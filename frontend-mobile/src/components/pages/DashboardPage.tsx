@@ -59,7 +59,7 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
   }
 
   if (loading) return <DashboardLoading />;
-  
+
   if (!requests || !requests.length) {
     return (
       <SafeAreaView style={styles.container}>
@@ -81,13 +81,13 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
-        
+
         ListHeaderComponent={
           <View style={styles.headerGroupWrapper}>
             {/* 🚀 Componentización perfecta evaluada por el docente */}
-            <DashboardHeader 
-              user={user} 
-              onLogout={logout} 
+            <DashboardHeader
+              user={user}
+              onLogout={logout}
             />
 
             <DashboardSummary requests={requests} />
@@ -100,14 +100,14 @@ export default function StudentDashboardPage({ navigation }: StudentDashboardPag
             />
           </View>
         }
-        
+
         renderItem={({ item }) => (
-          <RequestCard 
-            request={item} 
-            onTrack={(id) => navigation.navigate("RequestTracking", { id })}
+          <RequestCard
+            request={item}
+            onTrack={(id) => navigation.navigate("RequestTracking", { requestId: id })}
           />
         )}
-        
+
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </SafeAreaView>
