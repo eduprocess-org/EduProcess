@@ -2,32 +2,35 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LogOut } from 'lucide-react-native';
 import { COLORS } from '../../core/theme/colors';
+import {AppBrandHeader} from '../molecules/AppBrandHeader'; // 🚀 Importamos la nueva marca
 
 interface DashboardHeaderProps {
-  user: any; // 🚀 Cambiamos userName por el objeto user completo para tener más margen de maniobra
+  user: any;
   onLogout: () => void;
 }
 
 export default function DashboardHeader({ user, onLogout }: DashboardHeaderProps) {
+  const displayName = user?.firstName || user?.name || user?.lastName?.split(' ')[0] || 'Estudiante';
 
-const displayName = user?.firstName || user?.name || user?.lastName?.split(' ')[0] || 'Estudiante';
-    
   return (
     <View style={styles.headerGroup}>
-      {/* Fila de Utilidades Superiores (Saludo + LogOut) */}
-      <View style={styles.topBar}>
-        <Text style={styles.welcomeText}>Hola, {displayName}</Text>
+      
+      <View style={styles.navBar}>
+        <AppBrandHeader />
         <TouchableOpacity 
           style={styles.logoutIconButton} 
           onPress={onLogout}
           activeOpacity={0.7}
-          accessibilityLabel="Cerrar sesión institucional"
+          accessibilityLabel="Cerrar sesión"
         >
           <LogOut size={16} color={COLORS.textMuted} />
         </TouchableOpacity>
       </View>
 
-      {/* Título de la sección purificado */}
+      <View style={styles.welcomeRow}>
+        <Text style={styles.welcomeText}>Welcome, {displayName}</Text>
+      </View>
+
       <View style={styles.headerRow}>
         <View style={styles.titleWrapper}>
           <Text style={styles.mainTitle}>My Requests Dashboard</Text>
@@ -43,32 +46,35 @@ const displayName = user?.firstName || user?.name || user?.lastName?.split(' ')[
 const styles = StyleSheet.create({
   headerGroup: {
     flexDirection: 'column',
-    gap: 16,
-    marginBottom: 16,
+    gap: 14,
+    marginBottom: 10,
   },
-  topBar: {
+  navBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingBottom: 10,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
-    paddingTop: 10,
-    paddingBottom: 12,
-  },
-  welcomeText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: COLORS.textSub,
   },
   logoutIconButton: {
     padding: 8,
     borderRadius: 8,
     backgroundColor: COLORS.border,
   },
+  welcomeRow: {
+    paddingTop: 4,
+  },
+  welcomeText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.textSub,
+  },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
+    marginTop: 4,
   },
   titleWrapper: {
     flex: 1,
@@ -82,6 +88,6 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     color: COLORS.textMuted,
-    marginTop: 4,
+    marginTop: 2,
   }
 });
