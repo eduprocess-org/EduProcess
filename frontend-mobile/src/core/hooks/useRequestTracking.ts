@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-import { getRequestTracking } from "../../services/student/requests/requestTracking.service";
-import type { RequestTracking } from "../../types/student/request-tracking.types";
+import { getRequestTracking } from "../services/requestTracking.service";
+import type { RequestTracking } from "../types/request-tracking.types";
 
 export function useRequestTracking(requestId: string) {
   const [tracking, setTracking] = useState<RequestTracking | null>(null);
