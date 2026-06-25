@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { AdminProcedureService } from '../../../application/admin/procedures/admin-procedure.service';
-import { handleError } from '../utils/error-handler';
+import { AdminProcedureService } from '../../../../application/admin/procedures/admin-procedure.service';
+import { handleError } from '../../utils/error-handler';
 
 export class AdminProcedureController {
     constructor(private readonly adminProcedureService: AdminProcedureService) {}

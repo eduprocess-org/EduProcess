@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import { ProcedureController } from '../controllers/procedure.controller';
 import { ProcedureService } from '../../../application/procedures/procedure.service';
-import { PrismaProcedureRepository } from '../../persistence/prisma/prisma-procedure.repository';
+import { PrismaProcedureRepository } from '../../persistence/prisma/procedure/prisma-procedure.repository';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { adminMiddleware } from '../middlewares/admin.middleware';
 import { getSocketEvents } from '../../websocket';

@@ -5,8 +5,8 @@ import client from 'prom-client';
 import authRouter from './infrastructure/http/routes/auth.routes';
 import procedureRouter from './infrastructure/http/routes/procedure.routes';
 import careerRouter from './infrastructure/http/routes/career.routes';
-import adminDashboardRouter from './infrastructure/http/routes/admin-dashboard.routes';
-import adminProcedureRouter from './infrastructure/http/routes/admin-procedure.routes';
+import adminDashboardRouter from './infrastructure/http/routes/admin/dashboard.routes';
+import adminProcedureRouter from './infrastructure/http/routes/admin/procedure.routes';
 import observationRouter from './infrastructure/http/routes/observation.routes';
 import { initializeWebSocket } from './infrastructure/websocket/init';
 

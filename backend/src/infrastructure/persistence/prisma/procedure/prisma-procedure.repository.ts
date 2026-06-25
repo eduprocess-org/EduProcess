@@ -1,12 +1,12 @@
-import { prisma } from '../database.config';
-import { ProcedureRepository } from '../../../domain/procedures/procedure.repository';
+import { prisma } from '../../database.config';
+import { ProcedureRepository } from '../../../../domain/procedures/procedure.repository';
 import {
     CreateRequestInput,
     ProcedureRequestDTO,
     ProcedureTypeDTO,
     UpdateStatusInput,
     AuditLogEntryDTO,
-} from '../../../domain/procedures/procedure.types';
+} from '../../../../domain/procedures/procedure.types';
 
 export class PrismaProcedureRepository implements ProcedureRepository {
     async findAllActive(userCareerId?: string, userFacultyId?: string): Promise<ProcedureTypeDTO[]> {
@@ -102,6 +102,14 @@ export class PrismaProcedureRepository implements ProcedureRepository {
             include: {
                 procedureType: true,
                 uploadedDocuments: true,
+                observations: {
+                    include: {
+                        admin: true,
+                    },
+                    orderBy: {
+                        createdAt: 'asc',
+                    },
+                },
             },
         });
 
@@ -111,6 +119,12 @@ export class PrismaProcedureRepository implements ProcedureRepository {
             ...request,
             procedure: request.procedureType,
             documents: request.uploadedDocuments,
+            observations: request.observations.map((obs: any) => ({
+                id: obs.id,
+                comment: obs.comment,
+                createdAt: obs.createdAt,
+                adminName: obs.admin ? `${obs.admin.firstName} ${obs.admin.lastName}` : undefined
+            })),
         };
     }
 

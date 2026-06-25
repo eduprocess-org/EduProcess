@@ -49,11 +49,12 @@ export class StatusHistoryService {
 
       for (const obs of sortedObs) {
         const lastEntry = timeline[timeline.length - 1];
-        if (lastEntry && lastEntry.date === new Date(obs.createdAt).toISOString().split('T')[0]) {
+        const obsStatusLabel = statusLabels[request.status] ?? request.status;
+        if (lastEntry && (lastEntry.date === new Date(obs.createdAt).toISOString().split('T')[0] || lastEntry.status === obsStatusLabel)) {
           lastEntry.description = obs.comment;
         } else {
           timeline.push({
-            status: statusLabels[request.status] ?? request.status,
+            status: obsStatusLabel,
             date: new Date(obs.createdAt).toISOString().split('T')[0],
             description: obs.comment,
           });

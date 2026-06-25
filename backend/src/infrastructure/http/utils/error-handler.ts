@@ -25,6 +25,7 @@ const ERROR_MAPPINGS: ErrorMapping[] = [
   { message: "Specified faculty does not exist", status: 400 },
   { message: "Specified career does not exist", status: 400 },
   { message: "Each requirement must have a name", status: 400 },
+  { message: "Cannot delete procedure with active requests", status: 409 },
   { message: "Failed to upload document", status: 502 },
   { message: "Only administrators can update request status", status: 403 },
 ];

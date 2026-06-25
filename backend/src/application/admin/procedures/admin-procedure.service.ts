@@ -155,6 +155,11 @@ export class AdminProcedureService {
             throw new Error('Procedure not found');
         }
 
+        const activeRequests = await this.adminProcedureRepository.countActiveRequests(id);
+        if (activeRequests > 0) {
+            throw new Error('Cannot delete procedure with active requests');
+        }
+
         logger.info('Deleting procedure', { procedureId: id });
         await this.adminProcedureRepository.delete(id);
     }

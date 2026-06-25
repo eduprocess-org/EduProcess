@@ -9,7 +9,7 @@ process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-refresh
 process.env.SUPABASE_URL = process.env.SUPABASE_URL || 'http://fake-supabase-url.com';
 process.env.SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || 'fake-key';
 
-const { AdminDashboardController } = require('../../dist/infrastructure/http/controllers/admin-dashboard.controller.js');
+const { AdminDashboardController } = require('../../dist/infrastructure/http/controllers/admin/dashboard.controller.js');
 const { authMiddleware } = require('../../dist/infrastructure/http/middlewares/auth.middleware.js');
 const { adminMiddleware } = require('../../dist/infrastructure/http/middlewares/admin.middleware.js');
 const { Router } = require('express');

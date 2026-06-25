@@ -9,7 +9,7 @@ process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-refresh
 process.env.SUPABASE_URL = process.env.SUPABASE_URL || 'http://fake-supabase-url.com';
 process.env.SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || 'fake-key';
 
-const { AdminProcedureController } = require('../../dist/infrastructure/http/controllers/admin-procedure.controller.js');
+const { AdminProcedureController } = require('../../dist/infrastructure/http/controllers/admin/procedure.controller.js');
 const { authMiddleware } = require('../../dist/infrastructure/http/middlewares/auth.middleware.js');
 const { adminMiddleware } = require('../../dist/infrastructure/http/middlewares/admin.middleware.js');
 const { Router } = require('express');
@@ -174,6 +174,7 @@ class MockAdminProcedureService {
         if (this.shouldFail) throw new Error('Database error');
         const p = this.procedures.find((p) => p.id === id);
         if (!p) throw new Error('Procedure not found');
+        if (id === 'proc-1') throw new Error('Cannot delete procedure with active requests');
     }
 }
 
@@ -620,7 +621,7 @@ test('DELETE /admin/procedures/:id - deletes procedure successfully', async () =
     const token = createAdminToken();
 
     const res = await supertest(app)
-        .delete('/api/v1/admin/procedures/proc-1')
+        .delete('/api/v1/admin/procedures/proc-2')
         .set('Authorization', `Bearer ${token}`);
 
     assert.equal(res.status, 200);
@@ -656,7 +657,20 @@ test('DELETE /admin/procedures/:id - rejects request without token', async () =>
     const app = buildApp(service);
 
     const res = await supertest(app)
-        .delete('/api/v1/admin/procedures/proc-1');
+        .delete('/api/v1/admin/procedures/proc-2');
 
     assert.equal(res.status, 401);
+});
+
+test('DELETE /admin/procedures/:id - returns 409 when there are active requests', async () => {
+    const service = new MockAdminProcedureService();
+    const app = buildApp(service);
+    const token = createAdminToken();
+
+    const res = await supertest(app)
+        .delete('/api/v1/admin/procedures/proc-1')
+        .set('Authorization', `Bearer ${token}`);
+
+    assert.equal(res.status, 409);
+    assert.equal(res.body.success, false);
 });
