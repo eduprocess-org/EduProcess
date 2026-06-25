@@ -108,6 +108,29 @@ export class PrismaAdminProcedureRepository implements AdminProcedureRepository 
         };
     }
 
+    async findByName(name: string): Promise<AdminProcedureDetail | null> {
+        const procedure = await prisma.procedureType.findFirst({
+            where: { name: { equals: name, mode: 'insensitive' } },
+            include: {
+                faculty: { select: { id: true, name: true } },
+                career: { select: { id: true, name: true } },
+                procedureRequirements: true,
+            },
+        });
+        if (!procedure) return null;
+        return this.mapToDetail(procedure);
+    }
+
+    async existsFaculty(facultyId: string): Promise<boolean> {
+        const count = await prisma.faculty.count({ where: { id: facultyId } });
+        return count > 0;
+    }
+
+    async existsCareer(careerId: string): Promise<boolean> {
+        const count = await prisma.career.count({ where: { id: careerId } });
+        return count > 0;
+    }
+
     async create(input: CreateProcedureInput): Promise<AdminProcedureDetail> {
         const procedure = await prisma.procedureType.create({
             data: {

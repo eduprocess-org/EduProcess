@@ -18,6 +18,12 @@ export interface AdminProcedureRepository {
 
     findById(id: string): Promise<AdminProcedureDetail | null>;
 
+    findByName(name: string): Promise<AdminProcedureDetail | null>;
+
+    existsFaculty(facultyId: string): Promise<boolean>;
+
+    existsCareer(careerId: string): Promise<boolean>;
+
     create(input: CreateProcedureInput): Promise<AdminProcedureDetail>;
 
     update(id: string, input: UpdateProcedureInput): Promise<AdminProcedureDetail>;
