@@ -2,7 +2,14 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import ProceduresTable from "../ProceduresTable";
-import type { ProcedureStatus } from "../../../../types/admin/procedures/procedures.types";
+
+const mockDelete = vi.fn();
+
+vi.mock("../../../../services/admin/procedures/procedures.service", () => ({
+  adminProceduresApi: {
+    delete: (...args: any[]) => mockDelete(...args),
+  },
+}));
 
 vi.mock("sonner", () => ({
   toast: {
@@ -11,17 +18,21 @@ vi.mock("sonner", () => ({
   },
 }));
 
-
 const mockProcedures = [
   {
     id: "uuid-101",
-    code: "PROC-001",
     name: "Syllabus Certification Protocol",
     description: "Validation matrix",
-    status: "ACTIVE" as ProcedureStatus, // 👈 CASTING: Con esto resuelves el error de tipo
-    createdAt: "2026-01-01",
-    updatedAt: "2026-01-02"
-  }
+    requirementsText: "Docs",
+    isActive: true,
+    facultyId: null,
+    careerId: null,
+    facultyName: null,
+    careerName: null,
+    requirementsCount: 1,
+    createdAt: "2026-01-01T00:00:00.000Z",
+    updatedAt: "2026-01-02T00:00:00.000Z",
+  },
 ];
 
 describe("EDUPR-232: Procedure Deletion Suite", () => {
@@ -46,6 +57,8 @@ describe("EDUPR-232: Procedure Deletion Suite", () => {
   });
 
   it("should successfully execute backend pipeline workflow and trigger automatic list refresh", async () => {
+    mockDelete.mockResolvedValue(undefined);
+
     render(
       <BrowserRouter>
         <ProceduresTable procedures={mockProcedures} onRefreshList={mockRefreshList} />
@@ -56,6 +69,7 @@ describe("EDUPR-232: Procedure Deletion Suite", () => {
     fireEvent.click(screen.getByRole("button", { name: /confirm deletion/i }));
 
     await waitFor(() => {
+      expect(mockDelete).toHaveBeenCalledWith("uuid-101");
       expect(mockRefreshList).toHaveBeenCalledTimes(1);
     });
   });

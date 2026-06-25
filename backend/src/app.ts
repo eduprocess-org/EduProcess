@@ -6,6 +6,7 @@ import authRouter from './infrastructure/http/routes/auth.routes';
 import procedureRouter from './infrastructure/http/routes/procedure.routes';
 import careerRouter from './infrastructure/http/routes/career.routes';
 import adminDashboardRouter from './infrastructure/http/routes/admin-dashboard.routes';
+import adminProcedureRouter from './infrastructure/http/routes/admin-procedure.routes';
 import observationRouter from './infrastructure/http/routes/observation.routes';
 import { initializeWebSocket } from './infrastructure/websocket/init';
 
@@ -40,6 +41,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1', procedureRouter);
 app.use('/api/v1', careerRouter);
 app.use('/api/v1', adminDashboardRouter);
+app.use('/api/v1', adminProcedureRouter);
 app.use('/api/v1', observationRouter);
 
 app.get('/api/v1/metrics', async (req: Request, res: Response) => {

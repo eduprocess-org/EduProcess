@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 
 import ProceduresSearch from "../../../components/procedures/admin/ProceduresSearch";
 import ProceduresFilters from "../../../components/procedures/admin/ProceduresFilters";
@@ -10,21 +10,28 @@ import EmptyState from "../../../components/procedures/admin/EmptyState";
 import { useProcedures } from "../../../hooks/admin/procedures/useProcedures";
 
 function ProceduresManagementPage() {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const {
     procedures,
     page,
     setPage,
     search,
     setSearch,
-    status,
-    setStatus,
     sortOrder,
     setSortOrder,
     totalItems,
     totalPages,
+    isLoading,
     refresh,
   } = useProcedures();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   const isEmpty = procedures.length === 0;
   return (
@@ -45,7 +52,6 @@ function ProceduresManagementPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* El contador se mantiene visible u oculto según prefieras, usando los bordes corregidos dark:border-slate-800 */}
             <div className="hidden sm:flex items-center gap-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2.5 shadow-sm">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
@@ -53,7 +59,6 @@ function ProceduresManagementPage() {
               </span>
             </div>
 
-            {/* Tu botón "New Procedure" integrado perfectamente en el nuevo flujo responsivo */}
             <button
               onClick={() => navigate("/admin/procedures/create")}
               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-blue-950/20 transition-all transform active:scale-95 whitespace-nowrap"
@@ -62,7 +67,7 @@ function ProceduresManagementPage() {
               New Procedure
             </button>
           </div>
-        </div> 
+        </div>
 
         {/* DIVIDER */}
         <div className="h-px bg-slate-200 dark:bg-slate-800" />
@@ -74,8 +79,6 @@ function ProceduresManagementPage() {
           </div>
 
           <ProceduresFilters
-            status={status}
-            onStatusChange={setStatus}
             sortOrder={sortOrder}
             onSortChange={setSortOrder}
           />
