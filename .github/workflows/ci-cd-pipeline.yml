@@ -7,6 +7,68 @@ on:
     branches: [ develop, qa, main ]
 
 jobs:
+  verify-mobile:
+    name: Mobile Verification & Expo Export
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend-mobile
+    steps:
+      - name: Checkout Monorepo Code
+        uses: actions/checkout@v4
+
+      - name: Check Mobile Changes
+        id: filter-mobile
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            mobile_files:
+              - 'frontend-mobile/**'
+              - '.github/workflows/ci-cd-pipeline.yml'
+
+      - name: Setup Node.js Environment
+        if: steps.filter-mobile.outputs.mobile_files == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: './frontend-mobile/package-lock.json'
+
+      - name: Execute Install Checks (Dependencies)
+        if: steps.filter-mobile.outputs.mobile_files == 'true'
+        run: npm ci
+
+      - name: Verify TypeScript Compilation (Static Quality Check)
+        if: steps.filter-mobile.outputs.mobile_files == 'true'
+        run: npm run check-types
+
+      - name: Expo Production Bundle Verification
+        if: steps.filter-mobile.outputs.mobile_files == 'true'
+        run: npx expo export --platform android
+
+      - name: Prebuild Native Android Source (Expo Prebuild)
+        if: steps.filter-mobile.outputs.mobile_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
+        env:
+          EXPO_PUBLIC_API_URL: ${{ (github.base_ref == 'main' || github.ref == 'refs/heads/main') && 'https://eduprocessprod.programacionwebuce.net' || 'https://eduprocessqa.programacionwebuce.net' }}
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Assemble APK Build via Gradle
+        if: steps.filter-mobile.outputs.mobile_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
+        env:
+          EXPO_PUBLIC_API_URL: ${{ (github.base_ref == 'main' || github.ref == 'refs/heads/main') && 'https://eduprocessprod.programacionwebuce.net' || 'https://eduprocessqa.programacionwebuce.net' }}
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload Mobile APK Artifact to GitHub
+        if: steps.filter-mobile.outputs.mobile_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ (github.base_ref == 'main' || github.ref == 'refs/heads/main') && 'eduprocess-mobile-prod-build' || 'eduprocess-mobile-qa-build' }}
+          path: frontend-mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+
   verify-frontend:
     name: Frontend Verification (Node 24)
     runs-on: ubuntu-latest
@@ -157,7 +219,7 @@ jobs:
           host: ${{ secrets.QA_SSH_HOST }}
           username: ubuntu
           key: ${{ secrets.QA_SSH_KEY }}
-          source: "infrastructure/docker-compose.qa.yml,infrastructure/nginx.qa.conf,infrastructure/prometheus.yml,infrastructure/alert.rules.yml,infrastructure/grafana-datasources.qa.yml,infrastructure/grafana-dashboards.yml,infrastructure/dashboards/eduprocess_metrics.json"
+          source: "infrastructure/docker-compose.qa.yml,infrastructure/nginx.qa.conf,infrastructure/prometheus.qa.yml,infrastructure/alert.rules.yml,infrastructure/grafana-datasources.yml,infrastructure/grafana-dashboards.yml,infrastructure/dashboards/eduprocess_metrics.json"
           target: "~/eduprocess-qa"
           strip_components: 1
 
@@ -171,7 +233,7 @@ jobs:
             cd ~/eduprocess-qa
             mv docker-compose.qa.yml docker-compose.yml 2>/dev/null || true
             mv nginx.qa.conf nginx.conf 2>/dev/null || true
-            mv grafana-datasources.qa.yml grafana-datasources.qa.yml 2>/dev/null || true
+            mv prometheus.qa.yml prometheus.yml 2>/dev/null || true
             sudo systemctl stop nginx 2>/dev/null || true
             sudo systemctl disable nginx 2>/dev/null || true
             docker compose pull
@@ -193,7 +255,7 @@ jobs:
           host: ${{ secrets.PROD_SSH_HOST }}
           username: ubuntu
           key: ${{ secrets.PROD_SSH_KEY }}
-          source: "infrastructure/docker-compose.prod.yml,infrastructure/nginx.prod.conf,infrastructure/prometheus.yml,infrastructure/alert.rules.yml,infrastructure/grafana-datasources.prod.yml,infrastructure/grafana-dashboards.yml,infrastructure/dashboards/eduprocess_metrics.json"
+          source: "infrastructure/docker-compose.prod.yml,infrastructure/nginx.prod.conf,infrastructure/prometheus.prod.yml,infrastructure/alert.rules.yml,infrastructure/grafana-datasources.yml,infrastructure/grafana-dashboards.yml,infrastructure/dashboards/eduprocess_metrics.json"
           target: "~/eduprocess-prod"
           strip_components: 1
 
@@ -207,7 +269,7 @@ jobs:
             cd ~/eduprocess-prod
             mv docker-compose.prod.yml docker-compose.yml 2>/dev/null || true
             mv nginx.prod.conf nginx.conf 2>/dev/null || true
-            mv grafana-datasources.prod.yml grafana-datasources.prod.yml 2>/dev/null || true
+            mv prometheus.prod.yml prometheus.yml 2>/dev/null || true
             sudo systemctl stop nginx 2>/dev/null || true
             sudo systemctl disable nginx 2>/dev/null || true
             docker compose pull

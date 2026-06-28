@@ -4,7 +4,7 @@ datasources:
   - name: Prometheus
     type: prometheus
     access: proxy
-    url: http://eduprocess-prometheus-qa:9090/prometheus
+    url: http://prometheus:9090/prometheus
     isDefault: true
     uid: prometheus-eduprocess 
     editable: false
