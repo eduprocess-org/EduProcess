@@ -1,10 +1,18 @@
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
+    presets: [
+      [
+        'babel-preset-expo',
+        {
+          jsxRuntime: 'automatic',
+        },
+      ],
+    ],
     plugins: [
-      '@babel/plugin-transform-class-properties',
-      '@babel/plugin-transform-private-methods'
+      ['@babel/plugin-transform-private-methods', { loose: true }],
+      ['@babel/plugin-transform-class-properties', { loose: true }],
+      ['@babel/plugin-transform-private-property-in-object', { loose: true }]
     ],
   };
 };
