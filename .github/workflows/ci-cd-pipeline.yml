@@ -44,7 +44,7 @@ jobs:
 
       - name: Expo Production Bundle Verification
         if: steps.filter-mobile.outputs.mobile_files == 'true'
-        run: npx expo export --platform android
+        run: npx expo export --platform android --clear
 
       - name: Prebuild Native Android Source (Expo Prebuild)
         if: steps.filter-mobile.outputs.mobile_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
@@ -59,14 +59,14 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease -PminifyEnabled=false
+          ./gradlew assembleDebug -PminifyEnabled=false
 
       - name: Upload Mobile APK Artifact to GitHub
         if: steps.filter-mobile.outputs.mobile_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
         uses: actions/upload-artifact@v4
         with:
           name: ${{ (github.base_ref == 'main' || github.ref == 'refs/heads/main') && 'eduprocess-mobile-prod-build' || 'eduprocess-mobile-qa-build' }}
-          path: frontend-mobile/android/app/build/outputs/apk/release/*.apk
+          path: frontend-mobile/android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 7
 
   verify-frontend:
