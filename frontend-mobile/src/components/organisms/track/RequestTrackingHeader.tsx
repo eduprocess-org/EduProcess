@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Calendar, RefreshCw, ArrowLeft, FileText } from 'lucide-react-native'; 
 import { useNavigation } from '@react-navigation/native'; 
 import StatusBadge from '../../molecules/TrackStatusBadge'; 
-import { RequestStatus } from '../../../core/types/studentDashboard.types';
+import { RequestStatus } from '../../../core/types/studentDashboardTypes';
 
 interface RequestTrackingHeaderProps {
   procedureName: string;

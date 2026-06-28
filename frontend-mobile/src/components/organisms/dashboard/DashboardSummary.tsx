@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Files, TrendingUp, Check, X, Clock } from 'lucide-react-native';
-import { StudentRequest } from '../../../core/types/studentDashboard.types';
+import { StudentRequest } from '../../../core/types/studentDashboardTypes';
 import { STATUS_CONFIG } from '../../../core/types/status.types';
 import SummaryCard from '../../atoms/SummaryCard';
 

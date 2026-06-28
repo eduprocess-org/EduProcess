@@ -14,7 +14,7 @@ import RequestTrackingSkeleton from '../organisms/track/RequestTrackingSkeleton'
 
 import { useRequestTracking } from '../../core/hooks/useRequestTracking';
 
-import { RequestStatus } from '../../core/types/studentDashboard.types';
+import { RequestStatus } from '../../core/types/studentDashboardTypes';
 
 const mapToRequestStatus = (status: string): RequestStatus => {
   const normalized = status?.trim().toUpperCase();

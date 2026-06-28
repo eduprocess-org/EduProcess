@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { FileText, Eye } from 'lucide-react-native';
 import StatusBadge from '../atoms/StatusBadge';
-import { StudentRequest } from '../../core/types/studentDashboard.types';
+import { StudentRequest } from '../../core/types/studentDashboardTypes';
 import { STATUS_CONFIG } from '../../core/types/status.types'; 
 
 interface RequestCardProps {

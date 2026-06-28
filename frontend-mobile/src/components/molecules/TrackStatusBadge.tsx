@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { RequestStatus } from "../../core/types/studentDashboard.types";
+import { RequestStatus } from "../../core/types/studentDashboardTypes";
 import { STATUS_CONFIG, STATUS_FALLBACK } from "../../core/types/status.types";
 
 interface StatusBadgeProps {
