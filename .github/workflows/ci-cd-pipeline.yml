@@ -7,6 +7,68 @@ on:
     branches: [ develop, qa, main ]
 
 jobs:
+  verify-mobile:
+    name: Mobile Verification & Expo Export
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend-mobile
+    steps:
+      - name: Checkout Monorepo Code
+        uses: actions/checkout@v4
+
+      - name: Check Mobile Changes
+        id: filter-mobile
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            mobile_files:
+              - 'frontend-mobile/**'
+              - '.github/workflows/ci-cd-pipeline.yml'
+
+      - name: Setup Node.js Environment
+        if: steps.filter-mobile.outputs.mobile_files == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: './frontend-mobile/package-lock.json'
+
+      - name: Execute Install Checks (Dependencies)
+        if: steps.filter-mobile.outputs.mobile_files == 'true'
+        run: npm ci
+
+      # - name: Verify TypeScript Compilation (Static Quality Check)
+      #  if: steps.filter-mobile.outputs.mobile_files == 'true'
+      #  run: npm run check-types
+
+      # - name: Expo Production Bundle Verification
+      #  if: steps.filter-mobile.outputs.mobile_files == 'true'
+      #  run: npx expo export --platform android
+
+      - name: Prebuild Native Android Source (Expo Prebuild)
+        if: steps.filter-mobile.outputs.mobile_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
+        env:
+          EXPO_PUBLIC_API_URL: ${{ (github.base_ref == 'main' || github.ref == 'refs/heads/main') && 'https://eduprocessprod.programacionwebuce.net' || 'https://eduprocessqa.programacionwebuce.net' }}
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Assemble APK Build via Gradle
+        if: steps.filter-mobile.outputs.mobile_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
+        env:
+          EXPO_PUBLIC_API_URL: ${{ (github.base_ref == 'main' || github.ref == 'refs/heads/main') && 'https://eduprocessprod.programacionwebuce.net' || 'https://eduprocessqa.programacionwebuce.net' }}
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload Mobile APK Artifact to GitHub
+        if: steps.filter-mobile.outputs.mobile_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ (github.base_ref == 'main' || github.ref == 'refs/heads/main') && 'eduprocess-mobile-prod-build' || 'eduprocess-mobile-qa-build' }}
+          path: frontend-mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+
   verify-frontend:
     name: Frontend Verification (Node 24)
     runs-on: ubuntu-latest
