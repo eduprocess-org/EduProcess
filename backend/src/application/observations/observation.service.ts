@@ -1,9 +1,13 @@
 import { ObservationRepository } from '../../domain/observations/observation.repository';
 import { CreateObservationInput, ObservationDTO } from '../../domain/observations/observation.types';
 import { logger } from '../../infrastructure/config/logger.config';
+import { SocketEvents } from '../../infrastructure/websocket';
 
 export class ObservationService {
-    constructor(private readonly observationRepository: ObservationRepository) {}
+    constructor(
+        private readonly observationRepository: ObservationRepository,
+        private readonly socketEvents?: SocketEvents
+    ) {}
 
     async createObservation(input: CreateObservationInput): Promise<ObservationDTO> {
         logger.info('Observation creation attempt', { requestId: input.requestId, adminId: input.adminId });
@@ -18,6 +22,17 @@ export class ObservationService {
         });
 
         logger.info('Observation created successfully', { observationId: observation.id, requestId: input.requestId });
+
+        if (this.socketEvents && observation.studentId) {
+            this.socketEvents.notifyNewObservation({
+                requestId: input.requestId,
+                studentId: observation.studentId,
+                observationId: observation.id,
+                comment: observation.comment,
+                adminName: observation.adminName ?? 'Administrador',
+                createdAt: observation.createdAt?.toISOString() ?? new Date().toISOString(),
+            });
+        }
 
         return observation;
     }

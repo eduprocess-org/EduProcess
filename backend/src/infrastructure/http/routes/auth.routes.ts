@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { AuthService } from '../../../application/auth/auth.service';
-import { PrismaAuthRepository } from '../../persistence/prisma/prisma-auth.repository';
+import { PrismaAuthRepository } from '../../persistence/prisma/auth/prisma-auth.repository';
 import { AuthController } from '../controllers/auth.controller';
 
 import { authMiddleware } from '../middlewares/auth.middleware';

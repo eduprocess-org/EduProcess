@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { mockProcedureEditService } from "../../../services/admin/procedures/mockProcedureEditService";
+import { adminProceduresApi, type UpdateProcedureInput } from "../../../services/admin/procedures/procedures.service";
 
 export function useProcedureEdit() {
   const { id } = useParams<{ id: string }>();
@@ -10,8 +10,8 @@ export function useProcedureEdit() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [requirements, setRequirements] = useState<string[]>([""]);
-  const [estimatedTime, setEstimatedTime] = useState("");
-  const [status, setStatus] = useState<"active" | "draft">("active");
+  const [requirementsText, setRequirementsText] = useState("");
+  const [isActive, setIsActive] = useState(true);
 
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -19,18 +19,21 @@ export function useProcedureEdit() {
 
   useEffect(() => {
     if (!id) return;
-    
+
     setIsLoadingData(true);
-    mockProcedureEditService.getProcedureById(id)
+    adminProceduresApi
+      .getById(id)
       .then((procedure) => {
         setName(procedure.name);
         setDescription(procedure.description);
-        setRequirements(procedure.requirements.length > 0 ? procedure.requirements : [""]);
-        setEstimatedTime(procedure.estimatedTime);
-        setStatus(procedure.status);
+        setRequirementsText(procedure.requirementsText || "");
+        setIsActive(procedure.isActive);
+        if (procedure.requirements.length > 0) {
+          setRequirements(procedure.requirements.map((r) => r.name));
+        }
       })
       .catch((err) => {
-        toast.error(err.message || "Error loading procedure data");
+        toast.error(err.response?.data?.message || "Error loading procedure data");
         navigate("/admin/procedures");
       })
       .finally(() => {
@@ -39,7 +42,7 @@ export function useProcedureEdit() {
   }, [id, navigate]);
 
   const handleAddRequirement = () => setRequirements([...requirements, ""]);
-  
+
   const handleRequirementChange = (index: number, value: string) => {
     const updated = [...requirements];
     updated[index] = value;
@@ -58,9 +61,8 @@ export function useProcedureEdit() {
     const newErrors: Record<string, string> = {};
     if (!name.trim()) newErrors.name = "The procedure name is required.";
     if (!description.trim()) newErrors.description = "The description is required.";
-    if (!estimatedTime.trim()) newErrors.estimatedTime = "Estimated processing time is required.";
-    
-    const validReqs = requirements.filter(r => r.trim() !== "");
+
+    const validReqs = requirements.filter((r) => r.trim() !== "");
     if (validReqs.length === 0) newErrors.requirements = "At least one valid requirement is required.";
 
     setErrors(newErrors);
@@ -73,19 +75,23 @@ export function useProcedureEdit() {
 
     setIsUpdating(true);
     try {
-      const cleanRequirements = requirements.filter(r => r.trim() !== "");
-      await mockProcedureEditService.updateProcedure(id, {
+      const validRequirements = requirements
+        .filter((r) => r.trim() !== "")
+        .map((r) => ({ name: r.trim(), description: r.trim(), isMandatory: true }));
+
+      const input: UpdateProcedureInput = {
         name,
         description,
-        requirements: cleanRequirements,
-        estimatedTime,
-        status,
-      });
-      
+        requirementsText: requirementsText || undefined,
+        isActive,
+        requirements: validRequirements,
+      };
+
+      await adminProceduresApi.update(id, input);
       toast.success("Procedure updated successfully.");
       navigate("/admin/procedures");
     } catch (err: any) {
-      toast.error(err.message || "Failed to update procedure.");
+      toast.error(err.response?.data?.message || "Failed to update procedure.");
     } finally {
       setIsUpdating(false);
     }
@@ -97,10 +103,10 @@ export function useProcedureEdit() {
     description,
     setDescription,
     requirements,
-    estimatedTime,
-    setEstimatedTime,
-    status,
-    setStatus,
+    requirementsText,
+    setRequirementsText,
+    isActive,
+    setIsActive,
     errors,
     isLoadingData,
     isUpdating,

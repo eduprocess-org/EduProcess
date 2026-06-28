@@ -9,159 +9,89 @@ interface Props {
   onView: () => void;
 }
 
-const navy   = "#1B2B5E";
-const blue   = "#2563EB";
-const border = "#E4EAF4";
-const muted  = "#64748B";
-const subtle = "#94A3B8";
-
 function initials(name: string) {
-  return name
-    .split(" ")
-    .slice(0, 2)
-    .map((n) => n[0]?.toUpperCase() ?? "")
-    .join("");
+  return name.split(" ").slice(0, 2).map((n) => n[0]?.toUpperCase() ?? "").join("");
 }
 
 const avatarColors = [
-  { bg: "#DBEAFE", color: "#1D4ED8" },
-  { bg: "#DCFCE7", color: "#15803D" },
-  { bg: "#FEF3C7", color: "#B45309" },
-  { bg: "#F3E8FF", color: "#7E22CE" },
-  { bg: "#FCE7F3", color: "#BE185D" },
+  { bg: "#DBEAFE", color: "#1D4ED8", darkBg: "rgba(59,130,246,0.20)",  darkColor: "#93C5FD" },
+  { bg: "#DCFCE7", color: "#15803D", darkBg: "rgba(34,197,94,0.18)",   darkColor: "#86EFAC" },
+  { bg: "#FEF3C7", color: "#B45309", darkBg: "rgba(234,179,8,0.18)",   darkColor: "#FDE047" },
+  { bg: "#F3E8FF", color: "#7E22CE", darkBg: "rgba(168,85,247,0.18)",  darkColor: "#D8B4FE" },
+  { bg: "#FCE7F3", color: "#BE185D", darkBg: "rgba(236,72,153,0.18)",  darkColor: "#F9A8D4" },
 ];
 
 function avatarColor(name: string) {
-  const idx = name.charCodeAt(0) % avatarColors.length;
-  return avatarColors[idx];
+  return avatarColors[name.charCodeAt(0) % avatarColors.length];
 }
 
-export default function RequestTableRow({
-  request,
-  isEven,
-  selected,
-  onSelect,
-  onView,
-}: Props) {
+export default function RequestTableRow({ request, isEven, selected, onSelect, onView }: Props) {
   const av = avatarColor(request.studentName);
 
   return (
     <tr
-      style={{
-        borderBottom: `0.5px solid ${border}`,
-        backgroundColor: selected ? "#F0F6FF" : isEven ? "#FFFFFF" : "#FAFBFD",
-        transition: "background-color .15s",
-      }}
-      onMouseEnter={(e) => {
-        if (!selected) {
-          e.currentTarget.style.backgroundColor = "#F0F6FF";
-        }
-        const accent = e.currentTarget.querySelector(".row-accent") as HTMLElement | null;
-        if (accent) accent.style.opacity = "1";
-      }}
-      onMouseLeave={(e) => {
-        if (!selected) {
-          e.currentTarget.style.backgroundColor = isEven ? "#FFFFFF" : "#FAFBFD";
-        }
-        const accent = e.currentTarget.querySelector(".row-accent") as HTMLElement | null;
-        if (accent) accent.style.opacity = "0";
-      }}
+      className={`group border-b border-[#E4EAF4] dark:border-gray-700 transition-colors duration-150
+        hover:bg-[#F0F6FF] dark:hover:bg-blue-900/20
+        ${selected
+          ? "bg-[#F0F6FF] dark:bg-blue-900/20"
+          : isEven
+          ? "bg-white dark:bg-gray-900"
+          : "bg-[#FAFBFD] dark:bg-gray-800/50"
+        }`}
     >
       <td className="px-4 py-3">
         <input
           type="checkbox"
+          className="accent-[#1B2B5E] dark:accent-blue-400"
           checked={selected}
           onChange={() => onSelect(request.id)}
         />
       </td>
 
-      <td
-        className="px-5 py-3.5"
-        style={{ position: "relative", paddingLeft: "1.5rem" }}
-      >
+      {/* Request ID */}
+      <td className="relative px-5 py-3.5" style={{ paddingLeft: "1.5rem" }}>
         <div
-          className="row-accent"
-          style={{
-            position: "absolute",
-            left: 0,
-            top: "50%",
-            transform: "translateY(-50%)",
-            width: 3,
-            height: "60%",
-            borderRadius: 4,
-            backgroundColor: blue,
-            opacity: selected ? 1 : 0,
-            transition: "opacity .15s",
-          }}
+          className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-[4px] h-[60%] bg-[#2563EB] dark:bg-blue-400 transition-opacity
+            ${selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
         />
-        <span
-          style={{
-            display: "inline-block",
-            backgroundColor: "#EFF6FF",
-            color: "#1D4ED8",
-            fontFamily: "ui-monospace, monospace",
-            fontSize: ".72rem",
-            fontWeight: 600,
-            letterSpacing: ".04em",
-            padding: "2px 8px",
-            borderRadius: 6,
-          }}
-        >
+        <span className="inline-block bg-[#EFF6FF] dark:bg-blue-900/40 text-[#1D4ED8] dark:text-blue-300 font-mono text-[.72rem] font-semibold tracking-[.04em] px-2 py-0.5 rounded-md">
           {request.id}
         </span>
       </td>
 
+      {/* Student */}
       <td className="px-5 py-3.5">
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div className="flex items-center gap-2.5">
           <div
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: "50%",
-              backgroundColor: av.bg,
-              color: av.color,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: 500,
-              fontSize: ".7rem",
-              flexShrink: 0,
-            }}
+            className="w-[30px] h-[30px] rounded-full flex items-center justify-center font-medium text-[.7rem] shrink-0 dark:hidden"
+            style={{ backgroundColor: av.bg, color: av.color }}
           >
             {initials(request.studentName)}
           </div>
-          <span style={{ color: navy, fontWeight: 500, fontSize: ".875rem" }}>
+          <div
+            className="w-[30px] h-[30px] rounded-full items-center justify-center font-medium text-[.7rem] shrink-0 hidden dark:flex"
+            style={{ backgroundColor: av.darkBg, color: av.darkColor }}
+          >
+            {initials(request.studentName)}
+          </div>
+          <span className="text-[#1B2B5E] dark:text-slate-200 font-medium text-sm">
             {request.studentName}
           </span>
         </div>
       </td>
 
+      {/* Email */}
       <td className="px-5 py-3.5">
-        <span style={{ fontSize: ".8rem", color: muted }}>
+        <span className="text-[.8rem] text-[#64748B] dark:text-slate-400">
           {request.studentEmail}
         </span>
       </td>
 
+      {/* Procedure */}
       <td className="px-5 py-3.5">
-        <span
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 5,
-            color: muted,
-            fontSize: ".8rem",
-          }}
-        >
-          <svg
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke={subtle}
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
+        <span className="flex items-center gap-[5px] text-[#64748B] dark:text-slate-400 text-[.8rem]">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            className="text-[#94A3B8] dark:text-slate-500" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
           </svg>
@@ -169,65 +99,36 @@ export default function RequestTableRow({
         </span>
       </td>
 
+      {/* Status */}
       <td className="px-5 py-3.5">
         <RequestStatusBadge status={request.status} />
       </td>
 
+      {/* Date */}
       <td className="px-5 py-3.5">
-        <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-          <span
-            style={{
-              fontSize: ".8rem",
-              fontWeight: 500,
-              color: navy,
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            {new Date(request.createdAt).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })}
+        <div className="flex flex-col gap-px">
+          <span className="text-[.8rem] font-medium text-[#1B2B5E] dark:text-slate-200 tabular-nums">
+            {new Date(request.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
           </span>
-          <span style={{ fontSize: ".7rem", color: subtle }}>
-            {new Date(request.createdAt).toLocaleTimeString("en-GB", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+          <span className="text-[.7rem] text-[#94A3B8] dark:text-slate-500">
+            {new Date(request.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
           </span>
         </div>
       </td>
 
+      {/* Action */}
       <td className="px-5 py-3.5">
-       <button
-        type="button"
-        onClick={onView}
-        style={{
-          padding: "5px 14px",
-          borderRadius: 7,
-          border: "0.5px solid #7c9fcc",
-          background: "#3065a1",
-          fontSize: ".75rem",
-          fontWeight: 500,
-          color: "white",
-          cursor: "pointer",
-          transition: "background .12s, border-color .12s, color .12s",
-        }}
-        onMouseEnter={(e) => {
-          const btn = e.currentTarget;
-          btn.style.background = "#1f4e7a";      // azul más oscuro
-          btn.style.borderColor = "#1f4e7a";     // mismo que fondo para fusión
-          btn.style.color = "white";             // texto sigue blanco
-        }}
-        onMouseLeave={(e) => {
-          const btn = e.currentTarget;
-          btn.style.background = "#3065a1";      // vuelve al normal
-          btn.style.borderColor = "#7c9fcc";     // vuelve al borde claro
-          btn.style.color = "white";             // vuelve a blanco
-        }}
-      >
-        View
-      </button>
+        <button
+          type="button"
+          onClick={onView}
+          className="px-[14px] py-[5px] rounded-[7px] text-[.75rem] font-medium text-white cursor-pointer transition-all
+            bg-[#3065a1] border border-[#7c9fcc]
+            hover:bg-[#1f4e7a] hover:border-[#1f4e7a]
+            dark:bg-blue-700 dark:border-blue-600
+            dark:hover:bg-blue-600 dark:hover:border-blue-500"
+        >
+          View
+        </button>
       </td>
     </tr>
   );

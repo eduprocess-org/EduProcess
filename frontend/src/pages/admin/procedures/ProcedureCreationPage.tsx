@@ -6,14 +6,14 @@ import { ArrowLeft, Loader2, Save, AlertCircle } from "lucide-react";
 
 export default function ProcedureCreationPage() {
   const navigate = useNavigate();
-  const { form, setters, errors, isLoading, handleSubmit } = useProcedureForm(() => 
+  const { form, setters, errors, isLoading, handleSubmit } = useProcedureForm(() =>
     navigate("/admin/procedures")
   );
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#070C19] text-slate-900 dark:text-slate-100 py-8 px-4 md:px-8 transition-colors duration-200">
       <div className="mx-auto max-w-2xl">
-        
+
         {/* ENLACE DE REGRESO */}
         <button
           type="button"
@@ -35,11 +35,11 @@ export default function ProcedureCreationPage() {
         </div>
 
         {/* FORMULARIO ADAPTATIVO (CLARO / OSCURO) */}
-        <form 
-          onSubmit={handleSubmit} 
+        <form
+          onSubmit={handleSubmit}
           className="bg-white dark:bg-[#0B132B] border border-slate-200 dark:border-slate-900 p-6 md:p-8 rounded-2xl shadow-xl space-y-5 transition-colors duration-200"
         >
-          {/* CONTROL DE ERRORES DEL API (Actividad: Handle API errors) */}
+          {/* CONTROL DE ERRORES DEL API */}
           {errors.api && (
             <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 text-red-600 dark:text-red-400 text-xs font-medium flex items-center gap-2.5 animate-fadeIn">
               <AlertCircle size={16} className="shrink-0" />
@@ -49,7 +49,7 @@ export default function ProcedureCreationPage() {
             </div>
           )}
 
-          {/* CAMPO: NOMBRE (Actividad: Implement procedure name field) */}
+          {/* CAMPO: NOMBRE */}
           <InputField
             label="Procedure Name"
             value={form.name}
@@ -59,7 +59,7 @@ export default function ProcedureCreationPage() {
             placeholder="e.g., Degree Verification Protocol"
           />
 
-          {/* CAMPO: DESCRIPCIÓN (Actividad: Implement procedure description field) */}
+          {/* CAMPO: DESCRIPCIÓN */}
           <TextareaField
             label="Operational Description"
             value={form.description}
@@ -70,7 +70,7 @@ export default function ProcedureCreationPage() {
             placeholder="Summarize the core purpose of this procedure..."
           />
 
-          {/* CAMPO: REQUISITOS DINÁMICOS (Actividad: Implement requirements field) */}
+          {/* CAMPO: REQUISITOS DINÁMICOS */}
           <RequirementsInput
             requirements={form.requirements}
             onChange={setters.setRequirements}
@@ -78,35 +78,17 @@ export default function ProcedureCreationPage() {
             disabled={isLoading}
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* CAMPO: TIEMPO ESTIMADO (Actividad: Implement estimated processing time field) */}
-            <InputField
-              label="Estimated Processing Time"
-              value={form.estimatedTime}
-              onChange={(e) => setters.setEstimatedTime(e.target.value)}
-              error={errors.estimatedTime}
-              disabled={isLoading}
-              placeholder="e.g., 5 business days"
-            />
+          {/* CAMPO: TEXTO DE REQUISITOS */}
+          <TextareaField
+            label="Requirements Summary"
+            value={form.requirementsText}
+            onChange={(e) => setters.setRequirementsText(e.target.value)}
+            disabled={isLoading}
+            rows={2}
+            placeholder="Brief summary of requirements..."
+          />
 
-            {/* CAMPO: SELECCIÓN DE ESTADO (Actividad: Implement status selection field) */}
-            <div className="flex flex-col gap-1.5 w-full">
-              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                Initial Deployment Status
-              </label>
-              <select
-                value={form.status}
-                onChange={(e) => setters.setStatus(e.target.value as "active" | "draft")}
-                disabled={isLoading}
-                className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#131B2E] text-slate-900 dark:text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60 cursor-pointer transition-all"
-              >
-                <option value="active">Active (Available to Students)</option>
-                <option value="draft">Draft (System Hidden)</option>
-              </select>
-            </div>
-          </div>
-
-          {/* BOTONES DE ACCIÓN (Actividad: Implement loading indicators & API connections) */}
+          {/* BOTONES DE ACCIÓN */}
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-900/60">
             <button
               type="button"

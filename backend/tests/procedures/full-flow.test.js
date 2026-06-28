@@ -197,12 +197,12 @@ test('FULL FLOW: complete request lifecycle end-to-end', async () => {
     assert.equal(trackingRes.status, 200);
     assert.equal(trackingRes.body.data.status, 'pending');
 
-    // 6. Student views timeline (initially "Submitted" + audit log)
+    // 6. Student views timeline (initially just "Submitted")
     const timelineRes = await supertest(app)
         .get(`/api/v1/requests/${requestId}/timeline`)
         .set('Authorization', `Bearer ${studentToken}`);
     assert.equal(timelineRes.status, 200);
-    assert.equal(timelineRes.body.data.length, 2);
+    assert.equal(timelineRes.body.data.length, 1);
 
     // 7. Admin moves request to in_review
     const reviewRes = await supertest(app)
@@ -224,8 +224,8 @@ test('FULL FLOW: complete request lifecycle end-to-end', async () => {
         .get(`/api/v1/requests/${requestId}/timeline`)
         .set('Authorization', `Bearer ${studentToken}`);
     assert.equal(timeline2Res.status, 200);
-    assert.equal(timeline2Res.body.data.length, 3);
-    assert.equal(timeline2Res.body.data[2].status, 'Under Review');
+    assert.equal(timeline2Res.body.data.length, 2);
+    assert.equal(timeline2Res.body.data[1].status, 'Under Review');
 
     // 10. Admin approves the request
     const approveRes = await supertest(app)
@@ -240,8 +240,8 @@ test('FULL FLOW: complete request lifecycle end-to-end', async () => {
         .get(`/api/v1/admin/requests/${requestId}/timeline`)
         .set('Authorization', `Bearer ${adminToken}`);
     assert.equal(adminTimelineRes.status, 200);
-    assert.equal(adminTimelineRes.body.data.length, 4);
-    assert.equal(adminTimelineRes.body.data[3].status, 'Approved');
+    assert.equal(adminTimelineRes.body.data.length, 3);
+    assert.equal(adminTimelineRes.body.data[2].status, 'Approved');
 
     // 12. Student cannot change status (non-admin)
     const studentChangeRes = await supertest(app)
