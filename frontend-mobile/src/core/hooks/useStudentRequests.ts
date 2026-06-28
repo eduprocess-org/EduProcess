@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getStudentRequests } from '../services/dashboardService';
-import { StudentRequest } from '../types/studentDashboardTypes';
+import { StudentRequest } from '../types/studentDashboard.types';
 
 export function useStudentRequests() {
   const [requests, setRequests] = useState<StudentRequest[]>([]);
