@@ -1,7 +1,7 @@
-import ProceduresList from "../../../components/procedures/ProceduresList";
-import ProceduresLoading from "../../../components/procedures/ProceduresLoading";
-import ProceduresError from "../../../components/procedures/ErrorProcedures";
-import ProceduresEmpty from "../../../components/procedures/EmptyProcedures";
+import ProceduresList from "../../../components/procedures/student/ProceduresList";
+import ProceduresLoading from "../../../components/procedures/student/ProceduresLoading";
+import ProceduresError from "../../../components/procedures/student/ErrorProcedures";
+import ProceduresEmpty from "../../../components/procedures/student/EmptyProcedures";
 
 import { useProcedures } from "../../../hooks/procedures/useProcedures";
 

@@ -87,6 +87,42 @@ test('StatusHistoryService - buildTimeline: includes observations as description
     assert.equal(lastEntry.description, 'Documentation is incomplete');
 });
 
+test('StatusHistoryService - buildTimeline: observation on pending request does not duplicate Submitted', () => {
+    const timeline = service.buildTimeline(
+        {
+            createdAt: new Date('2026-06-10'),
+            status: 'pending',
+            observations: [
+                { comment: 'We need additional documents', createdAt: new Date('2026-06-11') },
+            ],
+        },
+        STATUS_LABELS
+    );
+
+    assert.equal(timeline.length, 1);
+    assert.equal(timeline[0].status, 'Submitted');
+    assert.equal(timeline[0].description, 'We need additional documents');
+});
+
+test('StatusHistoryService - buildTimeline: observation on same status as last entry does not duplicate', () => {
+    const timeline = service.buildTimeline(
+        {
+            createdAt: new Date('2026-06-10'),
+            status: 'in_review',
+            auditLogs: [
+                { action: 'STATUS_CHANGE', oldValue: 'pending', newValue: 'in_review', createdAt: new Date('2026-06-11') },
+            ],
+            observations: [
+                { comment: 'Under review observation', createdAt: new Date('2026-06-12') },
+            ],
+        },
+        STATUS_LABELS
+    );
+
+    assert.equal(timeline.length, 2);
+    assert.equal(timeline[1].description, 'Under review observation');
+});
+
 test('StatusHistoryService - buildTimeline: non-STATUS_CHANGE audit logs are ignored', () => {
     const timeline = service.buildTimeline(
         {

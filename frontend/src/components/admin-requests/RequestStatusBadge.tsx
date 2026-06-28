@@ -5,31 +5,31 @@ interface Props {
 }
 
 const styles: Record<
-  AdminRequestListItem["status"],
+  string, // Se cambia temporalmente a string o un sub-tipo para permitir la indexación con la normalización
   { bg: string; color: string; border: string; dot: string; label: string }
 > = {
-  pending: {
+  PENDING: {
     bg: "#FFFBEB",
     color: "#B45309",
     border: "#FDE68A",
     dot: "#F59E0B",
     label: "Pending",
   },
-  in_review: {
+  IN_REVIEW: {
     bg: "#EFF6FF",
     color: "#1D4ED8",
     border: "#BFDBFE",
     dot: "#3B82F6",
     label: "In Review",
   },
-  approved: {
+  APPROVED: {
     bg: "#ECFDF5",
     color: "#065F46",
     border: "#A7F3D0",
     dot: "#10B981",
     label: "Approved",
   },
-  rejected: {
+  REJECTED: {
     bg: "#FFF1F2",
     color: "#9F1239",
     border: "#FECDD3",
@@ -60,7 +60,9 @@ const PING_STYLE = `
 `;
 
 export default function RequestStatusBadge({ status }: Props) {
-  const s = styles[status] ?? {
+  const normalizedStatus = status.toUpperCase();
+  
+  const s = styles[normalizedStatus] ?? {
     bg: "#F3F4F6",
     color: "#374151",
     border: "#D1D5DB",
@@ -68,7 +70,7 @@ export default function RequestStatusBadge({ status }: Props) {
     label: status.charAt(0).toUpperCase() + status.slice(1).toLowerCase(),
   };
 
-  const isPulsing = status === "pending" || status === "in_review";
+  const isPulsing = normalizedStatus === "PENDING" || normalizedStatus === "IN_REVIEW";
 
   return (
     <>

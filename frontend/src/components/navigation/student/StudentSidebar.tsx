@@ -2,7 +2,6 @@ import {
   LayoutDashboard,
   FileText,
   Search,
-  Settings,
   Bell,
   LogOut,
 } from "lucide-react";
@@ -30,6 +29,7 @@ function Sidebar({ isCollapsed }: SidebarProps) {
       className={`
         h-full
         bg-[#0B2D63]
+        dark:bg-slate-950
         text-white
         flex
         flex-col
@@ -47,8 +47,7 @@ function Sidebar({ isCollapsed }: SidebarProps) {
             isCollapsed ? "justify-center" : "gap-4"
           }`}
         >
-          <div className="bg-white rounded-xl p-2 flex items-center justify-center w-12 h-12 flex-shrink-0">
-            <img
+          <div className="bg-white dark:bg-slate-900 rounded-xl p-2 flex items-center justify-center w-12 h-12 flex-shrink-0 border border-transparent dark:border-slate-700">            <img
               src={logo}
               alt="EduProcess"
               className="w-full h-full object-contain"
@@ -61,7 +60,7 @@ function Sidebar({ isCollapsed }: SidebarProps) {
                 EduProcess
               </h2>
 
-              <p className="text-xs text-slate-300 truncate">
+              <p className="text-xs text-slate-300 dark:text-slate-400 truncate">
                 Academic System
               </p>
             </div>
@@ -79,8 +78,8 @@ function Sidebar({ isCollapsed }: SidebarProps) {
               isCollapsed ? "justify-center" : "gap-3"
             } ${
               location.pathname === "/"
-                ? "bg-white/10 border border-white/10 text-white font-medium"
-                : "text-slate-200 hover:bg-white/10 hover:text-white"
+              ? "bg-white/10 dark:bg-slate-800 border border-white/10 dark:border-slate-700 text-white"
+              : "text-slate-200 dark:text-slate-300 hover:bg-white/10 dark:hover:bg-slate-800"
             }`}
           >
             <LayoutDashboard size={20} />
@@ -95,8 +94,8 @@ function Sidebar({ isCollapsed }: SidebarProps) {
               isCollapsed ? "justify-center" : "gap-3"
             } ${
               location.pathname === "/procedures"
-                ? "bg-white/10 border border-white/10 text-white font-medium"
-                : "text-slate-200 hover:bg-white/10 hover:text-white"
+              ? "bg-white/10 dark:bg-slate-800 border border-white/10 dark:border-slate-700 text-white"
+              : "text-slate-200 dark:text-slate-300 hover:bg-white/10 dark:hover:bg-slate-800"
             }`}
           >
             <FileText size={20} />
@@ -106,7 +105,7 @@ function Sidebar({ isCollapsed }: SidebarProps) {
 
           {/* Search */}
           <button
-            className={`flex w-full items-center px-4 py-3 rounded-xl text-slate-200 hover:bg-white/10 hover:text-white transition-all duration-200 ${
+            className={`flex w-full items-center px-4 py-3 rounded-xl text-slate-200 hover:bg-white/10 dark:hover:bg-slate-800 hover:text-white transition-all duration-200 ${
               isCollapsed ? "justify-center" : "gap-3"
             }`}
           >
@@ -117,7 +116,7 @@ function Sidebar({ isCollapsed }: SidebarProps) {
 
           {/* Notifications */}
           <button
-            className={`flex w-full items-center px-4 py-3 rounded-xl text-slate-200 hover:bg-white/10 hover:text-white transition-all duration-200 ${
+            className={`flex w-full items-center px-4 py-3 rounded-xl text-slate-200 hover:bg-white/10 dark:hover:bg-slate-800 hover:text-white transition-all duration-200 ${
               isCollapsed ? "justify-center" : "gap-3"
             }`}
           >
@@ -126,21 +125,11 @@ function Sidebar({ isCollapsed }: SidebarProps) {
             {!isCollapsed && <span>Notifications</span>}
           </button>
 
-          {/* Settings */}
-          <button
-            className={`flex w-full items-center px-4 py-3 rounded-xl text-slate-200 hover:bg-white/10 hover:text-white transition-all duration-200 ${
-              isCollapsed ? "justify-center" : "gap-3"
-            }`}
-          >
-            <Settings size={20} />
-
-            {!isCollapsed && <span>Settings</span>}
-          </button>
         </div>
       </nav>
 
       {/* FOOTER */}
-      <div className="p-4 border-t border-white/10 flex-shrink-0">
+      <div className="p-4 border-t border-white/10 dark:border-slate-700 flex-shrink-0">
         <button
           onClick={handleLogout}
           className={`w-full flex items-center px-4 py-3 rounded-xl text-red-300 hover:bg-red-500/20 hover:text-red-200 transition-all duration-200 ${
