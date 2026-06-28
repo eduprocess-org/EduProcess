@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Eye, Pencil, Trash2, ArrowUpDown } from "lucide-react";
+import { Eye, Pencil, Ban, ArrowUpDown } from "lucide-react"; 
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import type { ProcedureListItem } from "../../../types/admin/procedures/procedures.types";
 import ProcedureStatusBadge from "./ProcedureStatusBadge";
-import ProcedureDeleteModal from "./ProcedureDeleteModal";
+import ProcedureToggleStatusModal from "./ProcedureToggleStatusModal"; 
 import { adminProceduresApi } from "../../../services/admin/procedures/procedures.service";
 
 interface Props {
@@ -15,25 +15,27 @@ interface Props {
 function ProceduresTable({ procedures, onRefreshList }: Props) {
   const navigate = useNavigate();
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureListItem | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
 
-  const handleDeleteTrigger = (procedure: ProcedureListItem) => {
+  const handleToggleTrigger = (procedure: ProcedureListItem) => {
     setSelectedProcedure(procedure);
   };
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmToggle = async () => {
     if (!selectedProcedure) return;
-    setIsDeleting(true);
+    setIsToggling(true);
 
     try {
-      await adminProceduresApi.delete(selectedProcedure.id);
-      toast.success("Procedure type successfully removed from administrative registry.");
+      // Usamos el endpoint para cambiar el estado (asumiendo lógica en el servicio)
+      await adminProceduresApi.toggleStatus(selectedProcedure.id, !selectedProcedure.isActive);
+      
+      toast.success(`Procedure successfully ${selectedProcedure.isActive ? 'disabled' : 'enabled'}.`);
       onRefreshList();
       setSelectedProcedure(null);
     } catch (error) {
-      toast.error("An error occurred while attempting to remove the procedure.");
+      toast.error("An error occurred while attempting to update the procedure status.");
     } finally {
-      setIsDeleting(false);
+      setIsToggling(false);
     }
   };
 
@@ -70,7 +72,15 @@ function ProceduresTable({ procedures, onRefreshList }: Props) {
                 <td className="px-5 py-4 text-slate-400 dark:text-slate-500 text-xs tabular-nums">{new Date(procedure.createdAt).toLocaleDateString()}</td>
                 <td className="px-5 py-4">
                   <div className="flex items-center justify-center gap-1">
-                    <button className="rounded-lg p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-150" title="View details"><Eye size={16} /></button>
+                    {/* Botón Ojito para ver detalles */}
+                    <button 
+                      onClick={() => navigate(`/admin/procedures/view/${procedure.id}`)}
+                      className="rounded-lg p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-150" 
+                      title="View details"
+                    >
+                      <Eye size={16} />
+                    </button>
+                    
                     <button
                       onClick={() => navigate(`/admin/procedures/edit/${procedure.id}`)}
                       className="rounded-lg p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all duration-150"
@@ -78,13 +88,15 @@ function ProceduresTable({ procedures, onRefreshList }: Props) {
                     >
                       <Pencil size={16} />
                     </button>
+
+                    {/* Botón Ban (Deshabilitar) */}
                     <button
-                      onClick={() => handleDeleteTrigger(procedure)}
-                      className="rounded-lg p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all duration-150"
-                      title="Delete Procedure"
-                      data-testid={`delete-btn-${procedure.id}`}
+                      onClick={() => handleToggleTrigger(procedure)}
+                      className={`rounded-lg p-2 transition-all duration-150 ${procedure.isActive ? 'text-amber-500 hover:bg-amber-50' : 'text-slate-400 hover:bg-slate-100'}`}
+                      title={procedure.isActive ? "Disable Procedure" : "Enable Procedure"}
+                      data-testid={`toggle-btn-${procedure.id}`}
                     >
-                      <Trash2 size={16} />
+                      <Ban size={16} />
                     </button>
                   </div>
                 </td>
@@ -94,11 +106,12 @@ function ProceduresTable({ procedures, onRefreshList }: Props) {
         </table>
       </div>
 
-      <ProcedureDeleteModal
+      <ProcedureToggleStatusModal
         isOpen={selectedProcedure !== null}
         procedureName={selectedProcedure?.name || ""}
-        isDeleting={isDeleting}
-        onConfirm={handleConfirmDelete}
+        isActive={selectedProcedure?.isActive || false}
+        isToggling={isToggling}
+        onConfirm={handleConfirmToggle}
         onClose={() => setSelectedProcedure(null)}
       />
     </div>

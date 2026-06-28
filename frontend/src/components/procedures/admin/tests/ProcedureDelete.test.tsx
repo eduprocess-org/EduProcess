@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import ProceduresTable from "../ProceduresTable";
+import type { ProcedureListItem } from "../../../../types/admin/procedures/procedures.types";
 
 const mockDelete = vi.fn();
 
@@ -18,7 +19,7 @@ vi.mock("sonner", () => ({
   },
 }));
 
-const mockProcedures = [
+const mockProcedures: ProcedureListItem[] = [
   {
     id: "uuid-101",
     name: "Syllabus Certification Protocol",
@@ -53,7 +54,7 @@ describe("EDUPR-232: Procedure Deletion Suite", () => {
     fireEvent.click(deleteButton);
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(screen.getByText(/"Syllabus Certification Protocol"/)).toBeInTheDocument();
+    expect(screen.getByText(/Syllabus Certification Protocol/)).toBeInTheDocument();
   });
 
   it("should successfully execute backend pipeline workflow and trigger automatic list refresh", async () => {

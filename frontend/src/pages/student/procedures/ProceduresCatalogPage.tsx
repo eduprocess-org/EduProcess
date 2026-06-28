@@ -6,22 +6,14 @@ import ProceduresEmpty from "../../../components/procedures/student/EmptyProcedu
 import { useProcedures } from "../../../hooks/procedures/useProcedures";
 
 function ProceduresCatalogPage() {
-  const {
-    procedures,
-    loading,
-    error,
-  } = useProcedures();
+  const { procedures, loading, error } = useProcedures();
 
   if (loading) {
     return <ProceduresLoading />;
   }
 
   if (error) {
-    return (
-      <ProceduresError
-        message={error}
-      />
-    );
+    return <ProceduresError message={error} />;
   }
 
   if (!procedures.length) {
@@ -32,23 +24,19 @@ function ProceduresCatalogPage() {
     <div className="space-y-8">
 
       {/* Header */}
-
       <div className="flex items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
             My Procedures
           </h1>
-
-          <p className="mt-1 text-slate-600">
-            Explore all academic procedures
-            available for students.
+          <p className="mt-1 text-slate-600 dark:text-slate-400">
+            Explore all academic procedures available for students.
           </p>
         </div>
       </div>
 
-      <ProceduresList
-        procedures={procedures}
-      />
+      <ProceduresList procedures={procedures} />
+
     </div>
   );
 }

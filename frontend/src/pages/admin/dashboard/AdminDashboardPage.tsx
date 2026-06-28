@@ -4,13 +4,7 @@ import AdminQuickActions from "../../../components/dashboard/admin/AdminQuickAct
 import AdminDashboardLoading from "../../../components/dashboard/admin/AdminDashboardLoading";
 import AdminDashboardError from "../../../components/dashboard/admin/AdminDashboardError";
 import { useAdminDashboard } from "../../../hooks/admin/useAdminDashboard";
-import { Zap, ListChecks, BarChart2 } from "lucide-react"; 
-
-const navy   = "#1B2B5E";
-const blue   = "#2563EB";
-const border = "#E4EAF4";
-const muted  = "#64748B";
-const bgPage = "#F0F4FA";
+import { Zap, ListChecks, BarChart2 } from "lucide-react";
 
 function AdminDashboardPage() {
   const { stats, requests, distribution, loading, error } = useAdminDashboard();
@@ -26,32 +20,25 @@ function AdminDashboardPage() {
   });
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: bgPage,
-        padding: "0.75rem 2.5rem 3rem",
-      }}
-    >
-      <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", flexDirection: "column", gap: "2rem" }}>
+    <div className="min-h-screen bg-[#F0F4FA] dark:bg-gray-950 px-10 pt-3 pb-12">
+      <div className="max-w-[1100px] mx-auto flex flex-col gap-8">
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-[#0B2D63] tracking-tight">
+            <h1 className="text-3xl font-bold text-[#0B2D63] dark:text-blue-300 tracking-tight">
               Administrator Dashboard
             </h1>
-            <p className="text-slate-500 mt-1">
+            <p className="text-slate-500 dark:text-slate-400 mt-1">
               Overview of procedures and requests.
             </p>
           </div>
-
-          <span className="text-sm text-slate-400 sm:text-right">
+          <span className="text-sm text-slate-400 dark:text-slate-500 sm:text-right">
             {today}
           </span>
         </div>
 
-        {/* ── Summary stats ── */}
+        {/* Summary stats */}
         <div>
           <AdminDashboardSummary
             total={stats.totalRequests}
@@ -61,42 +48,32 @@ function AdminDashboardPage() {
           />
         </div>
 
-        {/* ── Quick actions ── */}
+        {/* Quick actions */}
         <section>
           <SectionLabel icon={<Zap size={13} />} label="Quick actions" />
           <AdminQuickActions />
         </section>
 
-        {/* ── Distribution by Procedure  ── */}
+        {/* Distribution by Procedure */}
         {distribution && distribution.length > 0 && (
           <section>
             <SectionLabel icon={<BarChart2 size={13} />} label="Requests by Procedure" />
-            <div
-              style={{
-                backgroundColor: "#ffffff",
-                border: `1px solid ${border}`,
-                borderRadius: 16,
-                padding: "1.5rem",
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-                gap: "1rem",
-              }}
+            <div className="bg-white dark:bg-gray-900 border border-[#E4EAF4] dark:border-gray-700 rounded-2xl p-6 grid gap-4"
+              style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}
             >
               {distribution.map((item) => (
-                <div 
+                <div
                   key={item.procedureTypeId}
-                  style={{
-                    padding: "1rem",
-                    backgroundColor: "#F8FAFC",
-                    borderRadius: 12,
-                    border: `1px solid ${border}`
-                  }}
+                  className="p-4 bg-[#F8FAFC] dark:bg-gray-800 rounded-xl border border-[#E4EAF4] dark:border-gray-700"
                 >
-                  <p style={{ fontSize: "0.85rem", fontWeight: 600, color: navy, margin: "0 0 0.25rem 0" }}>
+                  <p className="text-sm font-semibold text-[#1B2B5E] dark:text-blue-200 mb-1">
                     {item.procedureName}
                   </p>
-                  <p style={{ fontSize: "1.5rem", fontWeight: 700, color: blue, margin: 0 }}>
-                    {item.count} <span style={{ fontSize: "0.8rem", color: muted, fontWeight: 400 }}>solicitudes</span>
+                  <p className="text-2xl font-bold text-[#2563EB] dark:text-blue-400 m-0">
+                    {item.count}{" "}
+                    <span className="text-sm text-slate-500 dark:text-slate-400 font-normal">
+                      solicitudes
+                    </span>
                   </p>
                 </div>
               ))}
@@ -104,24 +81,11 @@ function AdminDashboardPage() {
           </section>
         )}
 
-        {/* ── Recent requests ── */}
+        {/* Recent requests */}
         <section>
           <SectionLabel icon={<ListChecks size={13} />} label="Recent requests" />
-          <div
-            style={{
-              backgroundColor: "#ffffff",
-              border: `1px solid ${border}`,
-              borderRadius: 16,
-              overflow: "hidden",
-            }}
-          >
-            {/* thin accent bar */}
-            <div
-              style={{
-                height: 3,
-                background: `linear-gradient(90deg, ${navy} 0%, ${blue} 100%)`,
-              }}
-            />
+          <div className="bg-white dark:bg-gray-900 border border-[#E4EAF4] dark:border-gray-700 rounded-2xl overflow-hidden">
+            <div className="h-[3px] bg-gradient-to-r from-[#1B2B5E] to-[#2563EB]" />
             <AdminRecentRequests requests={requests} />
           </div>
         </section>
@@ -139,49 +103,14 @@ function SectionLabel({
   label: string;
 }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 7,
-        marginBottom: "0.75rem",
-      }}
-    >
-      <span
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 24,
-          height: 24,
-          borderRadius: 7,
-          backgroundColor: "#EFF6FF",
-          color: blue,
-          flexShrink: 0,
-        }}
-      >
+    <div className="flex items-center gap-[7px] mb-3">
+      <span className="flex items-center justify-center w-6 h-6 rounded-[7px] bg-[#EFF6FF] dark:bg-blue-900/40 text-[#2563EB] dark:text-blue-400 shrink-0">
         {icon}
       </span>
-      <h2
-        style={{
-          fontSize: "0.72rem",
-          fontWeight: 700,
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-          color: muted,
-          margin: 0,
-        }}
-      >
+      <h2 className="text-[0.72rem] font-bold tracking-[0.1em] uppercase text-slate-500 dark:text-slate-400 m-0">
         {label}
       </h2>
-      <div
-        style={{
-          flex: 1,
-          height: 1,
-          backgroundColor: border,
-          marginLeft: 4,
-        }}
-      />
+      <div className="flex-1 h-px bg-[#E4EAF4] dark:bg-gray-700 ml-1" />
     </div>
   );
 }

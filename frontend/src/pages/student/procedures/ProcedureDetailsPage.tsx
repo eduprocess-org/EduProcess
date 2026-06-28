@@ -13,32 +13,18 @@ import { useProcedureDetails } from "../../../hooks/procedures/useProcedureDetai
 function ProcedureDetailsPage() {
   const { id } = useParams();
 
-  const {
-    procedure,
-    loading,
-    error,
-  } = useProcedureDetails(
-    id ?? ""
-  );
+  const { procedure, loading, error } = useProcedureDetails(id ?? "");
 
   if (loading) {
-    return (
-      <ProcedureDetailsSkeleton />
-    );
+    return <ProcedureDetailsSkeleton />;
   }
 
   if (error) {
-    return (
-      <ProcedureDetailsError
-        message={error}
-      />
-    );
+    return <ProcedureDetailsError message={error} />;
   }
 
   if (!procedure) {
-    return (
-      <ProcedureNotFound />
-    );
+    return <ProcedureNotFound />;
   }
 
   return (
@@ -47,36 +33,15 @@ function ProcedureDetailsPage() {
         id={procedure.id}
         name={procedure.name}
         description={procedure.description}
-        estimatedProcessingTime={
-          procedure.estimatedProcessingTime
-        }
+        estimatedProcessingTime={procedure.estimatedProcessingTime}
       />
 
-      <div
-        className="
-          grid
-          gap-6
-          lg:grid-cols-2
-        "
-      >
-        <RequirementsSection
-          requirements={
-            procedure.requirements
-          }
-        />
-
-        <DocumentsSection
-          documents={
-            procedure.documents
-          }
-        />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <RequirementsSection requirements={procedure.requirements} />
+        <DocumentsSection documents={procedure.documents} />
       </div>
 
-      <InstructionsSection
-        instructions={
-          procedure.instructions
-        }
-      />
+      <InstructionsSection instructions={procedure.instructions} />
     </div>
   );
 }

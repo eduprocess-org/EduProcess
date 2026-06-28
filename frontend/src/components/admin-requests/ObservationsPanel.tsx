@@ -14,21 +14,6 @@ interface Observation {
   createdAt: string;
 }
 
-const tk = {
-  navy:    "#0B2D63",
-  navyMid: "#1A52A8",
-  blue:    "#7EB3FF",
-  blueSoft:"#EFF6FF",
-  border:  "#E2EAF4",
-  bg:      "#F1F5FB",
-  muted:   "#64748B",
-  subtle:  "#94A3B8",
-  ink:     "#0F172A",
-  inkSoft: "#334155",
-  rose:    "#DC2626",
-  white:   "#FFFFFF",
-};
-
 const PANEL_STYLE = `
   @keyframes obs-in {
     from { opacity: 0; transform: translateY(6px); }
@@ -100,53 +85,51 @@ export default function ObservationsPanel({ requestId }: ObservationsPanelProps)
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <MessageSquare size={14} style={{ color: tk.navyMid }} />
-            <p className="text-[10px] font-extrabold uppercase tracking-[.18em]"
-               style={{ color: tk.subtle }}>
+            <MessageSquare size={14} className="text-[#1A52A8] dark:text-blue-400" />
+            <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#94A3B8] dark:text-slate-500">
               Observations
             </p>
             {observations.length > 0 && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                    style={{ background: tk.blueSoft, color: tk.navyMid }}>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#EFF6FF] dark:bg-blue-900/40 text-[#1A52A8] dark:text-blue-300">
                 {observations.length}
               </span>
             )}
           </div>
-          <button onClick={fetchObservations} disabled={isLoading}
-                  className="w-6 h-6 flex items-center justify-center rounded-lg transition-colors hover:bg-slate-100"
-                  style={{ color: tk.subtle }}>
+          <button
+            onClick={fetchObservations}
+            disabled={isLoading}
+            className="w-6 h-6 flex items-center justify-center rounded-lg transition-colors hover:bg-slate-100 dark:hover:bg-gray-700 text-[#94A3B8] dark:text-slate-500"
+          >
             <RefreshCw size={12} className={isLoading ? "animate-spin" : ""} />
           </button>
         </div>
 
         {/* Compose */}
         <form onSubmit={handleSubmit}>
-          <div className="rounded-xl overflow-hidden transition-all"
-               style={{ border: `1px solid ${tk.border}`, background: tk.bg }}>
+          <div className="rounded-xl overflow-hidden border border-[#E2EAF4] dark:border-gray-600 bg-[#F1F5FB] dark:bg-gray-800 transition-all">
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               disabled={isSubmitting}
               placeholder="Write an observation…"
               rows={2}
-              className="obs-textarea w-full p-3 text-sm bg-transparent resize-none"
-              style={{ color: tk.ink }}
+              className="obs-textarea w-full p-3 text-sm bg-transparent resize-none text-[#0F172A] dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none"
               onFocus={(e) => {
                 const wrap = e.currentTarget.closest("div") as HTMLElement;
-                if (wrap) { wrap.style.borderColor = tk.navyMid; wrap.style.boxShadow = `0 0 0 3px rgba(26,82,168,.08)`; }
+                if (wrap) { wrap.style.borderColor = "#1A52A8"; wrap.style.boxShadow = `0 0 0 3px rgba(26,82,168,.08)`; }
               }}
               onBlur={(e) => {
                 const wrap = e.currentTarget.closest("div") as HTMLElement;
-                if (wrap) { wrap.style.borderColor = tk.border; wrap.style.boxShadow = "none"; }
+                if (wrap) { wrap.style.borderColor = ""; wrap.style.boxShadow = "none"; }
               }}
             />
-            <div className="flex justify-end px-2.5 py-2"
-                 style={{ borderTop: `1px solid ${tk.border}` }}>
-              <button type="submit"
-                      disabled={isSubmitting || !comment.trim()}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-[11px] font-bold
-                                 text-white rounded-lg transition-all active:scale-95 disabled:opacity-40"
-                      style={{ background: tk.navyMid, boxShadow: "0 2px 8px rgba(26,82,168,.25)" }}>
+            <div className="flex justify-end px-2.5 py-2 border-t border-[#E2EAF4] dark:border-gray-600">
+              <button
+                type="submit"
+                disabled={isSubmitting || !comment.trim()}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-[11px] font-bold text-white rounded-lg transition-all active:scale-95 disabled:opacity-40 bg-[#1A52A8] dark:bg-blue-700 hover:bg-[#163f85] dark:hover:bg-blue-600"
+                style={{ boxShadow: "0 2px 8px rgba(26,82,168,.25)" }}
+              >
                 <Send size={11} />
                 {isSubmitting ? "Sending…" : "Add Note"}
               </button>
@@ -157,35 +140,32 @@ export default function ObservationsPanel({ requestId }: ObservationsPanelProps)
         {/* List */}
         {isLoading ? (
           <div className="flex justify-center py-6">
-            <RefreshCw size={16} className="animate-spin" style={{ color: tk.subtle }} />
+            <RefreshCw size={16} className="animate-spin text-[#94A3B8] dark:text-slate-500" />
           </div>
         ) : observations.length === 0 ? (
           <div className="flex flex-col items-center gap-1.5 py-6">
-            <MessageSquare size={18} style={{ color: tk.border }} />
-            <p className="text-xs" style={{ color: tk.subtle }}>No observations yet.</p>
+            <MessageSquare size={18} className="text-[#E2EAF4] dark:text-gray-600" />
+            <p className="text-xs text-[#94A3B8] dark:text-slate-500">No observations yet.</p>
           </div>
         ) : (
           <div className="space-y-2 max-h-[280px] overflow-y-auto pr-0.5">
             {observations.map((obs, i) => (
-              <div key={obs.id}
-                   className="obs-entry relative p-3 rounded-xl group"
-                   style={{
-                     background: tk.white,
-                     border: `1px solid ${tk.border}`,
-                     animationDelay: `${i * 40}ms`,
-                   }}>
+              <div
+                key={obs.id}
+                className="obs-entry relative p-3 rounded-xl group bg-white dark:bg-gray-900 border border-[#E2EAF4] dark:border-gray-700"
+                style={{ animationDelay: `${i * 40}ms` }}
+              >
                 {/* Meta row */}
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-extrabold text-white"
-                         style={{ background: tk.navyMid }}>
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-extrabold text-white bg-[#1A52A8] dark:bg-blue-700">
                       {obs.adminName.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-[10px] font-bold" style={{ color: tk.inkSoft }}>
+                    <span className="text-[10px] font-bold text-[#334155] dark:text-slate-300">
                       {obs.adminName}
                     </span>
                   </div>
-                  <span className="text-[10px]" style={{ color: tk.subtle }}>
+                  <span className="text-[10px] text-[#94A3B8] dark:text-slate-500">
                     {new Date(obs.createdAt).toLocaleString("en-US", {
                       month: "short", day: "numeric",
                       hour: "2-digit", minute: "2-digit",
@@ -194,16 +174,16 @@ export default function ObservationsPanel({ requestId }: ObservationsPanelProps)
                 </div>
 
                 {/* Comment */}
-                <p className="text-xs leading-relaxed pr-5" style={{ color: tk.inkSoft }}>
+                <p className="text-xs leading-relaxed pr-5 text-[#334155] dark:text-slate-300">
                   {obs.comment}
                 </p>
 
                 {/* Delete */}
-                <button onClick={() => handleDelete(obs.id)}
-                        disabled={isDeletingId === obs.id}
-                        className="obs-delete absolute top-2.5 right-2.5 w-5 h-5 flex items-center
-                                   justify-center rounded-md transition-colors hover:bg-red-50 disabled:opacity-40"
-                        style={{ color: tk.rose }}>
+                <button
+                  onClick={() => handleDelete(obs.id)}
+                  disabled={isDeletingId === obs.id}
+                  className="obs-delete absolute top-2.5 right-2.5 w-5 h-5 flex items-center justify-center rounded-md transition-colors hover:bg-red-50 dark:hover:bg-red-950/40 text-[#DC2626] dark:text-red-400 disabled:opacity-40"
+                >
                   <Trash2 size={11} />
                 </button>
               </div>

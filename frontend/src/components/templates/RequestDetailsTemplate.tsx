@@ -11,7 +11,7 @@ import ObservationsPanel from "../admin-requests/ObservationsPanel";
 import type { AdminRequestDetail, RequestStatus } from "../../types/admin/adminRequest.types";
 
 interface RequestDetailsTemplateProps {
-  detail: AdminRequestDetail | undefined | null; // ✅ Aceptar undefined
+  detail: AdminRequestDetail | undefined | null;
   documents: any[];
   history: any[];
   loading: boolean;
@@ -53,17 +53,22 @@ export function RequestDetailsTemplate({
   const fullName = `${detail.student.firstName} ${detail.student.lastName}`.trim();
 
   return (
-    <div className="min-h-screen bg-[#F1F5FB] py-8 px-4 md:px-8">
+    <div className="min-h-screen bg-[#F1F5FB] dark:bg-gray-950 py-8 px-4 md:px-8">
       <div className="mx-auto max-w-3xl">
+
+        {/* Back button */}
         <button
           onClick={navigateBack}
-          className="mb-6 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#94A3B8] transition-opacity hover:opacity-60"
+          className="mb-6 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#94A3B8] dark:text-slate-500 transition-opacity hover:opacity-60"
         >
           <ArrowLeft size={12} /> Back to Requests
         </button>
 
-        <div className="overflow-hidden rounded-3xl border border-[#E2EAF4] bg-white shadow-[0_4px_32px_rgba(11,45,99,.08)]">
+        {/* Main card */}
+        <div className="overflow-hidden rounded-3xl border border-[#E2EAF4] dark:border-gray-700 bg-white dark:bg-gray-900 shadow-[0_4px_32px_rgba(11,45,99,.08)] dark:shadow-none">
+          {/* Accent bar */}
           <div className="h-1 w-full bg-gradient-to-r from-[#0B2D63] via-[#1A52A8] to-[#7EB3FF]" />
+
           <div className="p-7 md:p-9">
             <RequestDetailsHeader
               id={detail.id}
@@ -76,8 +81,11 @@ export function RequestDetailsTemplate({
               onApprove={() => initiateStatusTransition("approved")}
               onReject={() => initiateStatusTransition("rejected")}
             />
+
             <Divider />
+
             <div className="grid gap-8 md:grid-cols-5">
+              {/* Left column */}
               <div className="space-y-6 md:col-span-3">
                 <StudentInfoCard
                   fullName={fullName}
@@ -86,37 +94,60 @@ export function RequestDetailsTemplate({
                   semester={detail.semester}
                   reason={detail.reason}
                 />
+
                 <Divider />
+
                 <div className="space-y-3">
-                  <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#94A3B8]">Documents</p>
+                  <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#94A3B8] dark:text-slate-500">
+                    Documents
+                  </p>
                   <DocumentsList documents={documents} />
                 </div>
+
                 <Divider />
+
                 <ObservationsPanel requestId={detail.id} />
+
                 {!isTerminal && (
                   <>
                     <Divider />
                     <div className="space-y-2">
-                      <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#94A3B8]">Reviewer Notes</p>
+                      <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#94A3B8] dark:text-slate-500">
+                        Reviewer Notes
+                      </p>
                       <textarea
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         placeholder="Add an internal justification or note…"
                         rows={3}
-                        className="w-full resize-none rounded-xl border border-[#E2EAF4] bg-[#F1F5FB] p-3.5 text-sm text-[#0F172A] transition-all focus:border-[#1A52A8] focus:shadow-[0_0_0_3px_rgba(26,82,168,.08)] focus:outline-none"
+                        className="
+                          w-full resize-none rounded-xl p-3.5 text-sm
+                          border border-[#E2EAF4] dark:border-gray-600
+                          bg-[#F1F5FB] dark:bg-gray-800
+                          text-[#0F172A] dark:text-slate-200
+                          placeholder:text-slate-400 dark:placeholder:text-slate-500
+                          transition-all focus:outline-none
+                          focus:border-[#1A52A8] dark:focus:border-blue-400
+                          focus:shadow-[0_0_0_3px_rgba(26,82,168,.08)] dark:focus:shadow-[0_0_0_3px_rgba(96,165,250,0.12)]
+                        "
                       />
                     </div>
                   </>
                 )}
               </div>
+
+              {/* Right column — Audit */}
               <div className="md:col-span-2">
-                <p className="mb-4 text-[10px] font-extrabold uppercase tracking-[.18em] text-[#94A3B8]">Audit History</p>
+                <p className="mb-4 text-[10px] font-extrabold uppercase tracking-[.18em] text-[#94A3B8] dark:text-slate-500">
+                  Audit History
+                </p>
                 <AuditHistory history={history} />
               </div>
             </div>
           </div>
         </div>
       </div>
+
       <StatusChangeModal
         isOpen={isConfirmOpen}
         pendingStatus={pendingStatus}
