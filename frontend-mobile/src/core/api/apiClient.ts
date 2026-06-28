@@ -1,8 +1,8 @@
 import axios from "axios";
 import { authStorage } from "../storage/authStorage";
 
-// 1. Configuración de la IP fija para el desarrollo en red local
-const API_BASE_URL = "http://192.168.100.63:3000";
+// @ts-ignore
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.100.63:3000";
 
 export const apiClient = axios.create({
   baseURL: `${API_BASE_URL}/api/v1`,
@@ -11,14 +11,12 @@ export const apiClient = axios.create({
   },
 });
 
-// Callback global para forzar el deslogueo en la navegación móvil cuando expire la sesión
 let onUnauthorizedErrorCallback: (() => void) | null = null;
 
 export const setUnauthorizedCallback = (callback: () => void) => {
   onUnauthorizedErrorCallback = callback;
 };
 
-// 2. Interceptor de Peticiones (Asíncrono para SecureStore)
 apiClient.interceptors.request.use(
   async (config) => {
     // En mobile recuperamos el token desde el almacenamiento seguro
@@ -33,7 +31,6 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Gestión de la cola de refresco
 let isRefreshing = false;
 let failedQueue: Array<{ resolve: (token: string) => void; reject: (error: unknown) => void }> = [];
 
@@ -55,19 +52,16 @@ const handleCleanExit = async () => {
   }
 };
 
-// 3. Interceptor de Respuestas (Manejo del ciclo de vida del Token)
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Caso A: El token expiró pero es renovable
     if (
       error.response?.status === 401 &&
       error.response?.data?.code === "TOKEN_EXPIRED" &&
       !originalRequest._retry
     ) {
-      // Intentamos recuperar el token desde el SecureStore móvil
       const refreshToken = await authStorage.getToken();
 
       if (!refreshToken) {
@@ -95,7 +89,6 @@ apiClient.interceptors.response.use(
         const response = await axios.post(`${API_BASE_URL}/api/v1/auth/refresh`, { refreshToken });
         const { sessionToken: newSessionToken } = response.data.data.tokens;
 
-        // Persistimos el nuevo token obtenido de forma segura
         await authStorage.saveToken(newSessionToken);
 
         processQueue(null, newSessionToken);
@@ -113,7 +106,6 @@ apiClient.interceptors.response.use(
       }
     }
 
-    // Caso B: Escape de seguridad para 401 definitivo (Credenciales inválidas, firma corrupta o usuario inexistente)
     if (error.response?.status === 401 && !originalRequest._retry) {
       console.warn("QA Log: 401 definitivo detectado (No fue por TOKEN_EXPIRED). Forzando limpieza del estado de autenticación.");
       await handleCleanExit();

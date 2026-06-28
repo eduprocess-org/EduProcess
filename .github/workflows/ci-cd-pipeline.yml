@@ -38,13 +38,13 @@ jobs:
         if: steps.filter-mobile.outputs.mobile_files == 'true'
         run: npm ci
 
-      # - name: Verify TypeScript Compilation (Static Quality Check)
-      #  if: steps.filter-mobile.outputs.mobile_files == 'true'
-      #  run: npm run check-types
+      - name: Verify TypeScript Compilation (Static Quality Check)
+        if: steps.filter-mobile.outputs.mobile_files == 'true'
+        run: npm run check-types
 
-      # - name: Expo Production Bundle Verification
-      #  if: steps.filter-mobile.outputs.mobile_files == 'true'
-      #  run: npx expo export --platform android
+      - name: Expo Production Bundle Verification
+        if: steps.filter-mobile.outputs.mobile_files == 'true'
+        run: npx expo export --platform android
 
       - name: Prebuild Native Android Source (Expo Prebuild)
         if: steps.filter-mobile.outputs.mobile_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
