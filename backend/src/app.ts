@@ -5,10 +5,13 @@ import client from 'prom-client';
 import authRouter from './infrastructure/http/routes/auth.routes';
 import procedureRouter from './infrastructure/http/routes/procedure.routes';
 import careerRouter from './infrastructure/http/routes/career.routes';
-import adminDashboardRouter from './infrastructure/http/routes/admin-dashboard.routes';
+import adminDashboardRouter from './infrastructure/http/routes/admin/dashboard.routes';
+import adminProcedureRouter from './infrastructure/http/routes/admin/procedure.routes';
 import observationRouter from './infrastructure/http/routes/observation.routes';
+import { initializeWebSocket } from './infrastructure/websocket/init';
 
 const app: Application = express();
+const { httpServer } = initializeWebSocket(app);
 
 app.use(express.json());
 app.use(cors());
@@ -38,6 +41,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1', procedureRouter);
 app.use('/api/v1', careerRouter);
 app.use('/api/v1', adminDashboardRouter);
+app.use('/api/v1', adminProcedureRouter);
 app.use('/api/v1', observationRouter);
 
 app.get('/api/v1/metrics', async (req: Request, res: Response) => {
@@ -57,7 +61,7 @@ export default app;
 
 if (require.main === module) {
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
     });
 }

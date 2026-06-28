@@ -44,10 +44,10 @@ function StudentDashboardPage() {
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
             My Requests Dashboard
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Track all your submitted procedure requests.
           </p>
         </div>
@@ -56,9 +56,9 @@ function StudentDashboardPage() {
           onClick={() => navigate("/procedures")}
           className="
             inline-flex items-center gap-2
-            rounded-xl bg-[#0B2D63]
+            rounded-xl bg-[#0B2D63] dark:bg-blue-700
             px-4 py-2.5 text-sm font-medium text-white
-            transition hover:bg-[#09224E] active:scale-[0.98]
+            transition hover:bg-[#09224E] dark:hover:bg-blue-600 active:scale-[0.98]
           "
         >
           <Plus size={15} />

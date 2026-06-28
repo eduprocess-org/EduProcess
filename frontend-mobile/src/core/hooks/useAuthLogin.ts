@@ -14,7 +14,8 @@ interface UseAuthLoginReturn {
   isLoading: boolean;
 }
 
-export const useAuthLogin = (onNavigate: (role: string) => void): UseAuthLoginReturn => {
+// Simplificamos la firma: removemos el callback onNavigate de la Web ya que App.tsx enruta por estado
+export const useAuthLogin = (onSuccessCallback?: () => void): UseAuthLoginReturn => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { login: contextLogin } = useAuth();
 
@@ -31,24 +32,26 @@ export const useAuthLogin = (onNavigate: (role: string) => void): UseAuthLoginRe
     try {
       setIsLoading(true);
 
-      // 1. Petición HTTP al backend mediante tu apiClient de Axios
+      // 1. Petición HTTP al backend mediante tu apiLogin
       const response = await apiLogin(data);
 
-      // 2. Guardar el usuario y el token de sesión en el estado global (Contexto)
-      contextLogin(response.data.user, response.data.tokens.sessionToken);
+      // CORRECCIÓN: Si response.data ya es { user, tokens }, desestructuramos directamente de ahí:
+      const { user, tokens } = response.data; 
+      const { sessionToken, refreshToken } = tokens;
 
-      // 3. Persistir el refresh token de forma segura para la reconstrucción de sesión
-      await authStorage.saveToken(response.data.tokens.refreshToken);
+      // 2. Persistir de forma segura el token de acceso para las firmas de Axios
+      await authStorage.saveToken(sessionToken);
 
-      Alert.alert("Success", "Welcome back! Loading system...");
-      
-      // 4. Ejecutar el callback de navegación según el rol retornado
-      onNavigate(response.data.user.role);
+      // 3. Cargar el usuario y el token de acceso en el estado de autenticación global
+      contextLogin(user, sessionToken);
+
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
 
     } catch (error: any) {
-      console.error(error);
+      console.error("QA Login Error Details:", error);
 
-      // Manejo de errores idéntico a tu lógica original de React web
       if (error.response?.status === 401) {
         Alert.alert("Authentication Failed", "Invalid email or password");
       } else if (error.response?.status === 400) {

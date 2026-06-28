@@ -7,9 +7,11 @@ export default function RequestManagementPage() {
   const ui = useRequestManagementUI();
 
   return (
-    <RequestManagementTemplate
-      {...ui}
-      onViewRequest={(id) => navigate(`/admin/requests/${id}`)}
-    />
+    <div className="dark:[color-scheme:dark]">
+      <RequestManagementTemplate
+        {...ui}
+        onViewRequest={(id) => navigate(`/admin/requests/${id}`)}
+      />
+    </div>
   );
 }

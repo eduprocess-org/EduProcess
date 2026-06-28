@@ -1,9 +1,9 @@
-import { prisma } from '../database.config';
+import { prisma } from '../../database.config';
 import {
     AuthRepository,
     CreateStudentAccountInput,
-} from '../../../domain/auth/auth.repository';
-import { AuthUserDTO, UserModel } from '../../../domain/auth/auth.types';
+} from '../../../../domain/auth/auth.repository';
+import { AuthUserDTO, UserModel } from '../../../../domain/auth/auth.types';
 
 export class PrismaAuthRepository implements AuthRepository {
     async findByEmail(email: string): Promise<UserModel | null> {

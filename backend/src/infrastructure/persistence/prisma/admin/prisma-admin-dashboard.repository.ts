@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { prisma } from "../../database.config";
+import { prisma, pool } from "../../database.config";
 import { AdminDashboardRepository } from "../../../../domain/admin/admin.repository";
 import {
   DashboardStatsDTO,
@@ -15,74 +15,57 @@ import {
   AdminRequestHistoryEntry,
 } from "../../../../domain/admin/admin.types";
 
-function isValidUUID(value: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
-}
-
 export class PrismaAdminDashboardRepository implements AdminDashboardRepository {
   async getDashboardStats(): Promise<DashboardStatsDTO> {
-    const [totalRequests, pendingRequests, approvedRequests, rejectedRequests] =
-      await Promise.all([
-        prisma.procedureRequest.count(),
-        prisma.procedureRequest.count({ where: { status: "pending" } }),
-        prisma.procedureRequest.count({ where: { status: "approved" } }),
-        prisma.procedureRequest.count({ where: { status: "rejected" } }),
-      ]);
+    const result = await pool.query(`
+      SELECT
+        COUNT(*)::int AS "totalRequests",
+        COUNT(*) FILTER (WHERE status = 'pending')::int AS "pendingRequests",
+        COUNT(*) FILTER (WHERE status = 'approved')::int AS "approvedRequests",
+        COUNT(*) FILTER (WHERE status = 'rejected')::int AS "rejectedRequests"
+      FROM "ProcedureRequest"
+    `);
 
-    return {
-      totalRequests,
-      pendingRequests,
-      approvedRequests,
-      rejectedRequests,
-    };
+    return result.rows[0];
   }
 
   async getRecentRequests(): Promise<RecentRequestDTO[]> {
-    const requests = await prisma.procedureRequest.findMany({
-      take: 10,
-      orderBy: { createdAt: "desc" },
-      include: {
-        student: {
-          select: { firstName: true, lastName: true },
-        },
-        procedureType: {
-          select: { name: true },
-        },
-      },
-    });
+    const result = await pool.query(`
+      SELECT
+        pr.id,
+        u."firstName" || ' ' || u."lastName" AS "studentName",
+        pt.name AS "procedureName",
+        pr.status,
+        pr."createdAt"
+      FROM "ProcedureRequest" pr
+      JOIN "User" u ON pr."studentId" = u.id
+      JOIN "ProcedureType" pt ON pr."procedureTypeId" = pt.id
+      ORDER BY pr."createdAt" DESC
+      LIMIT 10
+    `);
 
-    return requests.map((req: any) => ({
+    return result.rows.map((req: any) => ({
       id: req.id,
-      studentName: `${req.student.firstName} ${req.student.lastName}`,
-      procedureName: req.procedureType.name,
+      studentName: req.studentName,
+      procedureName: req.procedureName,
       status: req.status.toUpperCase() as "PENDING" | "APPROVED" | "REJECTED",
       createdAt: req.createdAt.toISOString(),
     }));
   }
 
   async getRequestsByProcedureType(): Promise<RequestsByProcedureTypeDTO[]> {
-    const results: any[] = await prisma.procedureRequest.groupBy({
-      by: ["procedureTypeId"],
-      _count: { id: true },
-      orderBy: { _count: { id: "desc" } },
-    });
+    const result = await pool.query(`
+      SELECT
+        pr."procedureTypeId",
+        pt.name AS "procedureName",
+        COUNT(*)::int AS count
+      FROM "ProcedureRequest" pr
+      JOIN "ProcedureType" pt ON pr."procedureTypeId" = pt.id
+      GROUP BY pr."procedureTypeId", pt.name
+      ORDER BY count DESC
+    `);
 
-    const procedureTypeIds = results.map((r: any) => r.procedureTypeId);
-
-    const procedureTypes: any[] = await prisma.procedureType.findMany({
-      where: { id: { in: procedureTypeIds } },
-      select: { id: true, name: true },
-    });
-
-    const procedureTypeMap = new Map(
-      procedureTypes.map((pt: any) => [pt.id, pt.name])
-    );
-
-    return results.map((result: any) => ({
-      procedureTypeId: result.procedureTypeId,
-      procedureName: procedureTypeMap.get(result.procedureTypeId) ?? "Unknown",
-      count: result._count.id,
-    }));
+    return result.rows;
   }
 
   async getAllRequests(
@@ -90,52 +73,91 @@ export class PrismaAdminDashboardRepository implements AdminDashboardRepository 
     pagination: AdminRequestPagination,
     sort: AdminRequestSort
   ): Promise<PaginatedResult<AdminRequestListItem>> {
-    const where: any = {};
+    const conditions: string[] = [];
+    const params: any[] = [];
+    let paramIndex = 1;
 
     if (filters.status) {
-      where.status = filters.status;
+      conditions.push(`pr.status = $${paramIndex}`);
+      params.push(filters.status);
+      paramIndex++;
     }
-    if (filters.procedureTypeId && isValidUUID(filters.procedureTypeId)) {
-      where.procedureTypeId = filters.procedureTypeId;
+
+    if (filters.procedureTypeId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(filters.procedureTypeId)) {
+      conditions.push(`pr."procedureTypeId" = $${paramIndex}`);
+      params.push(filters.procedureTypeId);
+      paramIndex++;
     }
+
     if (filters.career) {
-      where.career = filters.career;
+      conditions.push(`pr.career = $${paramIndex}`);
+      params.push(filters.career);
+      paramIndex++;
     }
+
     if (filters.search) {
-      where.OR = [
-        { student: { firstName: { contains: filters.search, mode: "insensitive" } } },
-        { student: { lastName: { contains: filters.search, mode: "insensitive" } } },
-        { student: { email: { contains: filters.search, mode: "insensitive" } } },
-        { procedureType: { name: { contains: filters.search, mode: "insensitive" } } },
-      ];
+      conditions.push(`(
+        u."firstName" ILIKE $${paramIndex} OR
+        u."lastName" ILIKE $${paramIndex} OR
+        u.email ILIKE $${paramIndex} OR
+        pt.name ILIKE $${paramIndex}
+      )`);
+      params.push(`%${filters.search}%`);
+      paramIndex++;
     }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    const allowedSortFields: Record<string, string> = {
+      createdAt: 'pr."createdAt"',
+      updatedAt: 'pr."updatedAt"',
+      status: 'pr.status',
+    };
+    const sortField = allowedSortFields[sort.field] || 'pr."createdAt"';
+    const sortDirection = sort.direction === 'asc' ? 'ASC' : 'DESC';
 
     const skip = (pagination.page - 1) * pagination.limit;
 
-    const [requests, total] = await Promise.all([
-      prisma.procedureRequest.findMany({
-        where,
-        skip,
-        take: pagination.limit,
-        orderBy: { [sort.field]: sort.direction },
-        include: {
-          student: {
-            select: { firstName: true, lastName: true, email: true },
-          },
-          procedureType: {
-            select: { name: true },
-          },
-        },
-      }),
-      prisma.procedureRequest.count({ where }),
+    const countQuery = `
+      SELECT COUNT(*)::int AS total
+      FROM "ProcedureRequest" pr
+      JOIN "User" u ON pr."studentId" = u.id
+      JOIN "ProcedureType" pt ON pr."procedureTypeId" = pt.id
+      ${whereClause}
+    `;
+
+    const dataQuery = `
+      SELECT
+        pr.id,
+        u."firstName" || ' ' || u."lastName" AS "studentName",
+        u.email AS "studentEmail",
+        pt.name AS "procedureName",
+        pr.career,
+        pr.semester,
+        pr.status,
+        pr."createdAt",
+        pr."updatedAt"
+      FROM "ProcedureRequest" pr
+      JOIN "User" u ON pr."studentId" = u.id
+      JOIN "ProcedureType" pt ON pr."procedureTypeId" = pt.id
+      ${whereClause}
+      ORDER BY ${sortField} ${sortDirection}
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+    `;
+
+    const [countResult, dataResult] = await Promise.all([
+      pool.query(countQuery, params),
+      pool.query(dataQuery, [...params, pagination.limit, skip]),
     ]);
 
+    const total = countResult.rows[0].total;
+
     return {
-      data: requests.map((req: any) => ({
+      data: dataResult.rows.map((req: any) => ({
         id: req.id,
-        studentName: `${req.student.firstName} ${req.student.lastName}`,
-        studentEmail: req.student.email,
-        procedureName: req.procedureType.name,
+        studentName: req.studentName,
+        studentEmail: req.studentEmail,
+        procedureName: req.procedureName,
         career: req.career,
         semester: req.semester,
         status: req.status,
