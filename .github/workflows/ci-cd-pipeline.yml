@@ -44,7 +44,7 @@ jobs:
 
       - name: Expo Production Bundle Verification
         if: steps.filter-mobile.outputs.mobile_files == 'true'
-        run: npx expo export --platform android
+        run: npx expo export --platform android --clear
 
       - name: Prebuild Native Android Source (Expo Prebuild)
         if: steps.filter-mobile.outputs.mobile_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
@@ -59,7 +59,7 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug -PminifyEnabled=false
 
       - name: Upload Mobile APK Artifact to GitHub
         if: steps.filter-mobile.outputs.mobile_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
