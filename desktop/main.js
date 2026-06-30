@@ -13,6 +13,7 @@ function createMainWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      session: require('electron').session.fromPartition('persist:eduprocess-session')
     },
   });
 
