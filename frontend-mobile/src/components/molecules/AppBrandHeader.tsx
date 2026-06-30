@@ -7,7 +7,7 @@ export function AppBrandHeader() {
     <View style={styles.brandContainer}>
       <View style={styles.logoWrapper}>
         <Image 
-          source={require('../../../assets/Logo.jpeg')}
+          source={require('../../../assets/Logo.png')}
           style={styles.logoImage}
           resizeMode="contain"
         />

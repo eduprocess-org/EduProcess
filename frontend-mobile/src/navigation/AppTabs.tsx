@@ -5,14 +5,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LayoutDashboard, FileText, Search, Bell, LogOut } from 'lucide-react-native';
 import { COLORS } from '../core/theme/colors';
 
-// 🚀 Importaciones añadidas de marca y sesión global
 import { AppBrandHeader } from '../components/molecules/AppBrandHeader'; 
 import { useAuth } from '../core/context/AuthContext';
 
-// 🚀 Tu página real
 import StudentDashboardPage from '../components/pages/DashboardPage';
 
-// 🚧 Mocks temporales para pruebas de QA
 function ProceduresCatalogPage() {
   return (
     <View style={styles.center}>
@@ -41,17 +38,16 @@ const Tab = createBottomTabNavigator();
 
 export default function AppTabs() {
   const insets = useSafeAreaInsets();
-  const { logout } = useAuth(); // 🚀 Consumo del estado global de cierre de sesión
+  const { logout } = useAuth();
 
-  // 🎨 Identidad visual EduProcess (Paleta UCE)
-  const ACTIVE_COLOR = '#0B2D63';         // Azul institucional
-  const ACTIVE_BG = 'rgba(11, 45, 99, 0.1)'; // Fondo sutil para la píldora activa
-  const BADGE_COLOR = '#EF4444';          // Rojo para las alertas académicas
+  const ACTIVE_COLOR = '#0B2D63';         
+  const ACTIVE_BG = 'rgba(11, 45, 99, 0.1)'; 
+  const BADGE_COLOR = '#EF4444';          
 
   return (
     <Tab.Navigator
+      id = "AppTabs"
       screenOptions={{
-        // 🚀 HEADER GLOBAL COMPARTIDO: Visible en cada pestaña
         headerShown: true,
         headerTitle: () => <AppBrandHeader />,
         headerTitleAlign: 'left',
@@ -69,8 +65,8 @@ export default function AppTabs() {
           backgroundColor: '#ffffff',
           borderBottomWidth: 1,
           borderBottomColor: COLORS.border,
-          elevation: 0,      // Elimina línea de sombra dura en Android
-          shadowOpacity: 0,  // Elimina línea de sombra dura en iOS
+          elevation: 0,    
+          shadowOpacity: 0,  
         },
         headerLeftContainerStyle: {
           paddingLeft: 20,
@@ -78,8 +74,8 @@ export default function AppTabs() {
         headerRightContainerStyle: {
           paddingRight: 20,
         },
-        tabBarActiveTintColor: '#0B2D63',     // Texto azul al estar activo
-        tabBarInactiveTintColor: '#64748b',   // Gris para las pestañas inactivas
+        tabBarActiveTintColor: '#0B2D63',   
+        tabBarInactiveTintColor: '#64748b',   
         tabBarLabelStyle: styles.tabLabel,
         tabBarStyle: {
           backgroundColor: '#ffffff',
@@ -92,7 +88,6 @@ export default function AppTabs() {
         },
       }}
     >
-      {/* 📊 Pestaña 1: Dashboard */}
       <Tab.Screen 
         name="Dashboard" 
         component={StudentDashboardPage} 
@@ -106,7 +101,6 @@ export default function AppTabs() {
         }}
       />
 
-      {/* 📄 Pestaña 2: Trámites */}
       <Tab.Screen 
         name="Procedures" 
         component={ProceduresCatalogPage} 
@@ -120,7 +114,6 @@ export default function AppTabs() {
         }}
       />
 
-      {/* 🔍 Pestaña 3: Búsqueda */}
       <Tab.Screen 
         name="Search" 
         component={SearchProceduresPage} 
@@ -134,7 +127,6 @@ export default function AppTabs() {
         }}
       />
 
-      {/* 🔔 Pestaña 4: Notificaciones */}
       <Tab.Screen 
         name="Notifications" 
         component={NotificationsPage} 

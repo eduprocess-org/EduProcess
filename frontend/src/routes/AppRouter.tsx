@@ -1,4 +1,3 @@
-// src/routes/AppRouter.tsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import AuthLayout from "../layouts/AuthLayout";
@@ -24,6 +23,7 @@ import { useAuth } from "../hooks/useAuth";
 import ProceduresManagementPage from "../pages/admin/procedures/ProceduresManagementPage";
 import ProcedureCreationPage from "../pages/admin/procedures/ProcedureCreationPage";
 import ProcedureEditPage from "../pages/admin/procedures/ProcedureEditPage";
+import AdminProcedureDetailsPage from "../pages/admin/procedures/ProcedureDetailsPage"; 
 
 function RoleBasedRedirect() {
   const { user } = useAuth(); 
@@ -114,6 +114,7 @@ function AppRouter() {
           <Route path="procedures" element={<ProceduresManagementPage />} />
           <Route path="procedures/create" element={<ProcedureCreationPage />} />
           <Route path="procedures/edit/:id" element={<ProcedureEditPage />} />
+          <Route path="procedures/view/:id" element={<AdminProcedureDetailsPage />} />
         </Route>
 
         {/* ================= FALLBACK ================= */}

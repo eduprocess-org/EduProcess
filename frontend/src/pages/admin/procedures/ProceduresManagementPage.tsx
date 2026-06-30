@@ -34,6 +34,7 @@ function ProceduresManagementPage() {
   }
 
   const isEmpty = procedures.length === 0;
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-6 py-8 transition-colors duration-200">
       <div className="mx-auto max-w-7xl space-y-7">

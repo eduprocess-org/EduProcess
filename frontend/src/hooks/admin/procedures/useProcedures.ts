@@ -12,7 +12,18 @@ export function useProcedures() {
 
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  // Efecto para aplicar el debounce a la búsqueda
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1); // Reiniciar a la página 1 al buscar
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [search]);
 
   const fetchProcedures = useCallback(async () => {
     setIsLoading(true);
@@ -20,7 +31,7 @@ export function useProcedures() {
       const response = await adminProceduresApi.getAll({
         page,
         limit: PAGE_SIZE,
-        search: search.trim() || undefined,
+        search: debouncedSearch.trim() || undefined,
         sortBy: "name",
         order: sortOrder,
       });
@@ -32,7 +43,7 @@ export function useProcedures() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, search, sortOrder]);
+  }, [page, debouncedSearch, sortOrder]);
 
   useEffect(() => {
     fetchProcedures();

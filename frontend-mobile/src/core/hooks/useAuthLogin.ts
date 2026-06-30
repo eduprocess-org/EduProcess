@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm, Control, UseFormHandleSubmit } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert } from 'react-native';
-import { login as apiLogin } from '../services/authService'; 
+import { login as apiLogin } from '../services/authService';
 import { authStorage } from '../storage/authStorage';
 import { loginSchema, LoginFormData } from '../utils/validators';
 import { useAuth } from '../context/AuthContext';
@@ -33,10 +33,9 @@ export const useAuthLogin = (onSuccessCallback?: () => void): UseAuthLoginReturn
       setIsLoading(true);
 
       // 1. Petición HTTP al backend mediante tu apiLogin
-      const response = await apiLogin(data);
-
+      const response = await apiLogin(data as any);
       // CORRECCIÓN: Si response.data ya es { user, tokens }, desestructuramos directamente de ahí:
-      const { user, tokens } = response.data; 
+      const { user, tokens } = response.data;
       const { sessionToken, refreshToken } = tokens;
 
       // 2. Persistir de forma segura el token de acceso para las firmas de Axios
@@ -58,7 +57,7 @@ export const useAuthLogin = (onSuccessCallback?: () => void): UseAuthLoginReturn
         Alert.alert("Bad Request", error.response.data.message || "Bad request parameters");
       } else {
         Alert.alert(
-          "Connection Error", 
+          "Connection Error",
           "Unable to connect to server. Please check your internet connection and backend IP configurations."
         );
       }

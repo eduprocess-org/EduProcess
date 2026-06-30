@@ -106,4 +106,9 @@ export const adminProceduresApi = {
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/admin/procedures/${id}`);
   },
+
+  toggleStatus: async (id: string, isActive: boolean): Promise<ProcedureDetail> => {
+    const { data } = await apiClient.patch(`/admin/procedures/${id}/status`, { isActive });
+    return data.data;
+  },
 };

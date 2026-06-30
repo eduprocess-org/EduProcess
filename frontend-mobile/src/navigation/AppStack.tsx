@@ -16,6 +16,7 @@ const Stack = createNativeStackNavigator<AppStackParamList>();
 export default function AppStack() {
   return (
     <Stack.Navigator 
+      id = "AppStack"
       screenOptions={{ 
         headerShown: false, // Ocultamos para que no se duplique con los headers de las pestañas
         animation: 'slide_from_right' 

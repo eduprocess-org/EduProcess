@@ -1,0 +1,36 @@
+{
+  "name": "desktop",
+  "version": "1.0.0",
+  "description": "Desktop wrapper for EduProcess",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "build": {
+    "appId": "com.eduprocess.management",
+    "productName": "EduProcess",
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      ".env"
+    ],
+    "extraResources": [
+      ".env"
+    ]
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "electron": "^42.5.1",
+    "electron-builder": "^26.15.3"
+  }
+}
