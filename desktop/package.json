@@ -19,7 +19,11 @@
     },
     "files": [
       "main.js",
-      "package.json"
+      "package.json",
+      ".env"
+    ],
+    "extraResources": [
+      ".env"
     ]
   },
   "dependencies": {
