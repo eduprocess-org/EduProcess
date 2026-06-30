@@ -80,8 +80,8 @@ services:
       - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/ 
       - GF_SERVER_SERVE_FROM_SUB_PATH=true                                            
     volumes:
-      - grafana-prod-data:/var/lib/grafana                                                 
-      - ./grafana-datasources.prod.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+      - grafana-prod-data:/var/lib/grafana                                                                                
+      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
       - ./grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro
       - ./dashboards/eduprocess_metrics.json:/var/lib/grafana/dashboards/eduprocess_metrics.json:ro
     networks:
