@@ -29,6 +29,11 @@ function createMainWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+
+  mainWindow.webContents.on('render-process-gone', (event, details) => {
+  console.error(`El proceso de renderizado falló: ${details.reason}`);
+  mainWindow.reload();
+});
 }
 
 app.whenReady().then(createMainWindow);
