@@ -1,5 +1,4 @@
 import {
-  Bell,
   CircleUser,
   Menu,
 } from "lucide-react";
@@ -66,14 +65,6 @@ function Navbar({
 
       {/* RIGHT */}
       <div className="flex items-center gap-5">
-        <button className="relative">
-          <Bell
-            size={20}
-            className="text-slate-600 dark:text-slate-300"
-          />
-
-          <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
-        </button>
 
         <ThemeToggle />
 

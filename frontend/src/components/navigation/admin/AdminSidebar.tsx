@@ -2,11 +2,15 @@ import {
   LayoutDashboard,
   FileText,
   ClipboardList,
+  Bell,
   LogOut,
 } from "lucide-react";
 
 import { useNavigate, useLocation } from "react-router-dom";
+
 import { useAuth } from "../../../hooks/useAuth";
+import { useNotifications } from "../../../hooks/notification/useNotifications";
+
 import logo from "../../../assets/images/Logo.jpeg";
 
 interface Props {
@@ -16,11 +20,18 @@ interface Props {
 function AdminSidebar({ isCollapsed }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
+
   const { logout } = useAuth();
+
+  const { data: notifications = [] } = useNotifications();
+
+  const unreadCount = notifications.filter(
+    (notification) => !notification.read
+  ).length;
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    navigate("/login", { replace: true });
   };
 
   const menuItems = [
@@ -33,6 +44,12 @@ function AdminSidebar({ isCollapsed }: Props) {
       label: "Requests",
       icon: ClipboardList,
       path: "/admin/requests",
+    },
+    {
+      label: "Notifications",
+      icon: Bell,
+      path: "/admin/notifications",
+      badge: unreadCount,
     },
     {
       label: "Procedures",
@@ -64,7 +81,8 @@ function AdminSidebar({ isCollapsed }: Props) {
             isCollapsed ? "justify-center" : "gap-4"
           }`}
         >
-          <div className="bg-white dark:bg-slate-900 rounded-xl p-2 flex items-center justify-center w-12 h-12 flex-shrink-0 border border-transparent dark:border-slate-700">            <img
+          <div className="bg-white dark:bg-slate-900 rounded-xl p-2 flex items-center justify-center w-12 h-12 flex-shrink-0 border border-transparent dark:border-slate-700">
+            <img
               src={logo}
               alt="EduProcess"
               className="w-full h-full object-contain"
@@ -90,23 +108,66 @@ function AdminSidebar({ isCollapsed }: Props) {
         <div className="space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+
+            const isActive =
+              location.pathname === item.path ||
+              location.pathname.startsWith(`${item.path}/`);
 
             return (
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className={`flex w-full items-center px-4 py-3 rounded-xl transition-all duration-200 ${
-                  isCollapsed ? "justify-center" : "gap-3"
-                } ${
-                  isActive
-                  ? "bg-white/10 dark:bg-slate-800 border border-white/10 dark:border-slate-700 text-white"
-                  : "text-slate-200 dark:text-slate-300 hover:bg-white/10 dark:hover:bg-slate-800"
-                }`}
+                className={`
+                  flex
+                  w-full
+                  items-center
+                  px-4
+                  py-3
+                  rounded-xl
+                  transition-all
+                  duration-200
+                  ${
+                    isCollapsed
+                      ? "justify-center"
+                      : "gap-3"
+                  }
+                  ${
+                    isActive
+                      ? "bg-white/10 dark:bg-slate-800 border border-white/10 dark:border-slate-700 text-white"
+                      : "text-slate-200 dark:text-slate-300 hover:bg-white/10 dark:hover:bg-slate-800"
+                  }
+                `}
               >
                 <Icon size={20} />
 
-                {!isCollapsed && <span>{item.label}</span>}
+                {!isCollapsed && (
+                  <>
+                    <span className="flex-1 text-left">
+                      {item.label}
+                    </span>
+
+                    {item.badge !== undefined &&
+                      item.badge > 0 && (
+                        <span
+                          className="
+                            flex
+                            h-6
+                            min-w-6
+                            items-center
+                            justify-center
+                            rounded-full
+                            bg-red-500
+                            px-2
+                            text-xs
+                            font-semibold
+                            text-white
+                          "
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                  </>
+                )}
               </button>
             );
           })}
@@ -117,9 +178,20 @@ function AdminSidebar({ isCollapsed }: Props) {
       <div className="p-4 border-t border-white/10 dark:border-slate-700 flex-shrink-0">
         <button
           onClick={handleLogout}
-          className={`w-full flex items-center px-4 py-3 rounded-xl text-red-300 hover:bg-red-500/20 hover:text-red-200 transition-all duration-200 ${
-            isCollapsed ? "justify-center" : "gap-3"
-          }`}
+          className={`
+            w-full
+            flex
+            items-center
+            px-4
+            py-3
+            rounded-xl
+            text-red-300
+            hover:bg-red-500/20
+            hover:text-red-200
+            transition-all
+            duration-200
+            ${isCollapsed ? "justify-center" : "gap-3"}
+          `}
         >
           <LogOut size={20} />
 

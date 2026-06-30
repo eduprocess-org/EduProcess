@@ -24,6 +24,7 @@ import ProceduresManagementPage from "../pages/admin/procedures/ProceduresManage
 import ProcedureCreationPage from "../pages/admin/procedures/ProcedureCreationPage";
 import ProcedureEditPage from "../pages/admin/procedures/ProcedureEditPage";
 import AdminProcedureDetailsPage from "../pages/admin/procedures/ProcedureDetailsPage"; 
+import NotificationsPage from "../pages/common/notification/NotificationPage";
 
 function RoleBasedRedirect() {
   const { user } = useAuth(); 
@@ -83,6 +84,11 @@ function AppRouter() {
 
           <Route path="requests" element={<RequestTrackingPage />} /> 
 
+          <Route
+              path="notifications"
+              element={<NotificationsPage />}
+          />
+
           <Route path="procedures" element={<ProceduresCatalogPage />} />
 
           <Route path="procedures/:id" element={<ProcedureDetailsPage />} />
@@ -108,7 +114,10 @@ function AppRouter() {
           }
         >
           <Route index element={<AdminDashboardPage />} />
-
+          <Route
+              path="notifications"
+              element={<NotificationsPage />}
+          />
           <Route path="requests" element={<RequestManagementPage />} />
           <Route path="requests/:id" element={<RequestDetailsPage />} />
           <Route path="procedures" element={<ProceduresManagementPage />} />
