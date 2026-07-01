@@ -5,17 +5,13 @@ const delay = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 export const notificationService = {
-
-  async getNotifications(userId: string): Promise<Notification[]> {
+  async getNotifications(): Promise<Notification[]> {
     await delay(500);
 
-    const notifications = mockNotifications.filter(
-      (notification) => notification.userId === userId
-    );
-
-    return structuredClone(notifications);
+    return mockNotifications.map((notification) => ({
+      ...notification,
+    }));
   },
-
 
   async markAsRead(id: string): Promise<Notification> {
     await delay(300);
@@ -30,29 +26,22 @@ export const notificationService = {
 
     notification.read = true;
 
-    return structuredClone(notification);
+    return { ...notification };
   },
 
-
-  async markAllAsRead(userId: string): Promise<void> {
+  async markAllAsRead(): Promise<void> {
     await delay(300);
 
     mockNotifications.forEach((notification) => {
-      if (notification.userId === userId) {
-        notification.read = true;
-      }
+      notification.read = true;
     });
   },
 
-
-  async getUnreadNotifications(userId: string): Promise<Notification[]> {
+  async getUnreadNotifications(): Promise<Notification[]> {
     await delay(300);
 
-    const notifications = mockNotifications.filter(
-      (notification) =>
-        notification.userId === userId && !notification.read
-    );
-
-    return structuredClone(notifications);
+    return mockNotifications
+      .filter((notification) => !notification.read)
+      .map((notification) => ({ ...notification }));
   },
 };

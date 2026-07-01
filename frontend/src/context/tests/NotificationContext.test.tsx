@@ -1,7 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
-import { vi } from "vitest";
+import { vi, describe, it, expect, beforeEach } from "vitest";
 
-// ✅ MOCK SIN VARIABLES EXTERNAS (IMPORTANTE)
 vi.mock("../../services/api/apiClient", () => ({
   apiClient: {
     get: vi.fn(),
@@ -9,7 +8,6 @@ vi.mock("../../services/api/apiClient", () => ({
   },
 }));
 
-// 🔥 IMPORT DESPUÉS DEL MOCK
 import { apiClient } from "../../services/api/apiClient";
 import { NotificationProvider, useNotifications } from "../NotificationContext";
 
@@ -22,7 +20,6 @@ describe("NotificationContext", () => {
     vi.clearAllMocks();
   });
 
-  // 🧪 1. FETCH
   it("loads notifications correctly", async () => {
     (apiClient.get as any).mockResolvedValue({
       data: [
@@ -46,7 +43,6 @@ describe("NotificationContext", () => {
     expect(result.current.notifications.length).toBe(1);
   });
 
-  // 🧪 2. MARK AS READ
   it("marks as read", async () => {
     (apiClient.patch as any).mockResolvedValue({});
 
@@ -59,7 +55,6 @@ describe("NotificationContext", () => {
     expect(apiClient.patch).toHaveBeenCalled();
   });
 
-  // 🧪 3. MARK ALL
   it("marks all as read", async () => {
     (apiClient.patch as any).mockResolvedValue({});
 
@@ -72,7 +67,6 @@ describe("NotificationContext", () => {
     expect(apiClient.patch).toHaveBeenCalled();
   });
 
-  // 🧪 4. ERROR
   it("handles error", async () => {
     (apiClient.get as any).mockRejectedValue(new Error("fail"));
 

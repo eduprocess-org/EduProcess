@@ -1,17 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-
-import { useAuth } from "../useAuth";
 import { notificationService } from "../../services/notification/notificationService";
 
 export function useNotifications() {
-  const { user } = useAuth();
-
   return useQuery({
-    queryKey: ["notifications", user?.id],
+    queryKey: ["notifications"],
 
-    queryFn: () => notificationService.getNotifications(user!.id),
-
-    enabled: !!user,
+    queryFn: () => notificationService.getNotifications(),
 
     staleTime: 1000 * 60,
 
