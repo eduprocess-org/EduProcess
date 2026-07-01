@@ -10,9 +10,8 @@ import NotificationLoading from "../../../components/notification/NotificationLo
 
 import { useNotifications } from "../../../hooks/notification/useNotifications";
 import { useMarkAsRead } from "../../../hooks/notification/useMarkAsRead";
+import { useMarkAllAsRead } from "../../../hooks/notification/useMarkAllAsRead";
 import { useAuth } from "../../../hooks/useAuth";
-
-import { notificationService } from "../../../services/notification/notificationService";
 
 import { groupNotifications } from "../../../utils/notification";
 
@@ -35,6 +34,7 @@ export default function NotificationsPage() {
   } = useNotifications();
 
   const markAsRead = useMarkAsRead();
+  const markAllAsRead = useMarkAllAsRead();
 
   const filteredNotifications = useMemo(() => {
     switch (filter) {
@@ -77,11 +77,7 @@ export default function NotificationsPage() {
   };
 
   const handleMarkAllAsRead = async () => {
-    if (!user) return;
-
-    await notificationService.markAllAsRead(user.id);
-
-    refetch();
+    await markAllAsRead.mutateAsync();
   };
 
   if (isLoading) {
@@ -94,15 +90,11 @@ export default function NotificationsPage() {
 
   return (
     <section className="mx-auto max-w-5xl space-y-6 p-6">
-
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
         <div className="flex items-center gap-3">
-
           <Bell className="h-8 w-8 text-blue-600" />
 
           <div>
-
             <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
               Notification Center
             </h1>
@@ -111,13 +103,10 @@ export default function NotificationsPage() {
               {unreadCount} unread notification
               {unreadCount !== 1 && "s"}
             </p>
-
           </div>
-
         </div>
 
         <div className="flex flex-wrap gap-3">
-
           <NotificationFilters
             value={filter}
             onChange={setFilter}
@@ -125,7 +114,7 @@ export default function NotificationsPage() {
 
           <button
             onClick={handleMarkAllAsRead}
-            disabled={unreadCount === 0}
+            disabled={unreadCount === 0 || markAllAsRead.isPending}
             className="
               flex
               items-center
@@ -145,18 +134,17 @@ export default function NotificationsPage() {
           >
             <CheckCheck size={18} />
 
-            Mark all as read
+            {markAllAsRead.isPending
+              ? "Updating..."
+              : "Mark all as read"}
           </button>
-
         </div>
-
       </header>
 
       {groups.length === 0 ? (
         <NotificationEmpty />
       ) : (
         <div className="space-y-8">
-
           {groups.map((group) => (
             <NotificationGroup
               key={group.title}
@@ -165,10 +153,8 @@ export default function NotificationsPage() {
               onClick={handleNotificationClick}
             />
           ))}
-
         </div>
       )}
-
     </section>
   );
 }

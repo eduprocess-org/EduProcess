@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { AlertTriangle } from "lucide-react";
 import type { RequestStatus } from "../../types/admin/adminRequest.types";
 
@@ -9,6 +10,16 @@ interface StatusChangeModalProps {
   onConfirm: () => void;
   onCancel: () => void;
 }
+
+const MODAL_STYLE = `
+  .scm-icon-box { background-color: var(--scm-bg); }
+  .dark .scm-icon-box { background-color: var(--scm-dark-bg); }
+  .scm-icon { color: var(--scm-color); }
+  .dark .scm-icon { color: var(--scm-dark-color); }
+  .scm-label { color: var(--scm-color); }
+  .dark .scm-label { color: var(--scm-dark-color); }
+  .scm-confirm-btn { background-color: var(--scm-color); box-shadow: var(--scm-shadow); }
+`;
 
 export function StatusChangeModal({
   isOpen,
@@ -23,26 +34,34 @@ export function StatusChangeModal({
   const isApproved = pendingStatus === "approved";
   const isRejected = pendingStatus === "rejected";
 
-  const lightColor  = isApproved ? "#059669"  : isRejected ? "#DC2626"  : "#1A52A8";
-  const lightBg     = isApproved ? "#ECFDF5"  : isRejected ? "#FEF2F2"  : "#EFF6FF";
-  const darkColor   = isApproved ? "#34D399"  : isRejected ? "#F87171"  : "#93C5FD";
-  const darkBg      = isApproved ? "rgba(16,185,129,0.15)" : isRejected ? "rgba(248,113,113,0.15)" : "rgba(147,197,253,0.15)";
-  const shadow      = isApproved
+  const lightColor = isApproved ? "#059669" : isRejected ? "#DC2626" : "#1A52A8";
+  const lightBg    = isApproved ? "#ECFDF5" : isRejected ? "#FEF2F2" : "#EFF6FF";
+  const darkColor  = isApproved ? "#34D399" : isRejected ? "#F87171" : "#93C5FD";
+  const darkBg     = isApproved ? "rgba(16,185,129,0.15)" : isRejected ? "rgba(248,113,113,0.15)" : "rgba(147,197,253,0.15)";
+  const shadow     = isApproved
     ? "0 3px 12px rgba(5,150,105,.30)"
     : isRejected
     ? "0 3px 12px rgba(220,38,38,.25)"
     : "0 3px 12px rgba(26,82,168,.25)";
 
+  const themeVars = {
+    "--scm-bg": lightBg,
+    "--scm-color": lightColor,
+    "--scm-dark-bg": darkBg,
+    "--scm-dark-color": darkColor,
+    "--scm-shadow": shadow,
+  } as CSSProperties;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(11,45,99,.40)] dark:bg-[rgba(0,0,0,.60)] p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-2xl border border-[#E2EAF4] dark:border-gray-700 bg-white dark:bg-gray-900 p-6 shadow-2xl">
-
+      <style>{MODAL_STYLE}</style>
+      <div
+        className="w-full max-w-sm rounded-2xl border border-[#E2EAF4] dark:border-gray-700 bg-white dark:bg-gray-900 p-6 shadow-2xl"
+        style={themeVars}
+      >
         {/* Icon */}
-        <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl dark:hidden" style={{ background: lightBg }}>
-          <AlertTriangle size={20} style={{ color: lightColor }} />
-        </div>
-        <div className="mb-4 hidden dark:flex h-11 w-11 items-center justify-center rounded-2xl" style={{ background: darkBg }}>
-          <AlertTriangle size={20} style={{ color: darkColor }} />
+        <div className="scm-icon-box mb-4 flex h-11 w-11 items-center justify-center rounded-2xl">
+          <AlertTriangle size={20} className="scm-icon" />
         </div>
 
         <h3 className="mb-1 text-base font-extrabold text-[#0F172A] dark:text-slate-100">
@@ -51,8 +70,7 @@ export function StatusChangeModal({
 
         <p className="mb-4 text-sm leading-relaxed text-[#64748B] dark:text-slate-400">
           Mark this request as{" "}
-          <span className="font-extrabold uppercase dark:hidden" style={{ color: lightColor }}>{pendingStatus}</span>
-          <span className="font-extrabold uppercase hidden dark:inline" style={{ color: darkColor }}>{pendingStatus}</span>
+          <span className="scm-label font-extrabold uppercase">{pendingStatus}</span>
           ? This cannot be undone.
         </p>
 
@@ -72,8 +90,7 @@ export function StatusChangeModal({
           <button
             onClick={onConfirm}
             disabled={updating}
-            className="flex-1 rounded-xl py-2.5 text-xs font-extrabold text-white transition-all active:scale-95 disabled:opacity-50"
-            style={{ background: lightColor, boxShadow: shadow }}
+            className="scm-confirm-btn flex-1 rounded-xl py-2.5 text-xs font-extrabold text-white transition-all active:scale-95 disabled:opacity-50"
           >
             {updating ? "Updating…" : "Yes, confirm"}
           </button>

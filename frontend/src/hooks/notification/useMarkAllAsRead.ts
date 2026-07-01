@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notificationService } from "../../services/notification/notificationService";
 
-export function useMarkAsRead() {
+export function useMarkAllAsRead() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: notificationService.markAsRead,
+    mutationFn: () => notificationService.markAllAsRead(),
 
     onSuccess: () => {
       queryClient.invalidateQueries({

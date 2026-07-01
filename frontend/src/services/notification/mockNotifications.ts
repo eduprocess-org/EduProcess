@@ -9,10 +9,9 @@ export const mockNotifications: Notification[] = [
     createdAt: "2026-06-27T18:30:00",
     read: false,
     requestId: "REQ-001",
-    userId: "a2bf6ab6-b2a2-41fa-91b9-cfdbbf7ace33",
-    role: "STUDENT"
+    userId: "mock-user",
+    role: "STUDENT",
   },
-
   {
     id: "2",
     title: "Administrative Observation",
@@ -21,10 +20,9 @@ export const mockNotifications: Notification[] = [
     createdAt: "2026-06-27T14:00:00",
     read: true,
     requestId: "REQ-003",
-    userId: "a2bf6ab6-b2a2-41fa-91b9-cfdbbf7ace33",
-    role: "STUDENT"
+    userId: "mock-user",
+    role: "STUDENT",
   },
-
   {
     id: "3",
     title: "New Request Received",
@@ -33,7 +31,7 @@ export const mockNotifications: Notification[] = [
     createdAt: "2026-06-27T09:10:00",
     read: false,
     requestId: "REQ-010",
-    userId: "64f4fa90-4ac1-4565-8f1c-eb48538cd6d2",
-    role: "ADMIN"
-  }
+    userId: "mock-admin",
+    role: "ADMIN",
+  },
 ];

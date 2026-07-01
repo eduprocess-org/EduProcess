@@ -16,8 +16,8 @@ export function Pagination({
   return (
     <div className="flex items-center justify-between px-1">
       {totalItems !== undefined && (
-        <p className="text-xs text-[#94A3B8]">
-          Page <strong className="text-[#1B2B5E]">{currentPage}</strong> of{" "}
+        <p className="text-xs text-[#94A3B8] dark:text-slate-500">
+          Page <strong className="text-[#1B2B5E] dark:text-blue-200">{currentPage}</strong> of{" "}
           {totalPages || 1}
         </p>
       )}

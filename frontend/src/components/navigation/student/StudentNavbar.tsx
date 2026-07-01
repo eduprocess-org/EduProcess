@@ -1,25 +1,21 @@
-import {
-  CircleUser,
-  Menu,
-} from "lucide-react";
-
+import { CircleUser, Menu } from "lucide-react";
 import ThemeToggle from "../../common/atoms/ThemeToggle";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   onMenuClick: () => void;
   onToggleSidebar: () => void;
 };
 
-function Navbar({
-  onMenuClick,
-  onToggleSidebar,
-}: Props) {
+function Navbar({ onMenuClick, onToggleSidebar }: Props) {
+  const navigate = useNavigate();
+
   const user = JSON.parse(
     localStorage.getItem("user") || "{}"
   );
 
   return (
-   <header
+    <header
       className="
         h-16
         flex
@@ -54,7 +50,8 @@ function Navbar({
         </button>
 
         <div>
-          <h1 className="text-xl font-bold text-[#0B2D63] dark:text-blue-300">            EduProcess
+          <h1 className="text-xl font-bold text-[#0B2D63] dark:text-blue-300">
+            EduProcess
           </h1>
 
           <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -65,20 +62,22 @@ function Navbar({
 
       {/* RIGHT */}
       <div className="flex items-center gap-5">
-
         <ThemeToggle />
 
-          <div
+        {/* USER SECTION (CLICKABLE → PROFILE) */}
+        <div
           className="
-          flex
-          items-center
-          gap-3
-          border-l
-          border-slate-200
-          dark:border-slate-700
-          pl-4
+            flex
+            items-center
+            gap-3
+            border-l
+            border-slate-200
+            dark:border-slate-700
+            pl-4
+            cursor-pointer
           "
-          >
+          onClick={() => navigate("/profile")}
+        >
           <CircleUser
             size={32}
             className="text-[#0B2D63]"

@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { AdminRequestListItem } from "../../types/admin/adminRequest.types";
 import RequestStatusBadge from "./RequestStatusBadge";
 
@@ -14,11 +15,11 @@ function initials(name: string) {
 }
 
 const avatarColors = [
-  { bg: "#DBEAFE", color: "#1D4ED8", darkBg: "rgba(59,130,246,0.20)",  darkColor: "#93C5FD" },
-  { bg: "#DCFCE7", color: "#15803D", darkBg: "rgba(34,197,94,0.18)",   darkColor: "#86EFAC" },
-  { bg: "#FEF3C7", color: "#B45309", darkBg: "rgba(234,179,8,0.18)",   darkColor: "#FDE047" },
-  { bg: "#F3E8FF", color: "#7E22CE", darkBg: "rgba(168,85,247,0.18)",  darkColor: "#D8B4FE" },
-  { bg: "#FCE7F3", color: "#BE185D", darkBg: "rgba(236,72,153,0.18)",  darkColor: "#F9A8D4" },
+  { bg: "#DBEAFE", color: "#1D4ED8", darkBg: "rgba(59,130,246,0.20)", darkColor: "#93C5FD" },
+  { bg: "#DCFCE7", color: "#15803D", darkBg: "rgba(34,197,94,0.18)", darkColor: "#86EFAC" },
+  { bg: "#FEF3C7", color: "#B45309", darkBg: "rgba(234,179,8,0.18)", darkColor: "#FDE047" },
+  { bg: "#F3E8FF", color: "#7E22CE", darkBg: "rgba(168,85,247,0.18)", darkColor: "#D8B4FE" },
+  { bg: "#FCE7F3", color: "#BE185D", darkBg: "rgba(236,72,153,0.18)", darkColor: "#F9A8D4" },
 ];
 
 function avatarColor(name: string) {
@@ -28,12 +29,19 @@ function avatarColor(name: string) {
 export default function RequestTableRow({ request, isEven, selected, onSelect, onView }: Props) {
   const av = avatarColor(request.studentName);
 
+  const avatarVars = {
+    "--avatar-bg": av.bg,
+    "--avatar-color": av.color,
+    "--avatar-dark-bg": av.darkBg,
+    "--avatar-dark-color": av.darkColor,
+  } as CSSProperties;
+
   return (
     <tr
       className={`group border-b border-[#E4EAF4] dark:border-gray-700 transition-colors duration-150
         hover:bg-[#F0F6FF] dark:hover:bg-blue-900/20
         ${selected
-          ? "bg-[#F0F6FF] dark:bg-blue-900/20"
+          ? "bg-[#F0F6FF] dark:bg-blue-500/10"
           : isEven
           ? "bg-white dark:bg-gray-900"
           : "bg-[#FAFBFD] dark:bg-gray-800/50"
@@ -54,7 +62,7 @@ export default function RequestTableRow({ request, isEven, selected, onSelect, o
           className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-[4px] h-[60%] bg-[#2563EB] dark:bg-blue-400 transition-opacity
             ${selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
         />
-        <span className="inline-block bg-[#EFF6FF] dark:bg-blue-900/40 text-[#1D4ED8] dark:text-blue-300 font-mono text-[.72rem] font-semibold tracking-[.04em] px-2 py-0.5 rounded-md">
+        <span className="inline-block bg-[#EFF6FF] dark:bg-blue-500/20 text-[#1D4ED8] dark:text-blue-200 font-mono text-[.72rem] font-semibold tracking-[.04em] px-2 py-0.5 rounded-md">
           {request.id}
         </span>
       </td>
@@ -63,14 +71,8 @@ export default function RequestTableRow({ request, isEven, selected, onSelect, o
       <td className="px-5 py-3.5">
         <div className="flex items-center gap-2.5">
           <div
-            className="w-[30px] h-[30px] rounded-full flex items-center justify-center font-medium text-[.7rem] shrink-0 dark:hidden"
-            style={{ backgroundColor: av.bg, color: av.color }}
-          >
-            {initials(request.studentName)}
-          </div>
-          <div
-            className="w-[30px] h-[30px] rounded-full items-center justify-center font-medium text-[.7rem] shrink-0 hidden dark:flex"
-            style={{ backgroundColor: av.darkBg, color: av.darkColor }}
+            className="avatar-chip flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full text-[.7rem] font-medium"
+            style={avatarVars}
           >
             {initials(request.studentName)}
           </div>
