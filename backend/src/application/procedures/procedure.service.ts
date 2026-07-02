@@ -4,13 +4,34 @@ import { logger } from '../../infrastructure/config/logger.config';
 import { isTransitionValid, normalizeStatus, STATUS_LABELS } from '../../domain/procedures/status-machine';
 import { StatusHistoryService } from './status-history.service';
 import { SocketEvents } from '../../infrastructure/websocket';
+import { NotificationService } from '../notifications/notification.service';
+import { NotificationType } from '../../domain/notifications/notification.types';
+
+const STATUS_NOTIFICATION_MAP: Record<string, { type: NotificationType; title: string; messageFn: (procedureName: string) => string }> = {
+    in_review: {
+        type: 'REQUEST_UPDATED',
+        title: 'Solicitud en Revisión',
+        messageFn: (name) => `Tu solicitud de "${name}" está siendo revisada por un administrador.`,
+    },
+    approved: {
+        type: 'REQUEST_APPROVED',
+        title: 'Solicitud Aprobada',
+        messageFn: (name) => `Tu solicitud de "${name}" ha sido aprobada.`,
+    },
+    rejected: {
+        type: 'REQUEST_REJECTED',
+        title: 'Solicitud Rechazada',
+        messageFn: (name) => `Tu solicitud de "${name}" ha sido rechazada.`,
+    },
+};
 
 export class ProcedureService {
     private readonly statusHistoryService: StatusHistoryService;
 
     constructor(
         private readonly procedureRepository: ProcedureRepository,
-        private readonly socketEvents?: SocketEvents
+        private readonly socketEvents?: SocketEvents,
+        private readonly notificationService?: NotificationService
     ) {
         this.statusHistoryService = new StatusHistoryService();
     }
@@ -211,6 +232,24 @@ export class ProcedureService {
                 procedureName: request.procedure?.name ?? 'Trámite',
                 updatedAt: new Date().toISOString(),
             });
+        }
+
+        if (this.notificationService && request.studentId) {
+            const notificationConfig = STATUS_NOTIFICATION_MAP[normalizedStatus];
+            if (notificationConfig) {
+                const procedureName = request.procedure?.name ?? 'Trámite';
+                await this.notificationService.createNotification({
+                    userId: request.studentId,
+                    typeName: notificationConfig.type,
+                    title: notificationConfig.title,
+                    message: notificationConfig.messageFn(procedureName),
+                });
+                logger.info('Status change notification created', {
+                    requestId,
+                    studentId: request.studentId,
+                    type: notificationConfig.type,
+                });
+            }
         }
 
         return updatedRequest;

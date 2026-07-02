@@ -6,6 +6,8 @@ import { PrismaProcedureRepository } from '../../persistence/prisma/procedure/pr
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { adminMiddleware } from '../middlewares/admin.middleware';
 import { getSocketEvents } from '../../websocket';
+import { NotificationService } from '../../../application/notifications/notification.service';
+import { PrismaNotificationRepository } from '../../persistence/prisma/notification/prisma-notification.repository';
 
 const router = Router();
 
@@ -41,8 +43,10 @@ const handleMulterError = (err: Error, _req: Request, res: Response, next: NextF
 };
 
 const repository = new PrismaProcedureRepository();
+const notificationRepository = new PrismaNotificationRepository();
 const socketEvents = getSocketEvents();
-const service = new ProcedureService(repository, socketEvents ?? undefined);
+const notificationService = new NotificationService(notificationRepository);
+const service = new ProcedureService(repository, socketEvents ?? undefined, notificationService);
 const controller = new ProcedureController(service);
 
 router.get('/procedures', authMiddleware, controller.getProcedures);
