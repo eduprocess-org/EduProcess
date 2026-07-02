@@ -2,11 +2,13 @@ import { ObservationRepository } from '../../domain/observations/observation.rep
 import { CreateObservationInput, ObservationDTO } from '../../domain/observations/observation.types';
 import { logger } from '../../infrastructure/config/logger.config';
 import { SocketEvents } from '../../infrastructure/websocket';
+import { NotificationService } from '../notifications/notification.service';
 
 export class ObservationService {
     constructor(
         private readonly observationRepository: ObservationRepository,
-        private readonly socketEvents?: SocketEvents
+        private readonly socketEvents?: SocketEvents,
+        private readonly notificationService?: NotificationService
     ) {}
 
     async createObservation(input: CreateObservationInput): Promise<ObservationDTO> {
@@ -31,6 +33,20 @@ export class ObservationService {
                 comment: observation.comment,
                 adminName: observation.adminName ?? 'Administrador',
                 createdAt: observation.createdAt?.toISOString() ?? new Date().toISOString(),
+            });
+        }
+
+        if (this.notificationService && observation.studentId) {
+            const adminName = observation.adminName ?? 'Administrador';
+            await this.notificationService.createNotification({
+                userId: observation.studentId,
+                typeName: 'ADMIN_OBSERVATION',
+                title: 'Nueva Observación Administrativa',
+                message: `${adminName} agregó un comentario en tu solicitud: "${observation.comment.substring(0, 100)}${observation.comment.length > 100 ? '...' : ''}"`,
+            });
+            logger.info('Observation notification created', {
+                observationId: observation.id,
+                studentId: observation.studentId,
             });
         }
 
