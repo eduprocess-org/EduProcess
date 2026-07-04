@@ -46,9 +46,11 @@ jobs:
       - name: Grant Gradle Execute Permission
         run: chmod +x android/gradlew
 
-      - name: Build Debug APK
-        working-directory: android
-        run: ./gradlew assembleDebug
+      - name: Build APK
+        run: |
+            cd android
+            chmod +x gradlew
+            ./gradlew assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
