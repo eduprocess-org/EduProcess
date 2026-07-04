@@ -36,7 +36,7 @@ jobs:
 
       - name: Build React Application
         env:
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_API_URL: https://eduprocessqa.programacionwebuce.net
         run: npm run build
 
       - name: Verify Build Output
