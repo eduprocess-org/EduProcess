@@ -43,6 +43,7 @@ export function useProcedureForm(onSuccess: () => void) {
 
     if (!name.trim()) newErrors.name = "The procedure name is required.";
     if (!description.trim()) newErrors.description = "The description is required.";
+    if (!requirementsText.trim()) newErrors.requirementsText = "The requirements summary is required.";
 
     const validRequirements = requirements.filter((r) => r.trim() !== "");
     if (validRequirements.length === 0) {

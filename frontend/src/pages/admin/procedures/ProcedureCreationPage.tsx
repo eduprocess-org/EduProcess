@@ -83,6 +83,7 @@ export default function ProcedureCreationPage() {
             label="Requirements Summary"
             value={form.requirementsText}
             onChange={(e) => setters.setRequirementsText(e.target.value)}
+            error={errors.requirementsText}
             disabled={isLoading}
             rows={2}
             placeholder="Brief summary of requirements..."
