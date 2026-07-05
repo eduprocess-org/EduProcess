@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import { apiClient } from "../services/api/apiClient";
+import { useAuth } from "../hooks/useAuth";
 export interface Notification {
   id: string;
   title: string;
@@ -33,6 +34,7 @@ const NotificationContext = createContext<NotificationContextType | undefined>(
 );
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +47,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       const res = await apiClient.get("/notifications");
-      setNotifications(res.data);
+      setNotifications(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       setError("Error loading notifications");
     } finally {
@@ -82,8 +84,10 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    fetchNotifications();
-  }, []);
+    if (!authLoading && isAuthenticated) {
+      fetchNotifications();
+    }
+  }, [authLoading, isAuthenticated]);
 
   return (
     <NotificationContext.Provider
