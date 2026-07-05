@@ -109,9 +109,9 @@ function AdminSidebar({ isCollapsed }: Props) {
           {menuItems.map((item) => {
             const Icon = item.icon;
 
-            const isActive =
-              location.pathname === item.path ||
-              location.pathname.startsWith(`${item.path}/`);
+            const isActive = item.path === "/admin"
+              ? location.pathname === "/admin"
+              : location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
 
             return (
               <button

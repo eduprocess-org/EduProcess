@@ -16,5 +16,6 @@ router.get('/admin/procedures/:id', authMiddleware, adminMiddleware, controller.
 router.post('/admin/procedures', authMiddleware, adminMiddleware, controller.create);
 router.put('/admin/procedures/:id', authMiddleware, adminMiddleware, controller.update);
 router.delete('/admin/procedures/:id', authMiddleware, adminMiddleware, controller.delete);
+router.patch('/admin/procedures/:id/status', authMiddleware, adminMiddleware, controller.toggleStatus);
 
 export default router;
