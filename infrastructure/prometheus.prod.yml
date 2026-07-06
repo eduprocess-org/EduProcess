@@ -14,7 +14,7 @@ scrape_configs:
   - job_name: 'eduprocess-backend-prod'
     metrics_path: '/api/v1/metrics'
     static_configs:
-      - targets: ['backend:3000']
+      - targets: ['eduprocess-backend-prod:3000']
 
   - job_name: 'docker-containers-prod'
     static_configs:
