@@ -160,7 +160,10 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends wine64 wine32
+          # Instalamos el paquete unificado 'wine' y habilitamos las herramientas de desarrollo esenciales
+          sudo apt-get install -y --no-install-recommends wine wine64 wine32
+          
+          sudo ln -sf /usr/bin/wine64 /usr/bin/wine
 
       - name: Build Desktop Executable (Linux & Windows Cross-Compile)
         if: steps.filter-desktop.outputs.desktop_files == 'true'
