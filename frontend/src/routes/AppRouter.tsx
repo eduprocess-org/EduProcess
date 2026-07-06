@@ -15,18 +15,24 @@ import RequestTrackingPage from "../pages/student/requests/RequestTrackingPage";
 
 // Admin
 import AdminDashboardPage from "../pages/admin/dashboard/AdminDashboardPage";
-import RequestManagementPage from "../pages/admin/requests/RequestsManagementPage"; 
-import ProtectedRoute from "../components/auth/ProtectedRoute";
-import PublicRoute from "../components/auth/PublicRoute";
+import RequestManagementPage from "../pages/admin/requests/RequestsManagementPage";
 import RequestDetailsPage from "../pages/admin/requests/RequestDetailsPage";
-import { useAuth } from "../hooks/useAuth"; 
 import ProceduresManagementPage from "../pages/admin/procedures/ProceduresManagementPage";
 import ProcedureCreationPage from "../pages/admin/procedures/ProcedureCreationPage";
 import ProcedureEditPage from "../pages/admin/procedures/ProcedureEditPage";
-import AdminProcedureDetailsPage from "../pages/admin/procedures/ProcedureDetailsPage"; 
+import AdminProcedureDetailsPage from "../pages/admin/procedures/ProcedureDetailsPage";
+
+// Common
+import NotificationsPage from "../pages/common/notification/NotificationPage";
+import ProfilePage from "../pages/common/profile/ProfilePage"; // 👈 UNO SOLO
+
+// Auth
+import ProtectedRoute from "../components/auth/ProtectedRoute";
+import PublicRoute from "../components/auth/PublicRoute";
+import { useAuth } from "../hooks/useAuth";
 
 function RoleBasedRedirect() {
-  const { user } = useAuth(); 
+  const { user } = useAuth();
 
   if (user?.role === "admin") {
     return <Navigate to="/admin" replace />;
@@ -50,7 +56,6 @@ function AppRouter() {
               </PublicRoute>
             }
           />
-
           <Route
             path="/register"
             element={
@@ -61,44 +66,36 @@ function AppRouter() {
           />
         </Route>
 
-        {/* ================= ROOT REDIRECT ================= */}
-        <Route 
-          path="/" 
+        {/* ================= ROOT ================= */}
+        <Route
+          path="/"
           element={
             <ProtectedRoute roles={["student", "admin"]}>
               <RoleBasedRedirect />
             </ProtectedRoute>
-          } 
+          }
         />
 
-        {/* ================= STUDENT MODULE ================= */}
+        {/* ================= STUDENT ================= */}
         <Route
           element={
-            <ProtectedRoute roles={["student"]}>
+            <ProtectedRoute roles={["student", "admin"]}>
               <DashboardLayout />
             </ProtectedRoute>
           }
         >
           <Route path="dashboard" element={<StudentDashboardPage />} />
-
-          <Route path="requests" element={<RequestTrackingPage />} /> 
+          <Route path="requests" element={<RequestTrackingPage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
+          <Route path="profile" element={<ProfilePage />} /> {/* 👈 UN SOLO PERFIL */}
 
           <Route path="procedures" element={<ProceduresCatalogPage />} />
-
           <Route path="procedures/:id" element={<ProcedureDetailsPage />} />
-
-          <Route
-            path="procedures/:id/request"
-            element={<ProcedureRequestPage />}
-          />
-
-          <Route
-            path="requests/:requestId/tracking"
-            element={<RequestTrackingPage />}
-          />
+          <Route path="procedures/:id/request" element={<ProcedureRequestPage />} />
+          <Route path="requests/:requestId/tracking" element={<RequestTrackingPage />} />
         </Route>
 
-        {/* ================= ADMIN MODULE ================= */}
+        {/* ================= ADMIN ================= */}
         <Route
           path="/admin"
           element={
@@ -108,9 +105,11 @@ function AppRouter() {
           }
         >
           <Route index element={<AdminDashboardPage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
 
           <Route path="requests" element={<RequestManagementPage />} />
           <Route path="requests/:id" element={<RequestDetailsPage />} />
+
           <Route path="procedures" element={<ProceduresManagementPage />} />
           <Route path="procedures/create" element={<ProcedureCreationPage />} />
           <Route path="procedures/edit/:id" element={<ProcedureEditPage />} />

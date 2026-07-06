@@ -21,6 +21,18 @@ const columns = [
   { label: "Submitted",  field: "createdAt" },
 ];
 
+const TABLE_STYLE = `
+  .avatar-chip {
+    background-color: var(--avatar-bg);
+    color: var(--avatar-color);
+    transition: background-color .15s, color .15s;
+  }
+  .dark .avatar-chip {
+    background-color: var(--avatar-dark-bg);
+    color: var(--avatar-dark-color);
+  }
+`;
+
 export default function RequestTable({
   requests, sortBy, order, onSort,
   selectedRequests, onToggleSelect, onToggleSelectAll, onViewRequest,
@@ -42,6 +54,7 @@ export default function RequestTable({
 
   return (
     <div className="overflow-x-auto">
+      <style>{TABLE_STYLE}</style>
       <table className="min-w-full">
         <thead>
           <tr className="border-b border-[#D9E3F0] dark:border-gray-700 bg-[#EEF3FA] dark:bg-gray-800">

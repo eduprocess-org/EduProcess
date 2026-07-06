@@ -56,7 +56,9 @@ services:
     container_name: eduprocess-cadvisor-prod
     restart: always
     user: root
-    privileged: true    
+    privileged: true
+    environment:
+      - DOCKER_API_VERSION=1.52
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
@@ -75,12 +77,12 @@ services:
     container_name: eduprocess-grafana-prod
     restart: always
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/ 
       - GF_SERVER_SERVE_FROM_SUB_PATH=true                                            
     volumes:
-      - grafana-prod-data:/var/lib/grafana                                                                                
+      - grafana-prod-data:/var/lib/grafana                                                                                                                
       - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
       - ./grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro
       - ./dashboards/eduprocess_metrics.json:/var/lib/grafana/dashboards/eduprocess_metrics.json:ro
