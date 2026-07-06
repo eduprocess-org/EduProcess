@@ -61,9 +61,9 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
 
 export default app;
 
-if (require.main === module) {
+// if (require.main === module) {
     const PORT = process.env.PORT || 3000;
     httpServer.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
     });
-}
+// }
