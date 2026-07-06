@@ -1,13 +1,14 @@
 import {
   LayoutDashboard,
   FileText,
-  Search,
   Bell,
   LogOut,
 } from "lucide-react";
 
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/useAuth";
+import { useNotifications } from "../../../hooks/notification/useNotifications";
+
 import logo from "../../../assets/images/Logo.jpeg";
 
 interface SidebarProps {
@@ -17,12 +18,38 @@ interface SidebarProps {
 function Sidebar({ isCollapsed }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
+
   const { logout } = useAuth();
+
+  const { data: notifications = [] } = useNotifications();
+
+  const unreadCount = notifications.filter(
+    (notification) => !notification.read
+  ).length;
 
   const handleLogout = () => {
     logout();
     navigate("/login", { replace: true });
   };
+
+  const menuItems = [
+    {
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      path: "/dashboard",
+    },
+    {
+      label: "My Procedures",
+      icon: FileText,
+      path: "/procedures",
+    },
+    {
+      label: "Notifications",
+      icon: Bell,
+      path: "/notifications",
+      badge: unreadCount,
+    },
+  ];
 
   return (
     <aside
@@ -47,7 +74,8 @@ function Sidebar({ isCollapsed }: SidebarProps) {
             isCollapsed ? "justify-center" : "gap-4"
           }`}
         >
-          <div className="bg-white dark:bg-slate-900 rounded-xl p-2 flex items-center justify-center w-12 h-12 flex-shrink-0 border border-transparent dark:border-slate-700">            <img
+          <div className="bg-white dark:bg-slate-900 rounded-xl p-2 flex items-center justify-center w-12 h-12 flex-shrink-0 border border-transparent dark:border-slate-700">
+            <img
               src={logo}
               alt="EduProcess"
               className="w-full h-full object-contain"
@@ -71,60 +99,71 @@ function Sidebar({ isCollapsed }: SidebarProps) {
       {/* MENU */}
       <nav className="flex-1 p-4 overflow-y-auto">
         <div className="space-y-2">
-          {/* Dashboard */}
-          <button
-            onClick={() => navigate("/")}
-            className={`flex w-full items-center px-4 py-3 rounded-xl transition-all duration-200 ${
-              isCollapsed ? "justify-center" : "gap-3"
-            } ${
-              location.pathname === "/"
-              ? "bg-white/10 dark:bg-slate-800 border border-white/10 dark:border-slate-700 text-white"
-              : "text-slate-200 dark:text-slate-300 hover:bg-white/10 dark:hover:bg-slate-800"
-            }`}
-          >
-            <LayoutDashboard size={20} />
+          {menuItems.map((item) => {
+            const Icon = item.icon;
 
-            {!isCollapsed && <span>Dashboard</span>}
-          </button>
+            const isActive =
+              location.pathname === item.path ||
+              location.pathname.startsWith(`${item.path}/`);
 
-          {/* Procedures */}
-          <button
-            onClick={() => navigate("/procedures")}
-            className={`flex w-full items-center px-4 py-3 rounded-xl transition-all duration-200 ${
-              isCollapsed ? "justify-center" : "gap-3"
-            } ${
-              location.pathname === "/procedures"
-              ? "bg-white/10 dark:bg-slate-800 border border-white/10 dark:border-slate-700 text-white"
-              : "text-slate-200 dark:text-slate-300 hover:bg-white/10 dark:hover:bg-slate-800"
-            }`}
-          >
-            <FileText size={20} />
+            return (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className={`
+                  flex
+                  w-full
+                  items-center
+                  px-4
+                  py-3
+                  rounded-xl
+                  transition-all
+                  duration-200
+                  ${
+                    isCollapsed
+                      ? "justify-center"
+                      : "gap-3"
+                  }
+                  ${
+                    isActive
+                      ? "bg-white/10 dark:bg-slate-800 border border-white/10 dark:border-slate-700 text-white"
+                      : "text-slate-200 dark:text-slate-300 hover:bg-white/10 dark:hover:bg-slate-800"
+                  }
+                `}
+              >
+                <Icon size={20} />
 
-            {!isCollapsed && <span>My Procedures</span>}
-          </button>
+                {!isCollapsed && (
+                  <>
+                    <span className="flex-1 text-left">
+                      {item.label}
+                    </span>
 
-          {/* Search */}
-          <button
-            className={`flex w-full items-center px-4 py-3 rounded-xl text-slate-200 hover:bg-white/10 dark:hover:bg-slate-800 hover:text-white transition-all duration-200 ${
-              isCollapsed ? "justify-center" : "gap-3"
-            }`}
-          >
-            <Search size={20} />
-
-            {!isCollapsed && <span>Search</span>}
-          </button>
-
-          {/* Notifications */}
-          <button
-            className={`flex w-full items-center px-4 py-3 rounded-xl text-slate-200 hover:bg-white/10 dark:hover:bg-slate-800 hover:text-white transition-all duration-200 ${
-              isCollapsed ? "justify-center" : "gap-3"
-            }`}
-          >
-            <Bell size={20} />
-
-            {!isCollapsed && <span>Notifications</span>}
-          </button>
-
+                    {item.badge !== undefined &&
+                      item.badge > 0 && (
+                        <span
+                          className="
+                            flex
+                            h-6
+                            min-w-6
+                            items-center
+                            justify-center
+                            rounded-full
+                            bg-red-500
+                            px-2
+                            text-xs
+                            font-semibold
+                            text-white
+                          "
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                  </>
+                )}
+              </button>
+            );
+          })}
         </div>
       </nav>
 
@@ -132,9 +171,20 @@ function Sidebar({ isCollapsed }: SidebarProps) {
       <div className="p-4 border-t border-white/10 dark:border-slate-700 flex-shrink-0">
         <button
           onClick={handleLogout}
-          className={`w-full flex items-center px-4 py-3 rounded-xl text-red-300 hover:bg-red-500/20 hover:text-red-200 transition-all duration-200 ${
-            isCollapsed ? "justify-center" : "gap-3"
-          }`}
+          className={`
+            w-full
+            flex
+            items-center
+            px-4
+            py-3
+            rounded-xl
+            text-red-300
+            hover:bg-red-500/20
+            hover:text-red-200
+            transition-all
+            duration-200
+            ${isCollapsed ? "justify-center" : "gap-3"}
+          `}
         >
           <LogOut size={20} />
 

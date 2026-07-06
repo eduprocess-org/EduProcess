@@ -28,7 +28,7 @@ export function DocumentsList({ documents }: DocumentsListProps) {
             bg-[#F1F5FB] dark:bg-gray-800
             px-3.5 py-2.5
             border border-[#E2EAF4] dark:border-gray-700
-            transition-all hover:translate-x-0.5"
+            transition-all hover:translate-x-0.5 hover:border-[#C7D8F0] dark:hover:border-gray-600"
         >
           <div className="flex min-w-0 items-center gap-2.5">
             <FileText size={14} className="flex-shrink-0 text-[#1A52A8] dark:text-blue-400" />
@@ -41,14 +41,14 @@ export function DocumentsList({ documents }: DocumentsListProps) {
               href={doc.fileUrl}
               target="_blank"
               rel="noreferrer"
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-[#94A3B8] dark:text-slate-500 transition-colors hover:bg-white dark:hover:bg-gray-700"
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-[#94A3B8] dark:text-slate-500 transition-colors hover:bg-white dark:hover:bg-gray-700 hover:text-[#1A52A8] dark:hover:text-blue-400"
               title="Preview"
             >
               <Eye size={13} />
             </a>
             <button
               onClick={() => handleDownload(doc.fileName, doc.fileUrl)}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-[#94A3B8] dark:text-slate-500 transition-colors hover:bg-white dark:hover:bg-gray-700"
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-[#94A3B8] dark:text-slate-500 transition-colors hover:bg-white dark:hover:bg-gray-700 hover:text-[#1A52A8] dark:hover:text-blue-400"
               title="Download"
             >
               <Download size={13} />
