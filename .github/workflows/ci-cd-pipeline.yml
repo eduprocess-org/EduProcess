@@ -173,7 +173,7 @@ jobs:
   publish-images:
     name: Build & Publish Images to Docker Hub
     runs-on: ubuntu-latest
-    needs: [verify-frontend, verify-backend, , verify-desktop]
+    needs: [verify-frontend, verify-backend, verify-desktop]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/qa' || github.ref == 'refs/heads/main')
     steps:
       - name: Checkout Monorepo Code
