@@ -2,9 +2,9 @@ name: EduProcess CI/CD Multi-Environment Pipeline
 
 on:
   push:
-    branches: [ develop, qa, main ]
+    branches: [develop, qa, main]
   pull_request:
-    branches: [ develop, qa, main ]
+    branches: [develop, qa, main]
 
 jobs:
   verify-frontend:
@@ -31,15 +31,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: 'npm'
-          cache-dependency-path: './frontend/package-lock.json'
+          cache: "npm"
+          cache-dependency-path: "./frontend/package-lock.json"
 
       - name: Setup Java 21 (Required for Capacitor Build)
         if: steps.filter-frontend.outputs.frontend_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '21'
+          distribution: "temurin"
+          java-version: "21"
 
       - name: Execute Install Checks (Dependencies)
         if: steps.filter-frontend.outputs.frontend_files == 'true'
@@ -95,8 +95,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-          cache-dependency-path: './backend/package-lock.json'
+          cache: "npm"
+          cache-dependency-path: "./backend/package-lock.json"
 
       - name: Execute Install Checks (Dependencies)
         if: steps.filter-backend.outputs.backend_files == 'true'
@@ -138,8 +138,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-          cache-dependency-path: './desktop/package-lock.json'
+          cache: "npm"
+          cache-dependency-path: "./desktop/package-lock.json"
 
       - name: Execute Install Checks (Dependencies)
         if: steps.filter-desktop.outputs.desktop_files == 'true'
@@ -156,14 +156,32 @@ jobs:
             echo "APP_URL=https://eduprocessqa.programacionwebuce.net" >> .env
           fi
 
-      - name: Install Wine for Windows cross-compilation
+      - name: Install Wine
+        if: steps.filter-desktop.outputs.desktop_files == 'true'
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          # Instalamos el paquete unificado 'wine' y habilitamos las herramientas de desarrollo esenciales
-          sudo apt-get install -y --no-install-recommends wine wine64 wine32
-          
-          sudo ln -sf /usr/bin/wine64 /usr/bin/wine
+
+          sudo apt-get install -y \
+            wine64 \
+            wine32 \
+            wine64-tools
+
+          # Algunos runners no crean el binario wine
+          if [ ! -f /usr/bin/wine ]; then
+            sudo ln -s /usr/bin/wine64 /usr/bin/wine
+          fi
+
+          which wine
+          wine --version
+
+      - name: Verify Wine installation
+        if: steps.filter-desktop.outputs.desktop_files == 'true'
+        run: |
+          which wine || true
+          which wine64 || true
+
+          ls -l /usr/bin/wine*
 
       - name: Build Desktop Executable (Linux & Windows Cross-Compile)
         if: steps.filter-desktop.outputs.desktop_files == 'true'
@@ -307,7 +325,7 @@ jobs:
             docker compose pull
             docker compose up -d --remove-orphans --force-recreate
             docker image prune -f
-  
+
   orchestrate-release:
     name: Automated Release Governance & Archival
     runs-on: ubuntu-latest
