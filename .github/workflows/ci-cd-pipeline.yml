@@ -156,6 +156,12 @@ jobs:
             echo "APP_URL=https://eduprocessqa.programacionwebuce.net" >> .env
           fi
 
+      - name: Install Wine for Windows cross-compilation
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends wine64 wine32
+
       - name: Build Desktop Executable (Linux & Windows Cross-Compile)
         if: steps.filter-desktop.outputs.desktop_files == 'true'
         run: npm run build -- --linux --win
