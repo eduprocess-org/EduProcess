@@ -1,7 +1,6 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 
 const API_URL = process.env.API_URL || `http://localhost:${process.env.PORT || 3000}`;
-const SWAGGER_ENABLED = process.env.SWAGGER_ENABLED !== 'false';
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -33,24 +32,25 @@ const options: swaggerJsdoc.Options = {
             email: { type: 'string', format: 'email' },
             firstName: { type: 'string' },
             lastName: { type: 'string' },
-            career: { type: 'string' },
             role: { type: 'string', enum: ['student', 'admin'] },
+            career: { type: 'string', nullable: true },
           },
         },
         LoginRequest: {
           type: 'object',
           required: ['email', 'password'],
           properties: {
-            email: { type: 'string', format: 'email' },
+            email: { type: 'string', format: 'email', description: 'Must end with @uce.edu.ec' },
             password: { type: 'string', minLength: 6 },
           },
         },
         RegisterRequest: {
           type: 'object',
-          required: ['email', 'password', 'firstName', 'lastName', 'careerId'],
+          required: ['email', 'password'],
           properties: {
-            email: { type: 'string', format: 'email' },
+            email: { type: 'string', format: 'email', description: 'Must end with @uce.edu.ec' },
             password: { type: 'string', minLength: 6 },
+            fullName: { type: 'string', description: 'Optional - alternative to firstName/lastName' },
             firstName: { type: 'string' },
             lastName: { type: 'string' },
             careerId: { type: 'string', format: 'uuid' },
@@ -60,6 +60,7 @@ const options: swaggerJsdoc.Options = {
           type: 'object',
           properties: {
             success: { type: 'boolean' },
+            message: { type: 'string' },
             data: {
               type: 'object',
               properties: {
@@ -81,9 +82,41 @@ const options: swaggerJsdoc.Options = {
             id: { type: 'string', format: 'uuid' },
             name: { type: 'string' },
             description: { type: 'string' },
-            facultyId: { type: 'string', format: 'uuid', nullable: true },
-            careerId: { type: 'string', format: 'uuid', nullable: true },
+            requirementsText: { type: 'string' },
             isActive: { type: 'boolean' },
+            requirements: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/ProcedureRequirement' },
+            },
+          },
+        },
+        ProcedureRequirement: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            name: { type: 'string' },
+            description: { type: 'string' },
+            isMandatory: { type: 'boolean' },
+          },
+        },
+        CreateRequestInput: {
+          type: 'object',
+          required: ['procedureTypeId'],
+          properties: {
+            procedureTypeId: { type: 'string', format: 'uuid' },
+            career: { type: 'string' },
+            semester: { type: 'string' },
+            reason: { type: 'string' },
+            documents: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  fileName: { type: 'string' },
+                  fileUrl: { type: 'string' },
+                },
+              },
+            },
           },
         },
         ProcedureRequest: {
@@ -92,12 +125,34 @@ const options: swaggerJsdoc.Options = {
             id: { type: 'string', format: 'uuid' },
             studentId: { type: 'string', format: 'uuid' },
             procedureTypeId: { type: 'string', format: 'uuid' },
-            procedureName: { type: 'string' },
-            faculty: { type: 'string' },
-            career: { type: 'string' },
+            career: { type: 'string', nullable: true },
+            semester: { type: 'string', nullable: true },
+            reason: { type: 'string', nullable: true },
             status: { type: 'string', enum: ['pending', 'in_review', 'approved', 'rejected'] },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
+            procedure: { $ref: '#/components/schemas/ProcedureType' },
+            documents: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/UploadedDocument' },
+            },
+            observations: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/Observation' },
+            },
+            auditLogs: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/AuditLogEntry' },
+            },
+          },
+        },
+        UploadedDocument: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            fileName: { type: 'string' },
+            fileUrl: { type: 'string' },
+            uploadedAt: { type: 'string', format: 'date-time' },
           },
         },
         Observation: {
@@ -106,9 +161,20 @@ const options: swaggerJsdoc.Options = {
             id: { type: 'string', format: 'uuid' },
             requestId: { type: 'string', format: 'uuid' },
             adminId: { type: 'string', format: 'uuid' },
-            adminName: { type: 'string' },
             comment: { type: 'string' },
             createdAt: { type: 'string', format: 'date-time' },
+            adminName: { type: 'string' },
+          },
+        },
+        AuditLogEntry: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            action: { type: 'string' },
+            oldValue: { type: 'string', nullable: true },
+            newValue: { type: 'string', nullable: true },
+            createdAt: { type: 'string', format: 'date-time' },
+            adminName: { type: 'string' },
           },
         },
         Notification: {
@@ -118,6 +184,7 @@ const options: swaggerJsdoc.Options = {
             userId: { type: 'string', format: 'uuid' },
             title: { type: 'string' },
             message: { type: 'string' },
+            type: { type: 'string', enum: ['REQUEST_CREATED', 'REQUEST_UPDATED', 'REQUEST_APPROVED', 'REQUEST_REJECTED', 'ADMIN_OBSERVATION'], nullable: true },
             isRead: { type: 'boolean' },
             createdAt: { type: 'string', format: 'date-time' },
           },
@@ -138,26 +205,45 @@ const options: swaggerJsdoc.Options = {
             },
           },
         },
+        CreateProcedureInput: {
+          type: 'object',
+          required: ['name', 'description', 'requirementsText'],
+          properties: {
+            name: { type: 'string' },
+            description: { type: 'string' },
+            requirementsText: { type: 'string' },
+            facultyId: { type: 'string', format: 'uuid', nullable: true },
+            careerId: { type: 'string', format: 'uuid', nullable: true },
+            isActive: { type: 'boolean', default: true },
+            requirements: {
+              type: 'array',
+              items: {
+                type: 'object',
+                required: ['name', 'description'],
+                properties: {
+                  name: { type: 'string' },
+                  description: { type: 'string' },
+                  isMandatory: { type: 'boolean', default: true },
+                },
+              },
+            },
+          },
+        },
         AdminProcedure: {
           type: 'object',
           properties: {
             id: { type: 'string', format: 'uuid' },
             name: { type: 'string' },
             description: { type: 'string' },
+            requirementsText: { type: 'string' },
+            isActive: { type: 'boolean' },
             facultyId: { type: 'string', format: 'uuid', nullable: true },
             careerId: { type: 'string', format: 'uuid', nullable: true },
-            isActive: { type: 'boolean' },
+            facultyName: { type: 'string', nullable: true },
+            careerName: { type: 'string', nullable: true },
             requirements: {
               type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string', format: 'uuid' },
-                  name: { type: 'string' },
-                  description: { type: 'string' },
-                  isRequired: { type: 'boolean' },
-                },
-              },
+              items: { $ref: '#/components/schemas/ProcedureRequirement' },
             },
           },
         },
@@ -168,7 +254,36 @@ const options: swaggerJsdoc.Options = {
             pendingRequests: { type: 'integer' },
             approvedRequests: { type: 'integer' },
             rejectedRequests: { type: 'integer' },
-            inReviewRequests: { type: 'integer' },
+          },
+        },
+        AdminRequestDetail: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            student: {
+              type: 'object',
+              properties: {
+                id: { type: 'string', format: 'uuid' },
+                firstName: { type: 'string' },
+                lastName: { type: 'string' },
+                email: { type: 'string' },
+                career: { type: 'string', nullable: true },
+              },
+            },
+            procedureType: {
+              type: 'object',
+              properties: {
+                id: { type: 'string', format: 'uuid' },
+                name: { type: 'string' },
+                description: { type: 'string' },
+              },
+            },
+            career: { type: 'string', nullable: true },
+            semester: { type: 'string', nullable: true },
+            reason: { type: 'string', nullable: true },
+            status: { type: 'string' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
           },
         },
         SuccessResponse: {
@@ -188,75 +303,36 @@ const options: swaggerJsdoc.Options = {
         },
       },
     },
-    security: [
-      {
-        bearerAuth: [],
-      },
-    ],
+    security: [{ bearerAuth: [] }],
     paths: {
+      // ==================== AUTH ====================
+      '/api/v1/auth/register': {
+        post: {
+          tags: ['Auth'],
+          summary: 'Register new student',
+          security: [],
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/RegisterRequest' } } },
+          },
+          responses: {
+            '201': { description: 'Registration successful', content: { 'application/json': { schema: { $ref: '#/components/schemas/AuthResponse' } } } },
+            '400': { description: 'Validation error' },
+          },
+        },
+      },
       '/api/v1/auth/login': {
         post: {
           tags: ['Auth'],
           summary: 'User login',
-          description: 'Authenticate user with email and password',
+          security: [],
           requestBody: {
             required: true,
-            content: {
-              'application/json': {
-                schema: { $ref: '#/components/schemas/LoginRequest' },
-              },
-            },
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/LoginRequest' } } },
           },
           responses: {
-            '200': {
-              description: 'Login successful',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/AuthResponse' },
-                },
-              },
-            },
-            '401': {
-              description: 'Invalid credentials',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/ErrorResponse' },
-                },
-              },
-            },
-          },
-        },
-      },
-      '/api/v1/auth/register': {
-        post: {
-          tags: ['Auth'],
-          summary: 'User registration',
-          description: 'Register a new student account',
-          requestBody: {
-            required: true,
-            content: {
-              'application/json': {
-                schema: { $ref: '#/components/schemas/RegisterRequest' },
-              },
-            },
-          },
-          responses: {
-            '201': {
-              description: 'Registration successful',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/AuthResponse' },
-                },
-              },
-            },
-            '400': {
-              description: 'Validation error',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/ErrorResponse' },
-                },
-              },
-            },
+            '200': { description: 'Login successful', content: { 'application/json': { schema: { $ref: '#/components/schemas/AuthResponse' } } } },
+            '401': { description: 'Invalid credentials' },
           },
         },
       },
@@ -264,7 +340,7 @@ const options: swaggerJsdoc.Options = {
         post: {
           tags: ['Auth'],
           summary: 'Refresh access token',
-          description: 'Get new session token using refresh token',
+          security: [],
           requestBody: {
             required: true,
             content: {
@@ -272,255 +348,86 @@ const options: swaggerJsdoc.Options = {
                 schema: {
                   type: 'object',
                   required: ['refreshToken'],
-                  properties: {
-                    refreshToken: { type: 'string' },
-                  },
+                  properties: { refreshToken: { type: 'string' } },
                 },
               },
             },
           },
           responses: {
-            '200': {
-              description: 'Token refreshed',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/AuthResponse' },
-                },
-              },
-            },
-            '401': {
-              description: 'Invalid refresh token',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/ErrorResponse' },
-                },
-              },
-            },
+            '200': { description: 'Token refreshed' },
+            '401': { description: 'Invalid refresh token' },
           },
         },
       },
       '/api/v1/auth/me': {
         get: {
           tags: ['Auth'],
-          summary: 'Get current user',
-          description: 'Get authenticated user profile',
-          security: [{ bearerAuth: [] }],
+          summary: 'Get current user profile',
           responses: {
-            '200': {
-              description: 'User profile',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: { $ref: '#/components/schemas/User' },
-                    },
-                  },
-                },
-              },
-            },
-            '401': {
-              description: 'Unauthorized',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/ErrorResponse' },
-                },
-              },
-            },
+            '200': { description: 'User profile', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, data: { $ref: '#/components/schemas/User' } } } } } },
+            '401': { description: 'Unauthorized' },
           },
         },
       },
+      '/api/v1/auth/logout': {
+        post: {
+          tags: ['Auth'],
+          summary: 'Logout user',
+          responses: {
+            '200': { description: 'Logged out' },
+          },
+        },
+      },
+      // ==================== PROCEDURES ====================
       '/api/v1/procedures': {
         get: {
           tags: ['Procedures'],
           summary: 'Get all procedure types',
-          description: 'Get list of available procedure types. Public endpoint.',
           responses: {
-            '200': {
-              description: 'List of procedure types',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: {
-                        type: 'array',
-                        items: { $ref: '#/components/schemas/ProcedureType' },
-                      },
-                    },
-                  },
-                },
-              },
-            },
+            '200': { description: 'List of procedures', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, data: { type: 'array', items: { $ref: '#/components/schemas/ProcedureType' } } } } } } },
           },
         },
       },
       '/api/v1/procedures/{id}': {
         get: {
           tags: ['Procedures'],
-          summary: 'Get procedure type by ID',
-          description: 'Get details of a specific procedure type',
-          security: [{ bearerAuth: [] }],
-          parameters: [
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: { type: 'string', format: 'uuid' },
-            },
-          ],
+          summary: 'Get procedure by ID',
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
           responses: {
-            '200': {
-              description: 'Procedure type details',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: { $ref: '#/components/schemas/ProcedureType' },
-                    },
-                  },
-                },
-              },
-            },
-            '404': {
-              description: 'Procedure type not found',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/ErrorResponse' },
-                },
-              },
-            },
+            '200': { description: 'Procedure details' },
+            '404': { description: 'Not found' },
           },
         },
       },
+      // ==================== STUDENT REQUESTS ====================
       '/api/v1/requests': {
+        get: {
+          tags: ['Student Requests'],
+          summary: 'Get my requests',
+          responses: {
+            '200': { description: 'List of requests' },
+          },
+        },
         post: {
           tags: ['Student Requests'],
           summary: 'Create a procedure request',
-          description: 'Submit a new procedure request',
-          security: [{ bearerAuth: [] }],
           requestBody: {
             required: true,
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  required: ['procedureTypeId'],
-                  properties: {
-                    procedureTypeId: { type: 'string', format: 'uuid' },
-                  },
-                },
-              },
-            },
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateRequestInput' } } },
           },
           responses: {
-            '201': {
-              description: 'Request created',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: { $ref: '#/components/schemas/ProcedureRequest' },
-                    },
-                  },
-                },
-              },
-            },
-            '400': {
-              description: 'Validation error',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/ErrorResponse' },
-                },
-              },
-            },
+            '201': { description: 'Request created', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, data: { $ref: '#/components/schemas/ProcedureRequest' } } } } } },
+            '400': { description: 'Validation error' },
           },
         },
       },
-      '/api/v1/requests/{id}': {
+      '/api/v1/requests/{id}/tracking': {
         get: {
           tags: ['Student Requests'],
-          summary: 'Get request by ID',
-          description: 'Get details of a specific procedure request',
-          security: [{ bearerAuth: [] }],
-          parameters: [
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: { type: 'string', format: 'uuid' },
-            },
-          ],
+          summary: 'Get request tracking',
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
           responses: {
-            '200': {
-              description: 'Request details',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: { $ref: '#/components/schemas/ProcedureRequest' },
-                    },
-                  },
-                },
-              },
-            },
-            '404': {
-              description: 'Request not found',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/ErrorResponse' },
-                },
-              },
-            },
-          },
-        },
-      },
-      '/api/v1/requests/{id}/status': {
-        patch: {
-          tags: ['Student Requests'],
-          summary: 'Update request status',
-          description: 'Update the status of a procedure request',
-          security: [{ bearerAuth: [] }],
-          parameters: [
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: { type: 'string', format: 'uuid' },
-            },
-          ],
-          requestBody: {
-            required: true,
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  required: ['status'],
-                  properties: {
-                    status: { type: 'string', enum: ['pending', 'in_review', 'approved', 'rejected'] },
-                    comment: { type: 'string' },
-                  },
-                },
-              },
-            },
-          },
-          responses: {
-            '200': {
-              description: 'Status updated',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/SuccessResponse' },
-                },
-              },
-            },
+            '200': { description: 'Request tracking data' },
           },
         },
       },
@@ -528,150 +435,18 @@ const options: swaggerJsdoc.Options = {
         get: {
           tags: ['Student Requests'],
           summary: 'Get request timeline',
-          description: 'Get timeline of status changes and observations',
-          security: [{ bearerAuth: [] }],
-          parameters: [
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: { type: 'string', format: 'uuid' },
-            },
-          ],
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
           responses: {
-            '200': {
-              description: 'Request timeline',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: {
-                        type: 'array',
-                        items: {
-                          type: 'object',
-                          properties: {
-                            id: { type: 'string' },
-                            action: { type: 'string' },
-                            description: { type: 'string' },
-                            createdAt: { type: 'string', format: 'date-time' },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
+            '200': { description: 'Timeline array' },
           },
         },
       },
-      '/api/v1/careers': {
-        get: {
-          tags: ['Careers'],
-          summary: 'Get all careers',
-          description: 'Get list of careers with faculty info. Public endpoint.',
-          responses: {
-            '200': {
-              description: 'List of careers',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: {
-                        type: 'array',
-                        items: { $ref: '#/components/schemas/Career' },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      '/api/v1/admin/dashboard/stats': {
-        get: {
-          tags: ['Admin Dashboard'],
-          summary: 'Get dashboard statistics',
-          description: 'Get overview statistics for admin dashboard',
-          security: [{ bearerAuth: [] }],
-          responses: {
-            '200': {
-              description: 'Dashboard statistics',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: { $ref: '#/components/schemas/DashboardStats' },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      '/api/v1/admin/requests': {
-        get: {
-          tags: ['Admin Requests'],
-          summary: 'Get all requests',
-          description: 'Get paginated list of procedure requests with filters',
-          security: [{ bearerAuth: [] }],
-          parameters: [
-            { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
-            { name: 'limit', in: 'query', schema: { type: 'integer', default: 10 } },
-            { name: 'status', in: 'query', schema: { type: 'string', enum: ['pending', 'in_review', 'approved', 'rejected'] } },
-            { name: 'procedureType', in: 'query', schema: { type: 'string' } },
-          ],
-          responses: {
-            '200': {
-              description: 'Paginated list of requests',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: {
-                        type: 'object',
-                        properties: {
-                          requests: {
-                            type: 'array',
-                            items: { $ref: '#/components/schemas/ProcedureRequest' },
-                          },
-                          total: { type: 'integer' },
-                          page: { type: 'integer' },
-                          totalPages: { type: 'integer' },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      '/api/v1/admin/requests/{id}/status': {
+      '/api/v1/requests/{id}/status': {
         patch: {
-          tags: ['Admin Requests'],
+          tags: ['Student Requests'],
           summary: 'Update request status (Admin)',
-          description: 'Admin endpoint to update request status with comment',
           security: [{ bearerAuth: [] }],
-          parameters: [
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: { type: 'string', format: 'uuid' },
-            },
-          ],
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
           requestBody: {
             required: true,
             content: {
@@ -688,211 +463,185 @@ const options: swaggerJsdoc.Options = {
             },
           },
           responses: {
-            '200': {
-              description: 'Status updated',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/SuccessResponse' },
-                },
-              },
-            },
+            '200': { description: 'Status updated' },
           },
         },
       },
-      '/api/v1/admin/procedures': {
+      // ==================== CAREERS ====================
+      '/api/v1/careers': {
         get: {
-          tags: ['Admin Procedures'],
-          summary: 'Get all procedures (Admin)',
-          description: 'Get list of all procedure types including inactive',
-          security: [{ bearerAuth: [] }],
+          tags: ['Careers'],
+          summary: 'Get all careers (public)',
+          security: [],
           responses: {
-            '200': {
-              description: 'List of procedures',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: {
-                        type: 'array',
-                        items: { $ref: '#/components/schemas/AdminProcedure' },
-                      },
-                    },
-                  },
-                },
-              },
-            },
+            '200': { description: 'List of careers', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, data: { type: 'array', items: { $ref: '#/components/schemas/Career' } } } } } } },
           },
         },
-        post: {
-          tags: ['Admin Procedures'],
-          summary: 'Create procedure type',
-          description: 'Create a new procedure type',
-          security: [{ bearerAuth: [] }],
+      },
+      // ==================== ADMIN DASHBOARD ====================
+      '/api/v1/admin/dashboard/stats': {
+        get: {
+          tags: ['Admin Dashboard'],
+          summary: 'Get dashboard statistics',
+          responses: {
+            '200': { description: 'Dashboard stats', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, data: { $ref: '#/components/schemas/DashboardStats' } } } } } },
+          },
+        },
+      },
+      '/api/v1/admin/dashboard/recent-requests': {
+        get: {
+          tags: ['Admin Dashboard'],
+          summary: 'Get recent requests',
+          responses: { '200': { description: 'Recent requests' } },
+        },
+      },
+      '/api/v1/admin/dashboard/requests-by-procedure': {
+        get: {
+          tags: ['Admin Dashboard'],
+          summary: 'Get requests grouped by procedure',
+          responses: { '200': { description: 'Requests by procedure' } },
+        },
+      },
+      // ==================== ADMIN REQUESTS ====================
+      '/api/v1/admin/requests': {
+        get: {
+          tags: ['Admin Requests'],
+          summary: 'Get all requests (paginated)',
+          parameters: [
+            { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+            { name: 'limit', in: 'query', schema: { type: 'integer', default: 10 } },
+            { name: 'status', in: 'query', schema: { type: 'string', enum: ['pending', 'in_review', 'approved', 'rejected'] } },
+          ],
+          responses: { '200': { description: 'Paginated requests' } },
+        },
+      },
+      '/api/v1/admin/requests/{id}': {
+        get: {
+          tags: ['Admin Requests'],
+          summary: 'Get request by ID',
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          responses: { '200': { description: 'Request details' } },
+        },
+      },
+      '/api/v1/admin/requests/{id}/documents': {
+        get: {
+          tags: ['Admin Requests'],
+          summary: 'Get request documents',
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          responses: { '200': { description: 'Documents list' } },
+        },
+      },
+      '/api/v1/admin/requests/{id}/history': {
+        get: {
+          tags: ['Admin Requests'],
+          summary: 'Get request history',
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          responses: { '200': { description: 'History list' } },
+        },
+      },
+      '/api/v1/admin/requests/{id}/timeline': {
+        get: {
+          tags: ['Admin Requests'],
+          summary: 'Get request timeline (admin)',
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          responses: { '200': { description: 'Timeline' } },
+        },
+      },
+      '/api/v1/admin/requests/{id}/status': {
+        patch: {
+          tags: ['Admin Requests'],
+          summary: 'Update request status',
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
           requestBody: {
             required: true,
             content: {
               'application/json': {
-                schema: { $ref: '#/components/schemas/AdminProcedure' },
-              },
-            },
-          },
-          responses: {
-            '201': {
-              description: 'Procedure created',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: { $ref: '#/components/schemas/AdminProcedure' },
-                    },
+                schema: {
+                  type: 'object',
+                  required: ['status'],
+                  properties: {
+                    status: { type: 'string', enum: ['pending', 'in_review', 'approved', 'rejected'] },
+                    comment: { type: 'string' },
                   },
                 },
               },
             },
           },
+          responses: { '200': { description: 'Status updated' } },
+        },
+      },
+      // ==================== ADMIN PROCEDURES ====================
+      '/api/v1/admin/procedures': {
+        get: {
+          tags: ['Admin Procedures'],
+          summary: 'Get all procedures (including inactive)',
+          responses: { '200': { description: 'List of procedures', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, data: { type: 'array', items: { $ref: '#/components/schemas/AdminProcedure' } } } } } } } },
+        },
+        post: {
+          tags: ['Admin Procedures'],
+          summary: 'Create procedure type',
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateProcedureInput' } } },
+          },
+          responses: { '201': { description: 'Procedure created', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, data: { $ref: '#/components/schemas/AdminProcedure' } } } } } } },
         },
       },
       '/api/v1/admin/procedures/{id}': {
         get: {
           tags: ['Admin Procedures'],
-          summary: 'Get procedure by ID (Admin)',
-          security: [{ bearerAuth: [] }],
-          parameters: [
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: { type: 'string', format: 'uuid' },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Procedure details',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: { $ref: '#/components/schemas/AdminProcedure' },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          summary: 'Get procedure by ID',
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          responses: { '200': { description: 'Procedure details' } },
         },
         put: {
           tags: ['Admin Procedures'],
-          summary: 'Update procedure type',
-          security: [{ bearerAuth: [] }],
-          parameters: [
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: { type: 'string', format: 'uuid' },
-            },
-          ],
+          summary: 'Update procedure',
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          requestBody: {
+            required: true,
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateProcedureInput' } } },
+          },
+          responses: { '200': { description: 'Procedure updated', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, data: { $ref: '#/components/schemas/AdminProcedure' } } } } } } },
+        },
+        delete: {
+          tags: ['Admin Procedures'],
+          summary: 'Delete procedure (soft delete)',
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          responses: { '200': { description: 'Procedure deleted' } },
+        },
+      },
+      '/api/v1/admin/procedures/{id}/status': {
+        patch: {
+          tags: ['Admin Procedures'],
+          summary: 'Toggle procedure active status',
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
           requestBody: {
             required: true,
             content: {
               'application/json': {
-                schema: { $ref: '#/components/schemas/AdminProcedure' },
-              },
-            },
-          },
-          responses: {
-            '200': {
-              description: 'Procedure updated',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: { $ref: '#/components/schemas/AdminProcedure' },
-                    },
-                  },
+                schema: {
+                  type: 'object',
+                  properties: { isActive: { type: 'boolean' } },
                 },
               },
             },
           },
-        },
-        delete: {
-          tags: ['Admin Procedures'],
-          summary: 'Delete procedure type (soft delete)',
-          security: [{ bearerAuth: [] }],
-          parameters: [
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: { type: 'string', format: 'uuid' },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Procedure deleted',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/SuccessResponse' },
-                },
-              },
-            },
-          },
+          responses: { '200': { description: 'Status toggled' } },
         },
       },
-      '/api/v1/observations/{requestId}': {
+      // ==================== ADMIN OBSERVATIONS ====================
+      '/api/v1/admin/requests/{requestId}/observations': {
         get: {
-          tags: ['Observations'],
-          summary: 'Get observations for a request',
-          security: [{ bearerAuth: [] }],
-          parameters: [
-            {
-              name: 'requestId',
-              in: 'path',
-              required: true,
-              schema: { type: 'string', format: 'uuid' },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'List of observations',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: {
-                        type: 'array',
-                        items: { $ref: '#/components/schemas/Observation' },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          tags: ['Admin Observations'],
+          summary: 'Get observations for request',
+          parameters: [{ name: 'requestId', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          responses: { '200': { description: 'Observations list' } },
         },
         post: {
-          tags: ['Observations'],
+          tags: ['Admin Observations'],
           summary: 'Create observation',
-          description: 'Add an observation to a request',
-          security: [{ bearerAuth: [] }],
-          parameters: [
-            {
-              name: 'requestId',
-              in: 'path',
-              required: true,
-              schema: { type: 'string', format: 'uuid' },
-            },
-          ],
+          parameters: [{ name: 'requestId', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
           requestBody: {
             required: true,
             content: {
@@ -900,122 +649,49 @@ const options: swaggerJsdoc.Options = {
                 schema: {
                   type: 'object',
                   required: ['comment'],
-                  properties: {
-                    comment: { type: 'string' },
-                  },
+                  properties: { comment: { type: 'string' } },
                 },
               },
             },
           },
-          responses: {
-            '201': {
-              description: 'Observation created',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: { $ref: '#/components/schemas/Observation' },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          responses: { '201': { description: 'Observation created' } },
         },
       },
-      '/api/v1/observations/{id}': {
+      '/api/v1/admin/observations/{id}': {
+        get: {
+          tags: ['Admin Observations'],
+          summary: 'Get observation by ID',
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          responses: { '200': { description: 'Observation details' } },
+        },
         delete: {
-          tags: ['Observations'],
+          tags: ['Admin Observations'],
           summary: 'Delete observation',
-          security: [{ bearerAuth: [] }],
-          parameters: [
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: { type: 'string', format: 'uuid' },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Observation deleted',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/SuccessResponse' },
-                },
-              },
-            },
-          },
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          responses: { '200': { description: 'Observation deleted' } },
         },
       },
+      // ==================== NOTIFICATIONS ====================
       '/api/v1/notifications': {
         get: {
           tags: ['Notifications'],
           summary: 'Get user notifications',
-          security: [{ bearerAuth: [] }],
-          responses: {
-            '200': {
-              description: 'List of notifications',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean' },
-                      data: {
-                        type: 'array',
-                        items: { $ref: '#/components/schemas/Notification' },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          responses: { '200': { description: 'Notifications list' } },
         },
       },
       '/api/v1/notifications/{id}/read': {
         patch: {
           tags: ['Notifications'],
           summary: 'Mark notification as read',
-          security: [{ bearerAuth: [] }],
-          parameters: [
-            {
-              name: 'id',
-              in: 'path',
-              required: true,
-              schema: { type: 'string', format: 'uuid' },
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Notification marked as read',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/SuccessResponse' },
-                },
-              },
-            },
-          },
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          responses: { '200': { description: 'Marked as read' } },
         },
       },
       '/api/v1/notifications/read-all': {
         patch: {
           tags: ['Notifications'],
           summary: 'Mark all notifications as read',
-          security: [{ bearerAuth: [] }],
-          responses: {
-            '200': {
-              description: 'All notifications marked as read',
-              content: {
-                'application/json': {
-                  schema: { $ref: '#/components/schemas/SuccessResponse' },
-                },
-              },
-            },
-          },
+          responses: { '200': { description: 'All marked as read' } },
         },
       },
     },
