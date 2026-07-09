@@ -32,24 +32,25 @@ const options: swaggerJsdoc.Options = {
             email: { type: 'string', format: 'email' },
             firstName: { type: 'string' },
             lastName: { type: 'string' },
-            career: { type: 'string' },
             role: { type: 'string', enum: ['student', 'admin'] },
+            career: { type: 'string', nullable: true },
           },
         },
         LoginRequest: {
           type: 'object',
           required: ['email', 'password'],
           properties: {
-            email: { type: 'string', format: 'email' },
+            email: { type: 'string', format: 'email', description: 'Must end with @uce.edu.ec' },
             password: { type: 'string', minLength: 6 },
           },
         },
         RegisterRequest: {
           type: 'object',
-          required: ['email', 'password', 'firstName', 'lastName', 'careerId'],
+          required: ['email', 'password'],
           properties: {
-            email: { type: 'string', format: 'email' },
+            email: { type: 'string', format: 'email', description: 'Must end with @uce.edu.ec' },
             password: { type: 'string', minLength: 6 },
+            fullName: { type: 'string', description: 'Optional - alternative to firstName/lastName' },
             firstName: { type: 'string' },
             lastName: { type: 'string' },
             careerId: { type: 'string', format: 'uuid' },
@@ -59,6 +60,7 @@ const options: swaggerJsdoc.Options = {
           type: 'object',
           properties: {
             success: { type: 'boolean' },
+            message: { type: 'string' },
             data: {
               type: 'object',
               properties: {
@@ -80,9 +82,41 @@ const options: swaggerJsdoc.Options = {
             id: { type: 'string', format: 'uuid' },
             name: { type: 'string' },
             description: { type: 'string' },
-            facultyId: { type: 'string', format: 'uuid', nullable: true },
-            careerId: { type: 'string', format: 'uuid', nullable: true },
+            requirementsText: { type: 'string' },
             isActive: { type: 'boolean' },
+            requirements: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/ProcedureRequirement' },
+            },
+          },
+        },
+        ProcedureRequirement: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            name: { type: 'string' },
+            description: { type: 'string' },
+            isMandatory: { type: 'boolean' },
+          },
+        },
+        CreateRequestInput: {
+          type: 'object',
+          required: ['procedureTypeId'],
+          properties: {
+            procedureTypeId: { type: 'string', format: 'uuid' },
+            career: { type: 'string' },
+            semester: { type: 'string' },
+            reason: { type: 'string' },
+            documents: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  fileName: { type: 'string' },
+                  fileUrl: { type: 'string' },
+                },
+              },
+            },
           },
         },
         ProcedureRequest: {
@@ -91,12 +125,34 @@ const options: swaggerJsdoc.Options = {
             id: { type: 'string', format: 'uuid' },
             studentId: { type: 'string', format: 'uuid' },
             procedureTypeId: { type: 'string', format: 'uuid' },
-            procedureName: { type: 'string' },
-            faculty: { type: 'string' },
-            career: { type: 'string' },
+            career: { type: 'string', nullable: true },
+            semester: { type: 'string', nullable: true },
+            reason: { type: 'string', nullable: true },
             status: { type: 'string', enum: ['pending', 'in_review', 'approved', 'rejected'] },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
+            procedure: { $ref: '#/components/schemas/ProcedureType' },
+            documents: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/UploadedDocument' },
+            },
+            observations: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/Observation' },
+            },
+            auditLogs: {
+              type: 'array',
+              items: { $ref: '#/components/schemas/AuditLogEntry' },
+            },
+          },
+        },
+        UploadedDocument: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            fileName: { type: 'string' },
+            fileUrl: { type: 'string' },
+            uploadedAt: { type: 'string', format: 'date-time' },
           },
         },
         Observation: {
@@ -105,9 +161,20 @@ const options: swaggerJsdoc.Options = {
             id: { type: 'string', format: 'uuid' },
             requestId: { type: 'string', format: 'uuid' },
             adminId: { type: 'string', format: 'uuid' },
-            adminName: { type: 'string' },
             comment: { type: 'string' },
             createdAt: { type: 'string', format: 'date-time' },
+            adminName: { type: 'string' },
+          },
+        },
+        AuditLogEntry: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            action: { type: 'string' },
+            oldValue: { type: 'string', nullable: true },
+            newValue: { type: 'string', nullable: true },
+            createdAt: { type: 'string', format: 'date-time' },
+            adminName: { type: 'string' },
           },
         },
         Notification: {
@@ -117,6 +184,7 @@ const options: swaggerJsdoc.Options = {
             userId: { type: 'string', format: 'uuid' },
             title: { type: 'string' },
             message: { type: 'string' },
+            type: { type: 'string', enum: ['REQUEST_CREATED', 'REQUEST_UPDATED', 'REQUEST_APPROVED', 'REQUEST_REJECTED', 'ADMIN_OBSERVATION'], nullable: true },
             isRead: { type: 'boolean' },
             createdAt: { type: 'string', format: 'date-time' },
           },
@@ -137,26 +205,45 @@ const options: swaggerJsdoc.Options = {
             },
           },
         },
+        CreateProcedureInput: {
+          type: 'object',
+          required: ['name', 'description', 'requirementsText'],
+          properties: {
+            name: { type: 'string' },
+            description: { type: 'string' },
+            requirementsText: { type: 'string' },
+            facultyId: { type: 'string', format: 'uuid', nullable: true },
+            careerId: { type: 'string', format: 'uuid', nullable: true },
+            isActive: { type: 'boolean', default: true },
+            requirements: {
+              type: 'array',
+              items: {
+                type: 'object',
+                required: ['name', 'description'],
+                properties: {
+                  name: { type: 'string' },
+                  description: { type: 'string' },
+                  isMandatory: { type: 'boolean', default: true },
+                },
+              },
+            },
+          },
+        },
         AdminProcedure: {
           type: 'object',
           properties: {
             id: { type: 'string', format: 'uuid' },
             name: { type: 'string' },
             description: { type: 'string' },
+            requirementsText: { type: 'string' },
+            isActive: { type: 'boolean' },
             facultyId: { type: 'string', format: 'uuid', nullable: true },
             careerId: { type: 'string', format: 'uuid', nullable: true },
-            isActive: { type: 'boolean' },
+            facultyName: { type: 'string', nullable: true },
+            careerName: { type: 'string', nullable: true },
             requirements: {
               type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string', format: 'uuid' },
-                  name: { type: 'string' },
-                  description: { type: 'string' },
-                  isRequired: { type: 'boolean' },
-                },
-              },
+              items: { $ref: '#/components/schemas/ProcedureRequirement' },
             },
           },
         },
@@ -167,7 +254,36 @@ const options: swaggerJsdoc.Options = {
             pendingRequests: { type: 'integer' },
             approvedRequests: { type: 'integer' },
             rejectedRequests: { type: 'integer' },
-            inReviewRequests: { type: 'integer' },
+          },
+        },
+        AdminRequestDetail: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            student: {
+              type: 'object',
+              properties: {
+                id: { type: 'string', format: 'uuid' },
+                firstName: { type: 'string' },
+                lastName: { type: 'string' },
+                email: { type: 'string' },
+                career: { type: 'string', nullable: true },
+              },
+            },
+            procedureType: {
+              type: 'object',
+              properties: {
+                id: { type: 'string', format: 'uuid' },
+                name: { type: 'string' },
+                description: { type: 'string' },
+              },
+            },
+            career: { type: 'string', nullable: true },
+            semester: { type: 'string', nullable: true },
+            reason: { type: 'string', nullable: true },
+            status: { type: 'string' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
           },
         },
         SuccessResponse: {
@@ -297,18 +413,10 @@ const options: swaggerJsdoc.Options = {
           summary: 'Create a procedure request',
           requestBody: {
             required: true,
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  required: ['procedureTypeId'],
-                  properties: { procedureTypeId: { type: 'string', format: 'uuid' } },
-                },
-              },
-            },
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateRequestInput' } } },
           },
           responses: {
-            '201': { description: 'Request created' },
+            '201': { description: 'Request created', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, data: { $ref: '#/components/schemas/ProcedureRequest' } } } } } },
             '400': { description: 'Validation error' },
           },
         },
@@ -467,16 +575,16 @@ const options: swaggerJsdoc.Options = {
         get: {
           tags: ['Admin Procedures'],
           summary: 'Get all procedures (including inactive)',
-          responses: { '200': { description: 'List of procedures' } },
+          responses: { '200': { description: 'List of procedures', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, data: { type: 'array', items: { $ref: '#/components/schemas/AdminProcedure' } } } } } } } },
         },
         post: {
           tags: ['Admin Procedures'],
           summary: 'Create procedure type',
           requestBody: {
             required: true,
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/AdminProcedure' } } },
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateProcedureInput' } } },
           },
-          responses: { '201': { description: 'Procedure created' } },
+          responses: { '201': { description: 'Procedure created', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, data: { $ref: '#/components/schemas/AdminProcedure' } } } } } } },
         },
       },
       '/api/v1/admin/procedures/{id}': {
@@ -492,9 +600,9 @@ const options: swaggerJsdoc.Options = {
           parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
           requestBody: {
             required: true,
-            content: { 'application/json': { schema: { $ref: '#/components/schemas/AdminProcedure' } } },
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateProcedureInput' } } },
           },
-          responses: { '200': { description: 'Procedure updated' } },
+          responses: { '200': { description: 'Procedure updated', content: { 'application/json': { schema: { type: 'object', properties: { success: { type: 'boolean' }, data: { $ref: '#/components/schemas/AdminProcedure' } } } } } } },
         },
         delete: {
           tags: ['Admin Procedures'],
