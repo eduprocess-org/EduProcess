@@ -46,7 +46,6 @@ export function useWasm(): UseWasmReturn {
 
   const validateEmailDomain = useCallback((email: string): boolean => {
     if (!isReady) {
-      // Fallback to JavaScript
       return email.endsWith('@uce.edu.ec');
     }
     return validateEmailDomainWasm(email);
@@ -54,7 +53,6 @@ export function useWasm(): UseWasmReturn {
 
   const hasValidFormat = useCallback((email: string): boolean => {
     if (!isReady) {
-      // Fallback to JavaScript
       return email.includes('@') && email.length >= 5;
     }
     return hasValidFormatWasm(email);
