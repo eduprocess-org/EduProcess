@@ -43,7 +43,7 @@ jobs:
 
       - name: Execute Install Checks (Dependencies)
         if: steps.filter-frontend.outputs.frontend_files == 'true'
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Execute Build Verification (Vite Compilation)
         if: steps.filter-frontend.outputs.frontend_files == 'true'
@@ -100,7 +100,7 @@ jobs:
 
       - name: Execute Install Checks (Dependencies)
         if: steps.filter-backend.outputs.backend_files == 'true'
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Execute Prisma Client Generation
         if: steps.filter-backend.outputs.backend_files == 'true'
@@ -143,7 +143,7 @@ jobs:
 
       - name: Execute Install Checks (Dependencies)
         if: steps.filter-desktop.outputs.desktop_files == 'true'
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Create Dynamic .env File for Electron
         if: steps.filter-desktop.outputs.desktop_files == 'true'

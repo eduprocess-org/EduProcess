@@ -7,6 +7,10 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
 
+  optimizeDeps: {
+    exclude: ['assemblyscript'],
+  },
+
   test: {
     globals: true,
     environment: "jsdom",

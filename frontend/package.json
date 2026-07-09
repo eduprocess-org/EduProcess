@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:wasm": "npx assemblyscript src/wasm/assembly/index.ts --outFile src/wasm/pkg/eduprocess_wasm.wasm --textFile src/wasm/pkg/eduprocess_wasm.wat --optimize",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run"
