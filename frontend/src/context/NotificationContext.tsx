@@ -3,10 +3,13 @@ import {
   useContext,
   useEffect,
   useState,
+  useRef,
+  useCallback,
   type ReactNode,
 } from "react";
 import { apiClient } from "../services/api/apiClient";
 import { useAuth } from "../hooks/useAuth";
+
 export interface Notification {
   id: string;
   title: string;
@@ -20,9 +23,7 @@ interface NotificationContextType {
   notifications: Notification[];
   loading: boolean;
   error: string | null;
-
   unreadCount: number;
-
   fetchNotifications: () => Promise<void>;
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
@@ -34,60 +35,72 @@ const NotificationContext = createContext<NotificationContextType | undefined>(
 );
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, initialized } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const fetchInProgressRef = useRef(false);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
+    if (fetchInProgressRef.current) return;
+
+    fetchInProgressRef.current = true;
     setLoading(true);
     setError(null);
 
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
+
     try {
-      const res = await apiClient.get("/notifications");
+      const res = await apiClient.get("/notifications", {
+        signal: abortControllerRef.current.signal,
+      });
       setNotifications(Array.isArray(res.data?.data) ? res.data.data : []);
-    } catch (err) {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === "AbortError") return;
       setError("Error loading notifications");
     } finally {
       setLoading(false);
+      fetchInProgressRef.current = false;
     }
-  };
+  }, []);
 
-  const refreshNotifications = async () => {
+  const refreshNotifications = useCallback(async () => {
     await fetchNotifications();
-  };
+  }, [fetchNotifications]);
 
-  const markAsRead = async (id: string) => {
+  const markAsRead = useCallback(async (id: string) => {
     try {
       await apiClient.patch(`/notifications/${id}/read`);
-
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, read: true } : n))
       );
-    } catch (err) {
+    } catch {
       setError("Error updating notification");
     }
-  };
+  }, []);
 
-  const markAllAsRead = async () => {
+  const markAllAsRead = useCallback(async () => {
     try {
       await apiClient.patch("/notifications/read-all");
-
-      setNotifications((prev) =>
-        prev.map((n) => ({ ...n, read: true }))
-      );
-    } catch (err) {
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    } catch {
       setError("Error updating notifications");
     }
-  };
+  }, []);
 
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
+    if (!authLoading && initialized && isAuthenticated) {
       fetchNotifications();
     }
-  }, [authLoading, isAuthenticated]);
+
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, [authLoading, initialized, isAuthenticated, fetchNotifications]);
 
   return (
     <NotificationContext.Provider
