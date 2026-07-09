@@ -2,7 +2,7 @@
   "info": {
     "name": "EduProcess API",
     "_postman_id": "eduprocess-api-collection",
-    "description": "Complete API collection for EduProcess - Academic Procedures Management System",
+    "description": "Complete API collection for EduProcess - Academic Procedures Management System for UCE",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -26,21 +26,32 @@
       "name": "00 - Auth",
       "item": [
         {
-          "name": "Login (Student)",
+          "name": "TC-AUTH-001: Login successfully with valid credentials",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "var jsonData = pm.response.json();",
-                  "if (jsonData.success && jsonData.data.tokens) {",
-                  "    pm.environment.set('token', jsonData.data.tokens.sessionToken);",
-                  "    pm.environment.set('refreshToken', jsonData.data.tokens.refreshToken);",
-                  "}",
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
-                  "pm.test('Login successful', function () {",
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has success field', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "pm.test('Response contains user and tokens', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('user');",
+                  "    pm.expect(jsonData.data).to.have.property('tokens');",
+                  "    pm.expect(jsonData.data.tokens).to.have.property('sessionToken');",
+                  "    pm.expect(jsonData.data.tokens).to.have.property('refreshToken');",
+                  "});",
+                  "pm.test('User has correct role', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.user.role).to.equal('student');",
+                  "});",
+                  "pm.test('Save token for other requests', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('token', jsonData.data.tokens.sessionToken);",
+                  "    pm.environment.set('refreshToken', jsonData.data.tokens.refreshToken);",
                   "});"
                 ]
               }
@@ -57,21 +68,70 @@
           }
         },
         {
-          "name": "Login (Admin)",
+          "name": "TC-AUTH-002: Login fails with wrong password",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "var jsonData = pm.response.json();",
-                  "if (jsonData.success && jsonData.data.tokens) {",
-                  "    pm.environment.set('token', jsonData.data.tokens.sessionToken);",
-                  "    pm.environment.set('refreshToken', jsonData.data.tokens.refreshToken);",
-                  "}",
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
-                  "pm.test('Admin login successful', function () {",
+                  "pm.test('Status 401 Unauthorized', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Response has error message', function () {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.success).to.be.false;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{studentEmail}}\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": { "raw": "{{apiUrl}}/auth/login", "host": ["{{apiUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "TC-AUTH-003: Login fails with non-institutional email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 Bad Request', function () { pm.response.to.have.status(400); });",
+                  "pm.test('Error mentions institutional email', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.include('@uce.edu.ec');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@gmail.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{apiUrl}}/auth/login", "host": ["{{apiUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "TC-AUTH-004: Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Admin token saved', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.user.role).to.equal('admin');",
+                  "    pm.environment.set('adminToken', jsonData.data.tokens.sessionToken);",
+                  "    pm.environment.set('adminRefreshToken', jsonData.data.tokens.refreshToken);",
                   "});"
                 ]
               }
@@ -88,13 +148,13 @@
           }
         },
         {
-          "name": "Register",
+          "name": "TC-AUTH-005: Register new student",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Status 201 Created', function () { pm.response.to.have.status(201); });",
                   "pm.test('Registration successful', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
@@ -114,18 +174,43 @@
           }
         },
         {
-          "name": "Refresh Token",
+          "name": "TC-AUTH-006: Register fails with non-institutional email",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "var jsonData = pm.response.json();",
-                  "if (jsonData.success && jsonData.data.tokens) {",
-                  "    pm.environment.set('token', jsonData.data.tokens.sessionToken);",
-                  "    pm.environment.set('refreshToken', jsonData.data.tokens.refreshToken);",
-                  "}",
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 400 Bad Request', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@gmail.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"careerId\": \"b1000000-0000-0000-0000-000000000001\"\n}"
+            },
+            "url": { "raw": "{{apiUrl}}/auth/register", "host": ["{{apiUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "TC-AUTH-007: Refresh token successfully",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('New tokens saved', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success && jsonData.data.tokens) {",
+                  "        pm.environment.set('token', jsonData.data.tokens.sessionToken);",
+                  "        pm.environment.set('refreshToken', jsonData.data.tokens.refreshToken);",
+                  "    }",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});"
                 ]
               }
             }
@@ -141,17 +226,21 @@
           }
         },
         {
-          "name": "Get Profile",
+          "name": "TC-AUTH-008: Get current user profile",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
-                  "pm.test('Has user data', function () {",
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Has user data with correct fields', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
                   "    pm.expect(jsonData.data).to.have.property('email');",
+                  "    pm.expect(jsonData.data).to.have.property('firstName');",
+                  "    pm.expect(jsonData.data).to.have.property('lastName');",
+                  "    pm.expect(jsonData.data).to.have.property('role');",
                   "});"
                 ]
               }
@@ -164,13 +253,32 @@
           }
         },
         {
-          "name": "Logout",
+          "name": "TC-AUTH-009: Get profile fails without token",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 401 Unauthorized', function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{apiUrl}}/auth/me", "host": ["{{apiUrl}}"], "path": ["auth", "me"] },
+            "auth": { "type": "noop" }
+          }
+        },
+        {
+          "name": "TC-AUTH-010: Logout successfully",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -184,20 +292,29 @@
       ]
     },
     {
-      "name": "01 - Procedures (Student)",
+      "name": "01 - Procedures",
       "item": [
         {
-          "name": "Get All Procedures",
+          "name": "TC-PROC-001: Get all active procedures",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
-                  "pm.test('Returns array', function () {",
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns array of procedures', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});",
+                  "pm.test('Each procedure has required fields', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data.length > 0) {",
+                  "        var proc = jsonData.data[0];",
+                  "        pm.expect(proc).to.have.property('id');",
+                  "        pm.expect(proc).to.have.property('name');",
+                  "        pm.expect(proc).to.have.property('description');",
+                  "    }",
                   "});"
                 ]
               }
@@ -210,17 +327,18 @@
           }
         },
         {
-          "name": "Get Procedure by ID",
+          "name": "TC-PROC-002: Get procedure by valid ID",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
-                  "pm.test('Has procedure data', function () {",
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Procedure has correct structure', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data).to.have.property('name');",
                   "});"
                 ]
               }
@@ -231,6 +349,24 @@
             "header": [],
             "url": { "raw": "{{apiUrl}}/procedures/{{procedureTypeId}}", "host": ["{{apiUrl}}"], "path": ["procedures", "{{procedureTypeId}}"] }
           }
+        },
+        {
+          "name": "TC-PROC-003: Get procedure returns 404 for invalid ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404 Not Found', function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{apiUrl}}/procedures/00000000-0000-0000-0000-000000000000", "host": ["{{apiUrl}}"], "path": ["procedures", "00000000-0000-0000-0000-000000000000"] }
+          }
         }
       ]
     },
@@ -238,17 +374,23 @@
       "name": "02 - Student Requests",
       "item": [
         {
-          "name": "Create Request",
+          "name": "TC-REQ-001: Create new procedure request",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "var jsonData = pm.response.json();",
-                  "if (jsonData.success && jsonData.data) {",
+                  "pm.test('Status 201 Created', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Request has correct structure', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data).to.have.property('status');",
+                  "});",
+                  "pm.test('Save request ID', function () {",
+                  "    var jsonData = pm.response.json();",
                   "    pm.environment.set('requestId', jsonData.data.id);",
-                  "}",
-                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });"
+                  "});"
                 ]
               }
             }
@@ -264,13 +406,39 @@
           }
         },
         {
-          "name": "Get My Requests",
+          "name": "TC-REQ-002: Create request fails without procedureTypeId",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 400 Bad Request', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": { "raw": "{{apiUrl}}/requests", "host": ["{{apiUrl}}"], "path": ["requests"] }
+          }
+        },
+        {
+          "name": "TC-REQ-003: Get my requests",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});"
                 ]
               }
             }
@@ -282,13 +450,13 @@
           }
         },
         {
-          "name": "Get Request Tracking",
+          "name": "TC-REQ-004: Get request tracking details",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -300,14 +468,14 @@
           }
         },
         {
-          "name": "Get Request Timeline",
+          "name": "TC-REQ-005: Get request timeline",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
-                  "pm.test('Returns array', function () {",
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns timeline array', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.be.an('array');",
@@ -328,17 +496,25 @@
       "name": "03 - Careers",
       "item": [
         {
-          "name": "Get All Careers",
+          "name": "TC-CAREER-001: Get all careers (public)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
-                  "pm.test('Returns array', function () {",
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns array of careers', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});",
+                  "pm.test('Career has faculty info', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data.length > 0) {",
+                  "        var career = jsonData.data[0];",
+                  "        pm.expect(career).to.have.property('name');",
+                  "        pm.expect(career).to.have.property('faculty');",
+                  "    }",
                   "});"
                 ]
               }
@@ -356,17 +532,20 @@
       "name": "04 - Admin Dashboard",
       "item": [
         {
-          "name": "Get Dashboard Stats",
+          "name": "TC-DASH-001: Get dashboard statistics",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
-                  "pm.test('Has stats', function () {",
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Stats have required fields', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.have.property('totalRequests');",
+                  "    pm.expect(jsonData.data).to.have.property('pendingRequests');",
+                  "    pm.expect(jsonData.data).to.have.property('approvedRequests');",
+                  "    pm.expect(jsonData.data).to.have.property('rejectedRequests');",
                   "});"
                 ]
               }
@@ -379,13 +558,35 @@
           }
         },
         {
-          "name": "Get Recent Requests",
+          "name": "TC-DASH-002: Get dashboard fails for non-admin",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 403 Forbidden', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{apiUrl}}/admin/dashboard/stats", "host": ["{{apiUrl}}"], "path": ["admin", "dashboard", "stats"] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            }
+          }
+        },
+        {
+          "name": "TC-DASH-003: Get recent requests",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -397,13 +598,13 @@
           }
         },
         {
-          "name": "Get Requests by Procedure",
+          "name": "TC-DASH-004: Get requests by procedure type",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -420,13 +621,17 @@
       "name": "05 - Admin Requests",
       "item": [
         {
-          "name": "Get All Requests",
+          "name": "TC-ADM-REQ-001: Get all requests with pagination",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Has pagination data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});"
                 ]
               }
             }
@@ -446,13 +651,18 @@
           }
         },
         {
-          "name": "Get Request by ID",
+          "name": "TC-ADM-REQ-002: Get request by ID",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Has student and procedure info', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('student');",
+                  "    pm.expect(jsonData.data).to.have.property('procedureType');",
+                  "});"
                 ]
               }
             }
@@ -464,13 +674,31 @@
           }
         },
         {
-          "name": "Get Request Documents",
+          "name": "TC-ADM-REQ-003: Get request returns 404 for invalid ID",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 404 Not Found', function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{apiUrl}}/admin/requests/00000000-0000-0000-0000-000000000000", "host": ["{{apiUrl}}"], "path": ["admin", "requests", "00000000-0000-0000-0000-000000000000"] }
+          }
+        },
+        {
+          "name": "TC-ADM-REQ-004: Get request documents",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -482,13 +710,13 @@
           }
         },
         {
-          "name": "Get Request History",
+          "name": "TC-ADM-REQ-005: Get request history",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -500,13 +728,13 @@
           }
         },
         {
-          "name": "Get Request Timeline (Admin)",
+          "name": "TC-ADM-REQ-006: Get request timeline (admin)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -518,13 +746,13 @@
           }
         },
         {
-          "name": "Update Request Status",
+          "name": "TC-ADM-REQ-007: Update request status to approved",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -538,6 +766,28 @@
             },
             "url": { "raw": "{{apiUrl}}/admin/requests/{{requestId}}/status", "host": ["{{apiUrl}}"], "path": ["admin", "requests", "{{requestId}}", "status"] }
           }
+        },
+        {
+          "name": "TC-ADM-REQ-008: Update status fails with invalid status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 Bad Request', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"invalid_status\"\n}"
+            },
+            "url": { "raw": "{{apiUrl}}/admin/requests/{{requestId}}/status", "host": ["{{apiUrl}}"], "path": ["admin", "requests", "{{requestId}}", "status"] }
+          }
         }
       ]
     },
@@ -545,13 +795,18 @@
       "name": "06 - Admin Procedures",
       "item": [
         {
-          "name": "Get All Procedures",
+          "name": "TC-ADM-PROC-001: Get all procedures (including inactive)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
                 ]
               }
             }
@@ -563,31 +818,22 @@
           }
         },
         {
-          "name": "Get Procedure by ID",
+          "name": "TC-ADM-PROC-002: Create new procedure",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": { "raw": "{{apiUrl}}/admin/procedures/{{procedureTypeId}}", "host": ["{{apiUrl}}"], "path": ["admin", "procedures", "{{procedureTypeId}}"] }
-          }
-        },
-        {
-          "name": "Create Procedure",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });"
+                  "pm.test('Status 201 Created', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Procedure created with ID', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "});",
+                  "pm.test('Save new procedure ID', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('newProcedureId', jsonData.data.id);",
+                  "});"
                 ]
               }
             }
@@ -597,19 +843,41 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Test Procedure\",\n  \"description\": \"Test procedure description\",\n  \"isActive\": true,\n  \"requirements\": []\n}"
+              "raw": "{\n  \"name\": \"Test Procedure\",\n  \"description\": \"Test procedure for API validation\",\n  \"requirementsText\": \"Requirements for test procedure\",\n  \"isActive\": true,\n  \"requirements\": [\n    {\n      \"name\": \"Document A\",\n      \"description\": \"First required document\",\n      \"isMandatory\": true\n    }\n  ]\n}"
             },
             "url": { "raw": "{{apiUrl}}/admin/procedures", "host": ["{{apiUrl}}"], "path": ["admin", "procedures"] }
           }
         },
         {
-          "name": "Update Procedure",
+          "name": "TC-ADM-PROC-003: Create procedure fails without name",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 400 Bad Request', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Missing name field\"\n}"
+            },
+            "url": { "raw": "{{apiUrl}}/admin/procedures", "host": ["{{apiUrl}}"], "path": ["admin", "procedures"] }
+          }
+        },
+        {
+          "name": "TC-ADM-PROC-004: Update procedure",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -619,19 +887,19 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated Procedure\",\n  \"description\": \"Updated description\",\n  \"isActive\": true,\n  \"requirements\": []\n}"
+              "raw": "{\n  \"name\": \"Updated Procedure\",\n  \"description\": \"Updated description\",\n  \"requirementsText\": \"Updated requirements\",\n  \"isActive\": true,\n  \"requirements\": []\n}"
             },
             "url": { "raw": "{{apiUrl}}/admin/procedures/{{procedureTypeId}}", "host": ["{{apiUrl}}"], "path": ["admin", "procedures", "{{procedureTypeId}}"] }
           }
         },
         {
-          "name": "Toggle Procedure Status",
+          "name": "TC-ADM-PROC-005: Toggle procedure status",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -647,13 +915,13 @@
           }
         },
         {
-          "name": "Delete Procedure (Soft Delete)",
+          "name": "TC-ADM-PROC-006: Delete procedure (soft delete)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -670,13 +938,13 @@
       "name": "07 - Admin Observations",
       "item": [
         {
-          "name": "Get Observations for Request",
+          "name": "TC-OBS-001: Get observations for request",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
                   "pm.test('Returns array', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
@@ -693,13 +961,23 @@
           }
         },
         {
-          "name": "Create Observation",
+          "name": "TC-OBS-002: Create observation",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });"
+                  "pm.test('Status 201 Created', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Observation has correct structure', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data).to.have.property('comment');",
+                  "});",
+                  "pm.test('Save observation ID', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('observationId', jsonData.data.id);",
+                  "});"
                 ]
               }
             }
@@ -709,19 +987,41 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"comment\": \"Please provide additional documents\"\n}"
+              "raw": "{\n  \"comment\": \"Please provide additional documents for verification\"\n}"
             },
             "url": { "raw": "{{apiUrl}}/admin/requests/{{requestId}}/observations", "host": ["{{apiUrl}}"], "path": ["admin", "requests", "{{requestId}}", "observations"] }
           }
         },
         {
-          "name": "Get Observation by ID",
+          "name": "TC-OBS-003: Create observation fails without comment",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 400 Bad Request', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": { "raw": "{{apiUrl}}/admin/requests/{{requestId}}/observations", "host": ["{{apiUrl}}"], "path": ["admin", "requests", "{{requestId}}", "observations"] }
+          }
+        },
+        {
+          "name": "TC-OBS-004: Get observation by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -733,13 +1033,13 @@
           }
         },
         {
-          "name": "Delete Observation",
+          "name": "TC-OBS-005: Delete observation",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -756,17 +1056,27 @@
       "name": "08 - Notifications",
       "item": [
         {
-          "name": "Get All Notifications",
+          "name": "TC-NOTIF-001: Get all notifications",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
                   "pm.test('Returns array', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});",
+                  "pm.test('Notification has correct fields', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data.length > 0) {",
+                  "        var notif = jsonData.data[0];",
+                  "        pm.expect(notif).to.have.property('id');",
+                  "        pm.expect(notif).to.have.property('title');",
+                  "        pm.expect(notif).to.have.property('message');",
+                  "        pm.expect(notif).to.have.property('isRead');",
+                  "    }",
                   "});"
                 ]
               }
@@ -779,13 +1089,13 @@
           }
         },
         {
-          "name": "Mark as Read",
+          "name": "TC-NOTIF-002: Mark notification as read",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -797,13 +1107,13 @@
           }
         },
         {
-          "name": "Mark All as Read",
+          "name": "TC-NOTIF-003: Mark all notifications as read",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -820,16 +1130,21 @@
       "name": "09 - Health",
       "item": [
         {
-          "name": "Health Check",
+          "name": "TC-HEALTH-001: Server health check",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
-                  "pm.test('Server running', function () {",
+                  "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Server is running', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.message).to.include('running');",
+                  "});",
+                  "pm.test('Has timestamp', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('timestamp');",
                   "});"
                 ]
               }
