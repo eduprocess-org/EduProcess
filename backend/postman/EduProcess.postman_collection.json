@@ -108,7 +108,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"newuser@test.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"careerId\": \"b1000000-0000-0000-0000-000000000001\"\n}"
+              "raw": "{\n  \"email\": \"newuser@uce.edu.ec\",\n  \"password\": \"password123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"careerId\": \"b1000000-0000-0000-0000-000000000001\"\n}"
             },
             "url": { "raw": "{{apiUrl}}/auth/register", "host": ["{{apiUrl}}"], "path": ["auth", "register"] }
           }
