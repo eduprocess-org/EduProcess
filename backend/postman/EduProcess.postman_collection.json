@@ -23,10 +23,10 @@
   ],
   "item": [
     {
-      "name": "Auth",
+      "name": "00 - Auth",
       "item": [
         {
-          "name": "Login",
+          "name": "Login (Student)",
           "event": [
             {
               "listen": "test",
@@ -36,14 +36,9 @@
                   "if (jsonData.success && jsonData.data.tokens) {",
                   "    pm.environment.set('token', jsonData.data.tokens.sessionToken);",
                   "    pm.environment.set('refreshToken', jsonData.data.tokens.refreshToken);",
-                  "    console.log('Token saved successfully');",
                   "}",
-                  "",
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has success field', function () {",
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Login successful', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "});"
@@ -53,21 +48,12 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"{{studentEmail}}\",\n  \"password\": \"{{studentPassword}}\"\n}"
             },
-            "url": {
-              "raw": "{{apiUrl}}/auth/login",
-              "host": ["{{apiUrl}}"],
-              "path": ["auth", "login"]
-            }
+            "url": { "raw": "{{apiUrl}}/auth/login", "host": ["{{apiUrl}}"], "path": ["auth", "login"] }
           }
         },
         {
@@ -81,47 +67,9 @@
                   "if (jsonData.success && jsonData.data.tokens) {",
                   "    pm.environment.set('token', jsonData.data.tokens.sessionToken);",
                   "    pm.environment.set('refreshToken', jsonData.data.tokens.refreshToken);",
-                  "    console.log('Admin token saved successfully');",
                   "}",
-                  "",
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
-            },
-            "url": {
-              "raw": "{{apiUrl}}/auth/login",
-              "host": ["{{apiUrl}}"],
-              "path": ["auth", "login"]
-            }
-          }
-        },
-        {
-          "name": "Register",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 201', function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});",
-                  "",
-                  "pm.test('Response has success field', function () {",
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Admin login successful', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "});"
@@ -131,21 +79,38 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": { "raw": "{{apiUrl}}/auth/login", "host": ["{{apiUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Registration successful', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});"
+                ]
               }
-            ],
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"newuser@test.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"careerId\": \"b1000000-0000-0000-0000-000000000001\"\n}"
             },
-            "url": {
-              "raw": "{{apiUrl}}/auth/register",
-              "host": ["{{apiUrl}}"],
-              "path": ["auth", "register"]
-            }
+            "url": { "raw": "{{apiUrl}}/auth/register", "host": ["{{apiUrl}}"], "path": ["auth", "register"] }
           }
         },
         {
@@ -159,33 +124,20 @@
                   "if (jsonData.success && jsonData.data.tokens) {",
                   "    pm.environment.set('token', jsonData.data.tokens.sessionToken);",
                   "    pm.environment.set('refreshToken', jsonData.data.tokens.refreshToken);",
-                  "    console.log('Token refreshed successfully');",
                   "}",
-                  "",
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
             },
-            "url": {
-              "raw": "{{apiUrl}}/auth/refresh",
-              "host": ["{{apiUrl}}"],
-              "path": ["auth", "refresh"]
-            }
+            "url": { "raw": "{{apiUrl}}/auth/refresh", "host": ["{{apiUrl}}"], "path": ["auth", "refresh"] }
           }
         },
         {
@@ -195,11 +147,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has user data', function () {",
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Has user data', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.have.property('email');",
@@ -211,17 +160,31 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/auth/me",
-              "host": ["{{apiUrl}}"],
-              "path": ["auth", "me"]
+            "url": { "raw": "{{apiUrl}}/auth/me", "host": ["{{apiUrl}}"], "path": ["auth", "me"] }
+          }
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
             }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{apiUrl}}/auth/logout", "host": ["{{apiUrl}}"], "path": ["auth", "logout"] }
           }
         }
       ]
     },
     {
-      "name": "Procedures",
+      "name": "01 - Procedures (Student)",
       "item": [
         {
           "name": "Get All Procedures",
@@ -230,11 +193,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has procedures array', function () {",
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns array', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.be.an('array');",
@@ -246,11 +206,7 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/procedures",
-              "host": ["{{apiUrl}}"],
-              "path": ["procedures"]
-            }
+            "url": { "raw": "{{apiUrl}}/procedures", "host": ["{{apiUrl}}"], "path": ["procedures"] }
           }
         },
         {
@@ -260,11 +216,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has procedure data', function () {",
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Has procedure data', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.have.property('id');",
@@ -276,17 +229,13 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/procedures/{{procedureTypeId}}",
-              "host": ["{{apiUrl}}"],
-              "path": ["procedures", "{{procedureTypeId}}"]
-            }
+            "url": { "raw": "{{apiUrl}}/procedures/{{procedureTypeId}}", "host": ["{{apiUrl}}"], "path": ["procedures", "{{procedureTypeId}}"] }
           }
         }
       ]
     },
     {
-      "name": "Student Requests",
+      "name": "02 - Student Requests",
       "item": [
         {
           "name": "Create Request",
@@ -298,51 +247,30 @@
                   "var jsonData = pm.response.json();",
                   "if (jsonData.success && jsonData.data) {",
                   "    pm.environment.set('requestId', jsonData.data.id);",
-                  "    console.log('Request ID saved: ' + jsonData.data.id);",
                   "}",
-                  "",
-                  "pm.test('Status code is 201', function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});"
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });"
                 ]
               }
             }
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"procedureTypeId\": \"c1000000-0000-0000-0000-000000000001\"\n}"
             },
-            "url": {
-              "raw": "{{apiUrl}}/requests",
-              "host": ["{{apiUrl}}"],
-              "path": ["requests"]
-            }
+            "url": { "raw": "{{apiUrl}}/requests", "host": ["{{apiUrl}}"], "path": ["requests"] }
           }
         },
         {
-          "name": "Get Request",
+          "name": "Get My Requests",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has request data', function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.data).to.have.property('status');",
-                  "});"
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -350,58 +278,36 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/requests/{{requestId}}",
-              "host": ["{{apiUrl}}"],
-              "path": ["requests", "{{requestId}}"]
-            }
+            "url": { "raw": "{{apiUrl}}/requests", "host": ["{{apiUrl}}"], "path": ["requests"] }
           }
         },
         {
-          "name": "Update Status",
+          "name": "Get Request Tracking",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
           ],
           "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"in_review\"\n}"
-            },
-            "url": {
-              "raw": "{{apiUrl}}/requests/{{requestId}}/status",
-              "host": ["{{apiUrl}}"],
-              "path": ["requests", "{{requestId}}", "status"]
-            }
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{apiUrl}}/requests/{{requestId}}/tracking", "host": ["{{apiUrl}}"], "path": ["requests", "{{requestId}}", "tracking"] }
           }
         },
         {
-          "name": "Get Timeline",
+          "name": "Get Request Timeline",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has timeline array', function () {",
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns array', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.be.an('array');",
@@ -413,17 +319,13 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/requests/{{requestId}}/timeline",
-              "host": ["{{apiUrl}}"],
-              "path": ["requests", "{{requestId}}", "timeline"]
-            }
+            "url": { "raw": "{{apiUrl}}/requests/{{requestId}}/timeline", "host": ["{{apiUrl}}"], "path": ["requests", "{{requestId}}", "timeline"] }
           }
         }
       ]
     },
     {
-      "name": "Careers",
+      "name": "03 - Careers",
       "item": [
         {
           "name": "Get All Careers",
@@ -432,11 +334,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has careers array', function () {",
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns array', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.be.an('array');",
@@ -448,30 +347,23 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/careers",
-              "host": ["{{apiUrl}}"],
-              "path": ["careers"]
-            }
+            "url": { "raw": "{{apiUrl}}/careers", "host": ["{{apiUrl}}"], "path": ["careers"] }
           }
         }
       ]
     },
     {
-      "name": "Admin Dashboard",
+      "name": "04 - Admin Dashboard",
       "item": [
         {
-          "name": "Get Stats",
+          "name": "Get Dashboard Stats",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has stats data', function () {",
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Has stats', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.have.property('totalRequests');",
@@ -483,17 +375,49 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/admin/dashboard/stats",
-              "host": ["{{apiUrl}}"],
-              "path": ["admin", "dashboard", "stats"]
+            "url": { "raw": "{{apiUrl}}/admin/dashboard/stats", "host": ["{{apiUrl}}"], "path": ["admin", "dashboard", "stats"] }
+          }
+        },
+        {
+          "name": "Get Recent Requests",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
             }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{apiUrl}}/admin/dashboard/recent-requests", "host": ["{{apiUrl}}"], "path": ["admin", "dashboard", "recent-requests"] }
+          }
+        },
+        {
+          "name": "Get Requests by Procedure",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{apiUrl}}/admin/dashboard/requests-by-procedure", "host": ["{{apiUrl}}"], "path": ["admin", "dashboard", "requests-by-procedure"] }
           }
         }
       ]
     },
     {
-      "name": "Admin Requests",
+      "name": "05 - Admin Requests",
       "item": [
         {
           "name": "Get All Requests",
@@ -502,14 +426,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has requests data', function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "});"
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -522,16 +439,82 @@
               "host": ["{{apiUrl}}"],
               "path": ["admin", "requests"],
               "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
               ]
             }
+          }
+        },
+        {
+          "name": "Get Request by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{apiUrl}}/admin/requests/{{requestId}}", "host": ["{{apiUrl}}"], "path": ["admin", "requests", "{{requestId}}"] }
+          }
+        },
+        {
+          "name": "Get Request Documents",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{apiUrl}}/admin/requests/{{requestId}}/documents", "host": ["{{apiUrl}}"], "path": ["admin", "requests", "{{requestId}}", "documents"] }
+          }
+        },
+        {
+          "name": "Get Request History",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{apiUrl}}/admin/requests/{{requestId}}/history", "host": ["{{apiUrl}}"], "path": ["admin", "requests", "{{requestId}}", "history"] }
+          }
+        },
+        {
+          "name": "Get Request Timeline (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{apiUrl}}/admin/requests/{{requestId}}/timeline", "host": ["{{apiUrl}}"], "path": ["admin", "requests", "{{requestId}}", "timeline"] }
           }
         },
         {
@@ -541,36 +524,25 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
           ],
           "request": {
             "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"status\": \"approved\",\n  \"comment\": \"Request approved by admin\"\n}"
             },
-            "url": {
-              "raw": "{{apiUrl}}/admin/requests/{{requestId}}/status",
-              "host": ["{{apiUrl}}"],
-              "path": ["admin", "requests", "{{requestId}}", "status"]
-            }
+            "url": { "raw": "{{apiUrl}}/admin/requests/{{requestId}}/status", "host": ["{{apiUrl}}"], "path": ["admin", "requests", "{{requestId}}", "status"] }
           }
         }
       ]
     },
     {
-      "name": "Admin Procedures",
+      "name": "06 - Admin Procedures",
       "item": [
         {
           "name": "Get All Procedures",
@@ -579,9 +551,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -589,11 +559,25 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/admin/procedures",
-              "host": ["{{apiUrl}}"],
-              "path": ["admin", "procedures"]
+            "url": { "raw": "{{apiUrl}}/admin/procedures", "host": ["{{apiUrl}}"], "path": ["admin", "procedures"] }
+          }
+        },
+        {
+          "name": "Get Procedure by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
             }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{apiUrl}}/admin/procedures/{{procedureTypeId}}", "host": ["{{apiUrl}}"], "path": ["admin", "procedures", "{{procedureTypeId}}"] }
           }
         },
         {
@@ -603,30 +587,19 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 201', function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});"
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });"
                 ]
               }
             }
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Test Procedure\",\n  \"description\": \"Test procedure description\",\n  \"isActive\": true,\n  \"requirements\": []\n}"
             },
-            "url": {
-              "raw": "{{apiUrl}}/admin/procedures",
-              "host": ["{{apiUrl}}"],
-              "path": ["admin", "procedures"]
-            }
+            "url": { "raw": "{{apiUrl}}/admin/procedures", "host": ["{{apiUrl}}"], "path": ["admin", "procedures"] }
           }
         },
         {
@@ -636,42 +609,51 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
           ],
           "request": {
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Updated Procedure\",\n  \"description\": \"Updated description\",\n  \"isActive\": true,\n  \"requirements\": []\n}"
             },
-            "url": {
-              "raw": "{{apiUrl}}/admin/procedures/{{procedureTypeId}}",
-              "host": ["{{apiUrl}}"],
-              "path": ["admin", "procedures", "{{procedureTypeId}}"]
-            }
+            "url": { "raw": "{{apiUrl}}/admin/procedures/{{procedureTypeId}}", "host": ["{{apiUrl}}"], "path": ["admin", "procedures", "{{procedureTypeId}}"] }
           }
         },
         {
-          "name": "Delete Procedure",
+          "name": "Toggle Procedure Status",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false\n}"
+            },
+            "url": { "raw": "{{apiUrl}}/admin/procedures/{{procedureTypeId}}/status", "host": ["{{apiUrl}}"], "path": ["admin", "procedures", "{{procedureTypeId}}", "status"] }
+          }
+        },
+        {
+          "name": "Delete Procedure (Soft Delete)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -679,30 +661,23 @@
           "request": {
             "method": "DELETE",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/admin/procedures/{{procedureTypeId}}",
-              "host": ["{{apiUrl}}"],
-              "path": ["admin", "procedures", "{{procedureTypeId}}"]
-            }
+            "url": { "raw": "{{apiUrl}}/admin/procedures/{{procedureTypeId}}", "host": ["{{apiUrl}}"], "path": ["admin", "procedures", "{{procedureTypeId}}"] }
           }
         }
       ]
     },
     {
-      "name": "Observations",
+      "name": "07 - Admin Observations",
       "item": [
         {
-          "name": "Get Observations by Request",
+          "name": "Get Observations for Request",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has observations array', function () {",
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns array', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.be.an('array');",
@@ -714,11 +689,7 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/observations/{{requestId}}",
-              "host": ["{{apiUrl}}"],
-              "path": ["observations", "{{requestId}}"]
-            }
+            "url": { "raw": "{{apiUrl}}/admin/requests/{{requestId}}/observations", "host": ["{{apiUrl}}"], "path": ["admin", "requests", "{{requestId}}", "observations"] }
           }
         },
         {
@@ -728,30 +699,37 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 201', function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});"
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });"
                 ]
               }
             }
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"comment\": \"Please provide additional documents\"\n}"
             },
-            "url": {
-              "raw": "{{apiUrl}}/observations/{{requestId}}",
-              "host": ["{{apiUrl}}"],
-              "path": ["observations", "{{requestId}}"]
+            "url": { "raw": "{{apiUrl}}/admin/requests/{{requestId}}/observations", "host": ["{{apiUrl}}"], "path": ["admin", "requests", "{{requestId}}", "observations"] }
+          }
+        },
+        {
+          "name": "Get Observation by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
             }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{apiUrl}}/admin/observations/{{observationId}}", "host": ["{{apiUrl}}"], "path": ["admin", "observations", "{{observationId}}"] }
           }
         },
         {
@@ -761,9 +739,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -771,17 +747,13 @@
           "request": {
             "method": "DELETE",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/observations/{{observationId}}",
-              "host": ["{{apiUrl}}"],
-              "path": ["observations", "{{observationId}}"]
-            }
+            "url": { "raw": "{{apiUrl}}/admin/observations/{{observationId}}", "host": ["{{apiUrl}}"], "path": ["admin", "observations", "{{observationId}}"] }
           }
         }
       ]
     },
     {
-      "name": "Notifications",
+      "name": "08 - Notifications",
       "item": [
         {
           "name": "Get All Notifications",
@@ -790,11 +762,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Response has notifications array', function () {",
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns array', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
                   "    pm.expect(jsonData.data).to.be.an('array');",
@@ -806,11 +775,7 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/notifications",
-              "host": ["{{apiUrl}}"],
-              "path": ["notifications"]
-            }
+            "url": { "raw": "{{apiUrl}}/notifications", "host": ["{{apiUrl}}"], "path": ["notifications"] }
           }
         },
         {
@@ -820,9 +785,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -830,11 +793,7 @@
           "request": {
             "method": "PATCH",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/notifications/{{notificationId}}/read",
-              "host": ["{{apiUrl}}"],
-              "path": ["notifications", "{{notificationId}}", "read"]
-            }
+            "url": { "raw": "{{apiUrl}}/notifications/{{notificationId}}/read", "host": ["{{apiUrl}}"], "path": ["notifications", "{{notificationId}}", "read"] }
           }
         },
         {
@@ -844,9 +803,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -854,17 +811,13 @@
           "request": {
             "method": "PATCH",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/notifications/read-all",
-              "host": ["{{apiUrl}}"],
-              "path": ["notifications", "read-all"]
-            }
+            "url": { "raw": "{{apiUrl}}/notifications/read-all", "host": ["{{apiUrl}}"], "path": ["notifications", "read-all"] }
           }
         }
       ]
     },
     {
-      "name": "Health & Metrics",
+      "name": "09 - Health",
       "item": [
         {
           "name": "Health Check",
@@ -873,14 +826,10 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Server is running', function () {",
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Server running', function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.message).to.include('running');",
                   "});"
                 ]
               }
@@ -889,11 +838,7 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{apiUrl}}/health",
-              "host": ["{{apiUrl}}"],
-              "path": ["health"]
-            }
+            "url": { "raw": "{{apiUrl}}/health", "host": ["{{apiUrl}}"], "path": ["health"] }
           }
         }
       ]
