@@ -101,7 +101,7 @@ async function main() {
                     description: proc.description,
                     requirementsText: proc.requirementsText,
                     isActive: true,
-                    requirements: {
+                    procedureRequirements: {
                         create: proc.requirements.map((r) => ({
                             name: r.name,
                             description: r.description,
