@@ -18,6 +18,7 @@ function createWindow() {
     height: 720,
     title: 'EduProcess',
     autoHideMenuBar: true,
+    icon: path.join(__dirname, 'assets/icon.png'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

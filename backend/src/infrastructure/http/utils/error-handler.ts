@@ -28,6 +28,7 @@ const ERROR_MAPPINGS: ErrorMapping[] = [
   { message: "Cannot delete procedure with active requests", status: 409 },
   { message: "Failed to upload document", status: 502 },
   { message: "Only administrators can update request status", status: 403 },
+  { message: "Notification not found", status: 404 },
 ];
 
 const PREFIX_MAPPINGS: Array<{ prefix: string; status: number }> = [

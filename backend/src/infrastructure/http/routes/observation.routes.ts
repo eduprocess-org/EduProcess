@@ -5,12 +5,16 @@ import { PrismaObservationRepository } from '../../persistence/prisma/observatio
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { adminMiddleware } from '../middlewares/admin.middleware';
 import { getSocketEvents } from '../../websocket';
+import { NotificationService } from '../../../application/notifications/notification.service';
+import { PrismaNotificationRepository } from '../../persistence/prisma/notification/prisma-notification.repository';
 
 const router = Router();
 
 const repository = new PrismaObservationRepository();
+const notificationRepository = new PrismaNotificationRepository();
 const socketEvents = getSocketEvents();
-const service = new ObservationService(repository, socketEvents ?? undefined);
+const notificationService = new NotificationService(notificationRepository);
+const service = new ObservationService(repository, socketEvents ?? undefined, notificationService);
 const controller = new ObservationController(service);
 
 router.post(

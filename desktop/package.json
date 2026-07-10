@@ -11,17 +11,31 @@
   "build": {
     "appId": "com.eduprocess.management",
     "productName": "EduProcess",
+
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "assets/icons/win/icon.ico"
     },
+
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "EduProcess"
+    },
+
     "mac": {
       "target": "dmg"
     },
+
     "files": [
       "main.js",
       "package.json",
       ".env"
     ],
+
     "extraResources": [
       ".env"
     ]

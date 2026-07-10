@@ -45,10 +45,19 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && error.response?.data?.code === "TOKEN_EXPIRED" && !originalRequest._retry) {
+    if (originalRequest._retry) {
+      return Promise.reject(error);
+    }
+
+    if (error.response?.status === 401 || error.response?.status === 403) {
       const refreshToken = localStorage.getItem("refreshToken");
 
       if (!refreshToken) {
+        redirectToLogin();
+        return Promise.reject(error);
+      }
+
+      if (error.response?.data?.code !== "TOKEN_EXPIRED" && error.response?.status === 401) {
         redirectToLogin();
         return Promise.reject(error);
       }

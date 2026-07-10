@@ -2,75 +2,13 @@ name: EduProcess CI/CD Multi-Environment Pipeline
 
 on:
   push:
-    branches: [ develop, qa, main ]
+    branches: [develop, qa, main]
   pull_request:
-    branches: [ develop, qa, main ]
+    branches: [develop, qa, main]
 
 jobs:
-  verify-mobile:
-    name: Mobile Verification & Expo Export
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend-mobile
-    steps:
-      - name: Checkout Monorepo Code
-        uses: actions/checkout@v4
-
-      - name: Check Mobile Changes
-        id: filter-mobile
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            mobile_files:
-              - 'frontend-mobile/**'
-              - '.github/workflows/ci-cd-pipeline.yml'
-
-      - name: Setup Node.js Environment
-        if: steps.filter-mobile.outputs.mobile_files == 'true'
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
-          cache-dependency-path: './frontend-mobile/package-lock.json'
-
-      - name: Execute Install Checks (Dependencies)
-        if: steps.filter-mobile.outputs.mobile_files == 'true'
-        run: npm ci
-
-      - name: Verify TypeScript Compilation (Static Quality Check)
-        if: steps.filter-mobile.outputs.mobile_files == 'true'
-        run: npm run check-types
-
-      - name: Expo Production Bundle Verification
-        if: steps.filter-mobile.outputs.mobile_files == 'true'
-        run: npx expo export --platform android --clear
-
-      - name: Prebuild Native Android Source (Expo Prebuild)
-        if: steps.filter-mobile.outputs.mobile_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
-        env:
-          EXPO_PUBLIC_API_URL: ${{ (github.base_ref == 'main' || github.ref == 'refs/heads/main') && 'https://eduprocessprod.programacionwebuce.net' || 'https://eduprocessqa.programacionwebuce.net' }}
-        run: npx expo prebuild --platform android --no-install
-
-      - name: Assemble APK Build via Gradle
-        if: steps.filter-mobile.outputs.mobile_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
-        env:
-          EXPO_PUBLIC_API_URL: ${{ (github.base_ref == 'main' || github.ref == 'refs/heads/main') && 'https://eduprocessprod.programacionwebuce.net' || 'https://eduprocessqa.programacionwebuce.net' }}
-        run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug -PminifyEnabled=false
-
-      - name: Upload Mobile APK Artifact to GitHub
-        if: steps.filter-mobile.outputs.mobile_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ (github.base_ref == 'main' || github.ref == 'refs/heads/main') && 'eduprocess-mobile-prod-build' || 'eduprocess-mobile-qa-build' }}
-          path: frontend-mobile/android/app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 7
-
   verify-frontend:
-    name: Frontend Verification (Node 24)
+    name: Frontend & Mobile (Capacitor) Verification (Node 24)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -79,7 +17,7 @@ jobs:
       - name: Checkout Monorepo Code
         uses: actions/checkout@v4
 
-      - name: Check Frontend Changes
+      - name: Check Frontend/Mobile Changes
         id: filter-frontend
         uses: dorny/paths-filter@v3
         with:
@@ -93,16 +31,45 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: 'npm'
-          cache-dependency-path: './frontend/package-lock.json'
+          cache: "npm"
+          cache-dependency-path: "./frontend/package-lock.json"
+
+      - name: Setup Java 21 (Required for Capacitor Build)
+        if: steps.filter-frontend.outputs.frontend_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
 
       - name: Execute Install Checks (Dependencies)
         if: steps.filter-frontend.outputs.frontend_files == 'true'
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
-      - name: Execute Build Verification (Compilation)
+      - name: Execute Build Verification (Vite Compilation)
         if: steps.filter-frontend.outputs.frontend_files == 'true'
+        env:
+          # Inyección dinámica de URL según el entorno de destino
+          VITE_API_URL: ${{ (github.base_ref == 'main' || github.ref == 'refs/heads/main') && 'https://eduprocessprod.programacionwebuce.net' || 'https://eduprocessqa.programacionwebuce.net' }}
         run: npm run build
+
+      - name: Synchronize Capacitor Android Project
+        if: steps.filter-frontend.outputs.frontend_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
+        run: npx cap sync android
+
+      - name: Assemble Mobile APK Build via Gradle
+        if: steps.filter-frontend.outputs.frontend_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload Mobile APK Artifact to GitHub
+        if: steps.filter-frontend.outputs.frontend_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ (github.base_ref == 'main' || github.ref == 'refs/heads/main') && 'eduprocess-mobile-prod-build' || 'eduprocess-mobile-qa-build' }}
+          path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
 
   verify-backend:
     name: Backend Verification (Node 22)
@@ -128,12 +95,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-          cache-dependency-path: './backend/package-lock.json'
+          cache: "npm"
+          cache-dependency-path: "./backend/package-lock.json"
 
       - name: Execute Install Checks (Dependencies)
         if: steps.filter-backend.outputs.backend_files == 'true'
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Execute Prisma Client Generation
         if: steps.filter-backend.outputs.backend_files == 'true'
@@ -147,10 +114,93 @@ jobs:
         if: steps.filter-backend.outputs.backend_files == 'true'
         run: npm test
 
+  verify-desktop:
+    name: Desktop (Electron) Verification & Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./desktop
+    steps:
+      - name: Checkout Monorepo Code
+        uses: actions/checkout@v4
+
+      - name: Check Desktop Changes
+        id: filter-desktop
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            desktop_files:
+              - 'desktop/**'
+              - '.github/workflows/ci-cd-pipeline.yml'
+
+      - name: Setup Node.js v22 Environment
+        if: steps.filter-desktop.outputs.desktop_files == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: "./desktop/package-lock.json"
+
+      - name: Execute Install Checks (Dependencies)
+        if: steps.filter-desktop.outputs.desktop_files == 'true'
+        run: npm install --no-audit --no-fund
+
+      - name: Create Dynamic .env File for Electron
+        if: steps.filter-desktop.outputs.desktop_files == 'true'
+        run: |
+          if [ "${{ github.base_ref }}" = "main" ] || [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "NODE_ENV=production" >> .env
+            echo "APP_URL=https://eduprocessprod.programacionwebuce.net" >> .env
+          else
+            echo "NODE_ENV=production" >> .env
+            echo "APP_URL=https://eduprocessqa.programacionwebuce.net" >> .env
+          fi
+
+      - name: Install Wine
+        if: steps.filter-desktop.outputs.desktop_files == 'true'
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+
+          sudo apt-get install -y \
+            wine64 \
+            wine32 \
+            wine64-tools
+
+          # Algunos runners no crean el binario wine
+          if [ ! -f /usr/bin/wine ]; then
+            sudo ln -s /usr/bin/wine64 /usr/bin/wine
+          fi
+
+          which wine
+          wine --version
+
+      - name: Verify Wine installation
+        if: steps.filter-desktop.outputs.desktop_files == 'true'
+        run: |
+          which wine || true
+          which wine64 || true
+
+          ls -l /usr/bin/wine*
+
+      - name: Build Desktop Executable (Linux & Windows Cross-Compile)
+        if: steps.filter-desktop.outputs.desktop_files == 'true'
+        run: npm run build -- --linux --win
+
+      - name: Upload Desktop Artifacts to GitHub
+        if: steps.filter-desktop.outputs.desktop_files == 'true' && (github.base_ref == 'qa' || github.ref == 'refs/heads/qa' || github.base_ref == 'main' || github.ref == 'refs/heads/main')
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ (github.base_ref == 'main' || github.ref == 'refs/heads/main') && 'eduprocess-desktop-prod-build' || 'eduprocess-desktop-qa-build' }}
+          path: |
+            desktop/dist/*.exe
+            desktop/dist/*.AppImage
+          retention-days: 7
+
   publish-images:
     name: Build & Publish Images to Docker Hub
     runs-on: ubuntu-latest
-    needs: [verify-frontend, verify-backend]
+    needs: [verify-frontend, verify-backend, verify-desktop]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/qa' || github.ref == 'refs/heads/main')
     steps:
       - name: Checkout Monorepo Code
@@ -275,7 +325,7 @@ jobs:
             docker compose pull
             docker compose up -d --remove-orphans --force-recreate
             docker image prune -f
-  
+
   orchestrate-release:
     name: Automated Release Governance & Archival
     runs-on: ubuntu-latest
