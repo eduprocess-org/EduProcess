@@ -1,5 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { Eye, MapPin, Calendar, FileText, FileCheck, Receipt, GraduationCap } from "lucide-react";
+import {
+  Eye,
+  MapPin,
+  Calendar,
+  FileText,
+  FileCheck,
+  Receipt,
+  GraduationCap,
+} from "lucide-react";
 import type { StudentRequest } from "../../../types/student/studentRequest.types";
 
 interface Props {
@@ -17,7 +25,6 @@ const statusConfig: Record<
     pillText: string;
     iconBg: string;
     iconColor: string;
-    // dark variants
     darkPillBg: string;
     darkPillBorder: string;
     darkPillText: string;
@@ -90,9 +97,12 @@ const fallbackStatus = {
 
 function getProcedureIcon(name: string) {
   const lower = name.toLowerCase();
+
   if (lower.includes("enrollment")) return FileCheck;
   if (lower.includes("tuition") || lower.includes("payment")) return Receipt;
-  if (lower.includes("grade") || lower.includes("academic")) return GraduationCap;
+  if (lower.includes("grade") || lower.includes("academic"))
+    return GraduationCap;
+
   return FileText;
 }
 
@@ -103,11 +113,11 @@ function RequestCard({ request }: Props) {
 
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition hover:border-slate-200 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-gray-600 sm:flex-row sm:items-center">
-
-      {/* Parte izquierda */}
+      {/* Left */}
       <div className="flex min-w-0 flex-1 items-start gap-3">
-
-        <div className={`mt-1 h-10 w-[3px] flex-shrink-0 rounded-full ${s.barColor}`} />
+        <div
+          className={`mt-1 h-10 w-[3px] flex-shrink-0 rounded-full ${s.barColor}`}
+        />
 
         <div
           className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${s.iconBg} ${s.iconColor} ${s.darkIconBg} ${s.darkIconColor}`}
@@ -134,12 +144,10 @@ function RequestCard({ request }: Props) {
             </span>
           </div>
         </div>
-
       </div>
 
-      {/* Botones */}
+      {/* Buttons */}
       <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-
         <button
           onClick={() => navigate(`/requests/${request.id}/tracking`)}
           className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-slate-50 dark:border-gray-600 dark:bg-gray-800 dark:text-slate-300 dark:hover:bg-gray-700 sm:w-auto"
@@ -155,9 +163,7 @@ function RequestCard({ request }: Props) {
           <Eye size={13} />
           View
         </button>
-
       </div>
-
     </div>
   );
 }
