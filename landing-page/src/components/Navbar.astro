@@ -1,0 +1,40 @@
+---
+
+const links = [
+  { name: "Home", href: "#hero" },
+  { name: "About", href: "#about" },
+  { name: "Features", href: "#features" },
+  { name: "Modules", href: "#modules" },
+  { name: "Architecture", href: "#architecture" },
+  { name: "Team", href: "#team" },
+];
+---
+
+<header class="fixed top-0 left-0 w-full bg-white shadow z-50">
+
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-8 py-4">
+
+        <h1 class="text-xl font-bold text-blue-600">
+            EduProcess
+        </h1>
+
+        <nav class="hidden gap-8 md:flex">
+
+            {
+                links.map(link => (
+
+                    <a
+                        href={link.href}
+                        class="font-medium text-gray-600 transition hover:text-blue-600"
+                    >
+                        {link.name}
+                    </a>
+
+                ))
+            }
+
+        </nav>
+
+    </div>
+
+</header>

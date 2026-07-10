@@ -1,33 +1,39 @@
 ---
-interface Props {
-  title: string;
-  description?: string;
+import Navbar from "../components/Navbar.astro";
+
+interface Props{
+    title:string;
 }
 
-const {
-  title,
-  description = "Smart Student Procedures Management System"
-} = Astro.props;
+const {title}=Astro.props;
 ---
 
 <!DOCTYPE html>
+
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>{title}</title>
+<head>
 
-    <meta
-      name="description"
-      content={description}
-    />
-  </head>
+<meta charset="UTF-8"/>
 
-  <body class="bg-white text-gray-900">
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"/>
 
-    <slot />
+<title>{title}</title>
 
-  </body>
+</head>
+
+<body class="bg-white text-gray-900">
+
+<Navbar/>
+
+<main>
+
+<slot/>
+
+</main>
+
+</body>
 
 </html>
