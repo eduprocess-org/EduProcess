@@ -39,15 +39,15 @@ function AdminQuickActions() {
   const navigate = useNavigate();
 
   return (
-    <div className="grid gap-4 md:grid-cols-3">
-      {actions.map(({ label, description, icon: Icon, path }) => (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {actions.map(({ label, description, icon: Icon, path }) => (
         <button
           key={label}
           onClick={() => navigate(path)}
           className="
             group text-left
             bg-white dark:bg-gray-900
-            rounded-2xl p-5
+            rounded-2xl p-4 sm:p-5
             border border-slate-100 dark:border-gray-700
             shadow-sm dark:shadow-none
             transition-all duration-200
@@ -67,7 +67,19 @@ function AdminQuickActions() {
             {description}
           </p>
 
-          <span className="inline-flex items-center gap-1 text-sm font-medium text-[#1A52A8] dark:text-blue-400 mt-3 opacity-0 -translate-x-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0">
+          <span className="
+            mt-3
+            inline-flex
+            items-center
+            gap-1
+            text-sm
+            font-medium
+            text-[#1A52A8]
+            transition-all
+            duration-200
+            dark:text-blue-400
+            group-hover:translate-x-1
+            ">
             Open
             <ArrowRight size={14} />
           </span>

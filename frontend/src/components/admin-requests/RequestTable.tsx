@@ -53,13 +53,12 @@ export default function RequestTable({
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="w-full overflow-x-auto rounded-2xl">
       <style>{TABLE_STYLE}</style>
-      <table className="min-w-full">
+      <table className="w-full min-w-[1000px]">
         <thead>
           <tr className="border-b border-[#D9E3F0] dark:border-gray-700 bg-[#EEF3FA] dark:bg-gray-800">
-            <th className="w-12 px-4 py-3">
-              <input
+            <th className="w-12 px-3 py-2.5 sm:px-4">              <input
                 type="checkbox"
                 className="accent-[#1B2B5E] dark:accent-blue-400"
                 checked={requests.length > 0 && selectedRequests.length === requests.length}
@@ -67,7 +66,10 @@ export default function RequestTable({
               />
             </th>
             {columns.map((column) => (
-              <th key={column.field} className="px-5 py-3 text-left text-xs uppercase tracking-wider">
+              <th
+                key={column.field}
+                className="px-3 py-2.5 text-left text-xs uppercase tracking-wider sm:px-5"
+              >
                 <button
                   type="button"
                   onClick={() => onSort(column.field)}
@@ -82,8 +84,7 @@ export default function RequestTable({
                 </button>
               </th>
             ))}
-            <th className="w-20 px-5 py-3" />
-          </tr>
+            <th className="w-20 px-3 py-2.5 sm:px-5" />          </tr>
         </thead>
         <tbody>
           {requests.map((request, index) => (

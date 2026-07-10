@@ -55,17 +55,17 @@ function DashboardSummary({ requests }: Props) {
   ];
 
   return (
-    <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
-      {cards.map((card) => {
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {cards.map((card) => {
         const Icon       = card.icon;
         const FooterIcon = card.footerIcon;
         return (
           <div
             key={card.label}
-            className="flex flex-col gap-3 rounded-2xl border border-slate-100 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 shadow-sm dark:shadow-none"
+            className="flex min-h-[130px] flex-col gap-3 rounded-2xl border border-slate-100 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 shadow-sm dark:shadow-none"
           >
             <div className="flex items-center justify-between">
-              <span className="text-[15px] font-medium uppercase tracking-wide text-[#0B2D63] dark:text-blue-200">
+              <span className="text-xs sm:text-[15px] font-medium uppercase tracking-wide text-[#0B2D63] dark:text-blue-200">
                 {card.label}
               </span>
               <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${card.iconBg} ${card.iconColor}`}>
@@ -73,7 +73,7 @@ function DashboardSummary({ requests }: Props) {
               </div>
             </div>
 
-            <p className={`text-3xl font-semibold leading-none ${card.valueColor}`}>
+            <p className={`text-2xl sm:text-3xl font-semibold leading-none ${card.valueColor}`}>
               {card.value}
             </p>
 

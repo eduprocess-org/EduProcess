@@ -76,10 +76,10 @@ function AdminRecentRequests({ requests }: Props) {
             return (
               <div
                 key={request.id}
-                className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
+                className="flex flex-col gap-3 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-semibold bg-[#0B2D63]/[0.08] text-[#0B2D63] dark:bg-blue-400/10 dark:text-blue-300">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-semibold bg-[#0B2D63]/[0.08] text-[#0B2D63] dark:bg-blue-400/10 dark:text-blue-300">
                     {initials(request.studentName)}
                   </div>
 
@@ -95,13 +95,13 @@ function AdminRecentRequests({ requests }: Props) {
 
                 {/* Status badge — uses CSS custom properties to toggle light/dark inline styles */}
                 <span
-                  className="text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ml-3 light-badge dark:hidden"
+                  className="text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 mt-1 sm:mt-0 sm:ml-3 light-badge dark:hidden"
                   style={{ background: style.bg, color: style.text }}
                 >
                   {request.status}
                 </span>
                 <span
-                  className="text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ml-3 hidden dark:inline-flex"
+                  className="text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 mt-1 sm:mt-0 sm:ml-3 hidden dark:inline-flex"
                   style={{ background: style.darkBg, color: style.darkText }}
                 >
                   {request.status}
