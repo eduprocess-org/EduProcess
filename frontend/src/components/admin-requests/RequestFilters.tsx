@@ -52,8 +52,8 @@ export default function RequestFilters({
   const { procedureTypes } = useProcedureTypes();
 
   return (
-    <div className="grid gap-3 md:grid-cols-3">
-      <div className="relative">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="relative">
         <svg
           className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B] dark:text-slate-400"
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}

@@ -47,8 +47,7 @@ export default function RequestTableRow({ request, isEven, selected, onSelect, o
           : "bg-[#FAFBFD] dark:bg-gray-800/50"
         }`}
     >
-      <td className="px-4 py-3">
-        <input
+      <td className="px-3 py-3 sm:px-4">        <input
           type="checkbox"
           className="accent-[#1B2B5E] dark:accent-blue-400"
           checked={selected}
@@ -57,42 +56,49 @@ export default function RequestTableRow({ request, isEven, selected, onSelect, o
       </td>
 
       {/* Request ID */}
-      <td className="relative px-5 py-3.5" style={{ paddingLeft: "1.5rem" }}>
+      <td
+        className="relative px-3 py-3 sm:px-5 sm:py-3.5"
+        style={{ paddingLeft: "1rem" }}
+      >
         <div
           className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-[4px] h-[60%] bg-[#2563EB] dark:bg-blue-400 transition-opacity
             ${selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
         />
-        <span className="inline-block bg-[#EFF6FF] dark:bg-blue-500/20 text-[#1D4ED8] dark:text-blue-200 font-mono text-[.72rem] font-semibold tracking-[.04em] px-2 py-0.5 rounded-md">
-          {request.id}
-        </span>
+        <>
+          <span className="hidden md:inline-block bg-[#EFF6FF] dark:bg-blue-500/20 text-[#1D4ED8] dark:text-blue-200 font-mono text-[.72rem] font-semibold tracking-[.04em] px-2 py-0.5 rounded-md">
+            {request.id}
+          </span>
+
+          <span className="inline-block md:hidden bg-[#EFF6FF] dark:bg-blue-500/20 text-[#1D4ED8] dark:text-blue-200 font-mono text-[.72rem] font-semibold tracking-[.04em] px-2 py-0.5 rounded-md">
+            {request.id.slice(0, 8)}...
+          </span>
+        </>
       </td>
 
       {/* Student */}
-      <td className="px-5 py-3.5">
-        <div className="flex items-center gap-2.5">
+        <td className="px-3 py-3 sm:px-5 sm:py-3.5">        <div className="flex items-center gap-2.5">
           <div
             className="avatar-chip flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full text-[.7rem] font-medium"
             style={avatarVars}
           >
             {initials(request.studentName)}
           </div>
-          <span className="text-[#1B2B5E] dark:text-slate-200 font-medium text-sm">
+          <span className="max-w-[140px] truncate text-sm font-medium text-[#1B2B5E] dark:text-slate-200 md:max-w-none">
             {request.studentName}
           </span>
         </div>
       </td>
 
       {/* Email */}
-      <td className="px-5 py-3.5">
-        <span className="text-[.8rem] text-[#64748B] dark:text-slate-400">
-          {request.studentEmail}
+      <td className="px-3 py-3 sm:px-5 sm:py-3.5">        
+        <span className="block max-w-[170px] truncate text-[.8rem] text-[#64748B] dark:text-slate-400">          {request.studentEmail}
         </span>
       </td>
 
       {/* Procedure */}
-      <td className="px-5 py-3.5">
-        <span className="flex items-center gap-[5px] text-[#64748B] dark:text-slate-400 text-[.8rem]">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      <td className="px-3 py-3 sm:px-5 sm:py-3.5">
+        <span className="flex max-w-[180px] items-center gap-[5px] truncate text-[.8rem] text-[#64748B] dark:text-slate-400 md:max-w-none">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
             className="text-[#94A3B8] dark:text-slate-500" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
@@ -102,12 +108,12 @@ export default function RequestTableRow({ request, isEven, selected, onSelect, o
       </td>
 
       {/* Status */}
-      <td className="px-5 py-3.5">
-        <RequestStatusBadge status={request.status} />
+      <td className="px-3 py-3 sm:px-5 sm:py-3.5">
+          <RequestStatusBadge status={request.status} />
       </td>
 
       {/* Date */}
-      <td className="px-5 py-3.5">
+      <td className="px-3 py-3 sm:px-5 sm:  py-3.5">
         <div className="flex flex-col gap-px">
           <span className="text-[.8rem] font-medium text-[#1B2B5E] dark:text-slate-200 tabular-nums">
             {new Date(request.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
@@ -119,15 +125,30 @@ export default function RequestTableRow({ request, isEven, selected, onSelect, o
       </td>
 
       {/* Action */}
-      <td className="px-5 py-3.5">
+      <td className="px-3 py-3 text-center sm:px-5 sm:py-3.5">
         <button
           type="button"
           onClick={onView}
-          className="px-[14px] py-[5px] rounded-[7px] text-[.75rem] font-medium text-white cursor-pointer transition-all
-            bg-[#3065a1] border border-[#7c9fcc]
-            hover:bg-[#1f4e7a] hover:border-[#1f4e7a]
-            dark:bg-blue-700 dark:border-blue-600
-            dark:hover:bg-blue-600 dark:hover:border-blue-500"
+          className="
+            rounded-lg
+            border
+            border-[#7c9fcc]
+            bg-[#3065a1]
+            px-3
+            py-1.5
+            text-xs
+            font-medium
+            text-white
+            transition-all
+            hover:border-[#1f4e7a]
+            hover:bg-[#1f4e7a]
+            sm:px-4
+            sm:text-sm
+            dark:border-blue-600
+            dark:bg-blue-700
+            dark:hover:border-blue-500
+            dark:hover:bg-blue-600
+          "
         >
           View
         </button>
