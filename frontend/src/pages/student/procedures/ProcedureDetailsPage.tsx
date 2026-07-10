@@ -2,7 +2,6 @@ import { useParams } from "react-router-dom";
 
 import ProcedureHeader from "../../../components/procedure-details/ProcedureHeader";
 import RequirementsSection from "../../../components/procedure-details/RequirementsSection";
-import DocumentsSection from "../../../components/procedure-details/DocumentsSection";
 import InstructionsSection from "../../../components/procedure-details/InstructionsSection";
 import ProcedureDetailsSkeleton from "../../../components/procedure-details/ProcedureDetailsSkeleton";
 import ProcedureNotFound from "../../../components/procedure-details/ProcedureNotFound";
@@ -36,9 +35,8 @@ function ProcedureDetailsPage() {
         estimatedProcessingTime={procedure.estimatedProcessingTime}
       />
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 ">
         <RequirementsSection requirements={procedure.requirements} />
-        <DocumentsSection documents={procedure.documents} />
       </div>
 
       <InstructionsSection instructions={procedure.instructions} />
