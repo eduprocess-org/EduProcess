@@ -1,11 +1,7 @@
-import './App.css'
+import LandingPage from "./pages/LandingPage";
 
 function App() {
-  return (
-    <main>
-      <h1>EduProcess</h1>
-    </main>
-  );
+  return <LandingPage />;
 }
 
-export default App
+export default App;
