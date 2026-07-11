@@ -1,4 +1,7 @@
 import { Save, Plus, Trash2, Loader2 } from "lucide-react";
+import InstructionsInput from "./InstructionsInput";
+import ProcedureScopeSelector from "./ProcedureScopeSelector";
+import type { Faculty, CareerWithFaculty } from "../../../services/admin/procedures/procedures.service";
 
 interface ProcedureFormProps {
   formData: {
@@ -6,14 +9,24 @@ interface ProcedureFormProps {
     description: string;
     requirements: string[];
     requirementsText: string;
+    instructions: string[];
+    isSpecific: boolean;
+    facultyId: string;
+    careerId: string;
     isActive: boolean;
   };
   setters: {
     setName: (v: string) => void;
     setDescription: (v: string) => void;
     setRequirementsText: (v: string) => void;
+    setInstructions: (v: string[]) => void;
+    setIsSpecific: (v: boolean) => void;
+    setFacultyId: (v: string) => void;
+    setCareerId: (v: string) => void;
     setIsActive: (v: boolean) => void;
   };
+  faculties: Faculty[];
+  filteredCareers: CareerWithFaculty[];
   errors: Record<string, string>;
   isUpdating: boolean;
   onAddRequirement: () => void;
@@ -26,6 +39,8 @@ interface ProcedureFormProps {
 export default function ProcedureEditForm({
   formData,
   setters,
+  faculties,
+  filteredCareers,
   errors,
   isUpdating,
   onAddRequirement,
@@ -36,6 +51,20 @@ export default function ProcedureEditForm({
 }: ProcedureFormProps) {
   return (
     <form onSubmit={onSubmit} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm space-y-4">
+
+      {/* SCOPE SELECTOR */}
+      <ProcedureScopeSelector
+        isSpecific={formData.isSpecific}
+        onToggle={setters.setIsSpecific}
+        facultyId={formData.facultyId}
+        onFacultyChange={setters.setFacultyId}
+        careerId={formData.careerId}
+        onCareerChange={setters.setCareerId}
+        faculties={faculties}
+        filteredCareers={filteredCareers}
+        disabled={isUpdating}
+      />
+
       {/* NAME */}
       <div className="flex flex-col gap-1">
         <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Procedure Name</span>
@@ -100,6 +129,13 @@ export default function ProcedureEditForm({
         </div>
         {errors.requirements && <p className="text-xs text-red-500 font-medium">{errors.requirements}</p>}
       </div>
+
+      {/* INSTRUCTIONS */}
+      <InstructionsInput
+        instructions={formData.instructions}
+        onChange={setters.setInstructions}
+        disabled={isUpdating}
+      />
 
       {/* STATUS */}
       <div className="flex flex-col gap-1">

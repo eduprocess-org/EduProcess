@@ -48,9 +48,6 @@ describe(
             requirements: [
               "Be enrolled",
             ],
-            documents: [
-              "Student ID",
-            ],
             instructions: [
               "Complete the form",
             ],

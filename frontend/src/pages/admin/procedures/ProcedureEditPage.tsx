@@ -8,6 +8,11 @@ export default function ProcedureEditPage() {
     description, setDescription,
     requirements,
     requirementsText, setRequirementsText,
+    instructions, setInstructions,
+    isSpecific, setIsSpecific,
+    facultyId, setFacultyId,
+    careerId, setCareerId,
+    faculties, filteredCareers,
     isActive, setIsActive,
     errors, isLoadingData, isUpdating,
     handleAddRequirement, handleRequirementChange, handleRemoveRequirement,
@@ -45,8 +50,10 @@ export default function ProcedureEditPage() {
 
         {/* ATOMIC FORM COMPONENT */}
         <ProcedureEditForm
-          formData={{ name, description, requirements, requirementsText, isActive }}
-          setters={{ setName, setDescription, setRequirementsText, setIsActive }}
+          formData={{ name, description, requirements, requirementsText, instructions, isSpecific, facultyId, careerId, isActive }}
+          setters={{ setName, setDescription, setRequirementsText, setInstructions, setIsSpecific, setFacultyId, setCareerId, setIsActive }}
+          faculties={faculties}
+          filteredCareers={filteredCareers}
           errors={errors}
           isUpdating={isUpdating}
           onAddRequirement={handleAddRequirement}

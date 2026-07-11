@@ -31,6 +31,14 @@ export async function getProcedureDetails(
     });
   }
 
+  const instructionsList: string[] = [];
+
+  if (item.instructions) {
+    item.instructions.split('\n').filter(Boolean).forEach((step) => {
+      instructionsList.push(step.trim());
+    });
+  }
+
   return {
     id: item.id,
     name: item.name,
@@ -39,7 +47,6 @@ export async function getProcedureDetails(
     estimatedProcessingTime:
       "3 business days",
     requirements: requirementsList,
-    documents: [],
-    instructions: [],
+    instructions: instructionsList,
   };
 }

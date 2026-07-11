@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { adminProceduresApi, type UpdateProcedureInput } from "../../../services/admin/procedures/procedures.service";
+import { adminProceduresApi, type UpdateProcedureInput, type Faculty, type CareerWithFaculty } from "../../../services/admin/procedures/procedures.service";
 
 export function useProcedureEdit() {
   const { id } = useParams<{ id: string }>();
@@ -11,6 +11,12 @@ export function useProcedureEdit() {
   const [description, setDescription] = useState("");
   const [requirements, setRequirements] = useState<string[]>([""]);
   const [requirementsText, setRequirementsText] = useState("");
+  const [instructions, setInstructions] = useState<string[]>([""]);
+  const [isSpecific, setIsSpecific] = useState(false);
+  const [facultyId, setFacultyId] = useState("");
+  const [careerId, setCareerId] = useState("");
+  const [faculties, setFaculties] = useState<Faculty[]>([]);
+  const [allCareers, setAllCareers] = useState<CareerWithFaculty[]>([]);
   const [isActive, setIsActive] = useState(true);
 
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -18,28 +24,38 @@ export function useProcedureEdit() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (!id) return;
-
-    setIsLoadingData(true);
-    adminProceduresApi
-      .getById(id)
-      .then((procedure) => {
+    Promise.all([
+      id ? adminProceduresApi.getById(id) : Promise.reject("No id"),
+      adminProceduresApi.getFaculties(),
+      adminProceduresApi.getCareers(),
+    ])
+      .then(([procedure, facs, careers]) => {
         setName(procedure.name);
         setDescription(procedure.description);
         setRequirementsText(procedure.requirementsText || "");
+        setInstructions(procedure.instructions ? procedure.instructions.split("\n").filter(Boolean) : [""]);
         setIsActive(procedure.isActive);
+        setIsSpecific(!!procedure.facultyId);
+        setFacultyId(procedure.facultyId || "");
+        setCareerId(procedure.careerId || "");
+        setFaculties(facs);
+        setAllCareers(careers);
         if (procedure.requirements.length > 0) {
           setRequirements(procedure.requirements.map((r) => r.name));
         }
       })
       .catch((err) => {
-        toast.error(err.response?.data?.message || "Error loading procedure data");
+        toast.error(err?.response?.data?.message || "Error loading procedure data");
         navigate("/admin/procedures");
       })
       .finally(() => {
         setIsLoadingData(false);
       });
   }, [id, navigate]);
+
+  const filteredCareers = facultyId
+    ? allCareers.filter((c) => c.faculty.id === facultyId)
+    : [];
 
   const handleAddRequirement = () => setRequirements([...requirements, ""]);
 
@@ -83,8 +99,11 @@ export function useProcedureEdit() {
         name,
         description,
         requirementsText: requirementsText || undefined,
+        instructions: instructions.filter((i) => i.trim()).join("\n") || undefined,
         isActive,
         requirements: validRequirements,
+        facultyId: isSpecific && facultyId ? facultyId : null,
+        careerId: isSpecific && careerId ? careerId : null,
       };
 
       await adminProceduresApi.update(id, input);
@@ -105,6 +124,16 @@ export function useProcedureEdit() {
     requirements,
     requirementsText,
     setRequirementsText,
+    instructions,
+    setInstructions,
+    isSpecific,
+    setIsSpecific,
+    facultyId,
+    setFacultyId,
+    careerId,
+    setCareerId,
+    faculties,
+    filteredCareers,
     isActive,
     setIsActive,
     errors,

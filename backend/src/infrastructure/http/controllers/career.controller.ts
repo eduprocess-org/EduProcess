@@ -13,4 +13,13 @@ export class CareerController {
             handleError(error, res, "CareerController");
         }
     };
+
+    getAllFaculties = async (_req: Request, res: Response): Promise<void> => {
+        try {
+            const faculties = await this.careerService.getAllFaculties();
+            res.status(200).json({ success: true, data: faculties });
+        } catch (error) {
+            handleError(error, res, "CareerController");
+        }
+    };
 }

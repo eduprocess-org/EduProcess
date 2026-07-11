@@ -14,11 +14,6 @@ export const mockProcedureDetails: ProcedureDetails[] = [
       "Have no pending debts"
     ],
 
-    documents: [
-      "Student ID",
-      "Identity card"
-    ],
-
     instructions: [
       "Complete the form",
       "Upload required documents",
@@ -41,10 +36,6 @@ export const mockProcedureDetails: ProcedureDetails[] = [
       "Active enrollment"
     ],
 
-    documents: [
-      "Student ID"
-    ],
-
     instructions: [
       "Confirm information",
       "Submit request"
@@ -53,16 +44,12 @@ export const mockProcedureDetails: ProcedureDetails[] = [
   {
     id: "PROC-003",
     name: "Tuition Payment Validation",
-    description:
-      "Validate your tuition payment for the current semester.",
+    description: "Validate your tuition payment for the current semester.",
     category: "Financial",
-    estimatedProcessingTime: "2 business days",   
+    estimatedProcessingTime: "2 business days",
     requirements: [
       "Have paid tuition for the current semester"
     ],
-    documents: [
-      "Payment receipt"
-    ],      
     instructions: [
       "Upload payment receipt",
       "Submit request"
