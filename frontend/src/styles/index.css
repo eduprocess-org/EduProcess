@@ -1,14 +1,11 @@
 @import "tailwindcss";
 
-@theme {
-}
-
 @variant dark (&:where(.dark, .dark *));
 
-:root {
+html {
   color-scheme: light;
 }
 
-.dark {
+html.dark {
   color-scheme: dark;
 }
