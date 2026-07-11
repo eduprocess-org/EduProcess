@@ -1,68 +1,52 @@
-<section
-  id="about"
-  class="bg-white py-24"
->
+---
+const features = [
+  {
+    title: "Student Experience",
+    description: "Students can submit requests, upload supporting documents, monitor progress, and receive updates in one place."
+  },
+  {
+    title: "Administrative Efficiency",
+    description: "Administrative staff can review, approve, reject, and manage procedure requests through a centralized dashboard."
+  },
+  {
+    title: "Digital Transformation",
+    description: "The platform reduces paperwork, improves communication, and accelerates institutional processes through modern web technologies."
+  }
+];
+---
+
+<section id="about" class="bg-white py-24">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
 
+    {/* Encabezado de la sección */}
     <div class="mx-auto max-w-3xl text-center">
-
       <span class="text-sm font-semibold uppercase tracking-widest text-blue-600">
         About EduProcess
       </span>
-
       <h2 class="mt-4 text-4xl font-bold tracking-tight text-gray-900">
         Simplifying Student Administrative Procedures
       </h2>
-
       <p class="mt-6 text-lg leading-8 text-gray-600">
         EduProcess is a smart platform designed to streamline academic
         administrative procedures by providing students and administrators
         with a centralized, secure, and intuitive environment.
       </p>
-
     </div>
 
+    {/* Grid de Tarjetas Reutilizables */}
     <div class="mt-16 grid gap-8 md:grid-cols-3">
-
-      <div class="rounded-xl border border-gray-200 p-8 shadow-sm">
-
-        <h3 class="mb-4 text-xl font-semibold text-gray-900">
-          Student Experience
-        </h3>
-
-        <p class="text-gray-600">
-          Students can submit requests, upload supporting documents,
-          monitor progress, and receive updates in one place.
-        </p>
-
-      </div>
-
-      <div class="rounded-xl border border-gray-200 p-8 shadow-sm">
-
-        <h3 class="mb-4 text-xl font-semibold text-gray-900">
-          Administrative Efficiency
-        </h3>
-
-        <p class="text-gray-600">
-          Administrative staff can review, approve, reject,
-          and manage procedure requests through a centralized dashboard.
-        </p>
-
-      </div>
-
-      <div class="rounded-xl border border-gray-200 p-8 shadow-sm">
-
-        <h3 class="mb-4 text-xl font-semibold text-gray-900">
-          Digital Transformation
-        </h3>
-
-        <p class="text-gray-600">
-          The platform reduces paperwork, improves communication,
-          and accelerates institutional processes through modern web technologies.
-        </p>
-
-      </div>
-
+      {
+        features.map((feature) => (
+          <div class="rounded-xl border border-gray-200 p-8 shadow-sm transition hover:shadow-md">
+            <h3 class="mb-4 text-xl font-semibold text-gray-900">
+              {feature.title}
+            </h3>
+            <p class="text-gray-600">
+              {feature.description}
+            </p>
+          </div>
+        ))
+      }
     </div>
 
   </div>
