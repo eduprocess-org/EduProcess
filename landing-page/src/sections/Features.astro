@@ -1,0 +1,99 @@
+---
+const features = [
+  {
+    title: "Secure Authentication",
+    description:
+      "Students and administrators authenticate securely using JWT authentication.",
+    icon: "🔐",
+  },
+  {
+    title: "Procedure Requests",
+    description:
+      "Submit administrative procedure requests and upload the required documentation.",
+    icon: "📄",
+  },
+  {
+    title: "Request Tracking",
+    description:
+      "Monitor the current status of every submitted request in real time.",
+    icon: "📊",
+  },
+  {
+    title: "Administrator Dashboard",
+    description:
+      "Manage requests, review documentation and update request statuses.",
+    icon: "👨‍💼",
+  },
+  {
+    title: "Cross-Platform Access",
+    description:
+      "Available on Web, Desktop (Electron) and Mobile (Capacitor).",
+    icon: "💻",
+  },
+  {
+    title: "Notifications",
+    description:
+      "Receive notifications whenever the status of a procedure changes.",
+    icon: "🔔",
+  },
+];
+---
+
+<section id="features" class="bg-gray-50 py-24">
+
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+
+    <div class="text-center">
+
+      <span class="text-sm font-semibold uppercase tracking-widest text-blue-600">
+        Features
+      </span>
+
+      <h2 class="mt-4 text-4xl font-bold text-gray-900">
+        Everything Students Need in One Platform
+      </h2>
+
+      <p class="mx-auto mt-6 max-w-3xl text-lg text-gray-600">
+        EduProcess centralizes academic procedures into a modern platform,
+        providing a faster, simpler and more transparent experience.
+      </p>
+
+    </div>
+
+    <div class="mt-16 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+
+      {
+        features.map((feature) => (
+
+          <div
+            class="rounded-xl border border-gray-200 bg-white p-8 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+          >
+
+            <div class="mb-6 text-5xl">
+
+              {feature.icon}
+
+            </div>
+
+            <h3 class="mb-3 text-xl font-semibold text-gray-900">
+
+              {feature.title}
+
+            </h3>
+
+            <p class="text-gray-600 leading-7">
+
+              {feature.description}
+
+            </p>
+
+          </div>
+
+        ))
+      }
+
+    </div>
+
+  </div>
+
+</section>

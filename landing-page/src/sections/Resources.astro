@@ -1,0 +1,58 @@
+---
+import ResourceCard from "../components/ResourceCard.astro";
+---
+
+<section
+    id="resources"
+    class="bg-white py-24"
+>
+    <div class="mx-auto max-w-7xl px-6">
+
+        <div class="text-center">
+
+            <h2 class="text-4xl font-bold text-slate-900">
+                Resources
+            </h2>
+
+            <p class="mt-4 text-slate-600">
+                Access the project repository, documentation and API resources.
+            </p>
+
+        </div>
+
+        <div class="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+
+            <ResourceCard
+                title="GitHub Repository"
+                description="Browse the project source code."
+                href="https://github.com/eduprocess-org/EduProcess"
+            />
+
+            <ResourceCard
+                title="Web Application"
+                description="Access the Smart Student Procedures Management System."
+                icon="globe"
+                href="https://eduprocessprod.programacionwebuce.net/"
+                action="Open"
+            />
+
+            <ResourceCard
+                title="Desktop Application"
+                description="Download the latest Electron installer."
+                icon="monitor"
+                href="/downloads/EduProcess-Setup.exe"
+                action="Download"
+            />
+
+            <ResourceCard
+                title="Android APK"
+                description="Install the Android application."
+                icon="smartphone"
+                href="/downloads/EduProcess.apk"
+                action="Download"
+            />
+
+        </div>
+
+    </div>
+</section>
