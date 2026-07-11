@@ -41,31 +41,26 @@ export function RequestManagementTemplate(props: RequestManagementTemplateProps)
   } = props;
 
   return (
-    <div className="min-w-0 space-y-4 sm:space-y-5">
-
+    <div className="space-y-4 sm:space-y-5">
       {/* Header */}
       <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-2xl font-bold tracking-tight text-[#1B2B5E] dark:text-blue-200 sm:text-3xl">
             Request Management
           </h1>
-
           <p className="mt-1 text-sm text-[#64748B] dark:text-slate-400">
             Review and manage all submitted procedure requests.
           </p>
         </div>
-
         <div className="flex items-center gap-2 sm:flex-col sm:items-end sm:gap-0 sm:shrink-0">
           <p className="text-xs uppercase tracking-wide text-[#94A3B8] dark:text-slate-500">
             Total Requests
           </p>
-
           <p className="text-xl font-bold text-[#1B2B5E] dark:text-blue-300 sm:text-2xl">
             {total || 0}
           </p>
         </div>
       </div>
-
 
       {/* Filters */}
       <div className="rounded-2xl border border-[#D9E3F0] dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 shadow-sm dark:shadow-none sm:px-5 sm:py-4">
@@ -79,80 +74,42 @@ export function RequestManagementTemplate(props: RequestManagementTemplateProps)
         />
       </div>
 
-
       {/* Selection counter */}
       {!loading && !error && selectedRequests.length > 0 && (
         <div className="rounded-xl border border-[#D9E3F0] dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 shadow-sm dark:shadow-none">
           <span className="text-sm font-medium text-[#1B2B5E] dark:text-blue-200">
-            {selectedRequests.length} request
-            {selectedRequests.length > 1 ? "s" : ""} selected
+            {selectedRequests.length} request{selectedRequests.length > 1 ? "s" : ""} selected
           </span>
         </div>
       )}
 
-
-
       {/* Table */}
       <DataShell isLoading={loading} error={error}>
-        <div className="min-w-0 space-y-4">
-
-          <div
-            className="
-              rounded-2xl
-              border
-              border-[#D9E3F0]
-              dark:border-gray-700
-              bg-white
-              dark:bg-gray-900
-              shadow-sm
-              dark:shadow-none
-              overflow-hidden
-            "
-          >
-
+        <div className="space-y-4">
+          <div className="overflow-hidden rounded-2xl border border-[#D9E3F0] dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm dark:shadow-none">
             <div className="h-[3px] bg-gradient-to-r from-[#1B2B5E] to-[#2563EB]" />
-
-
-            {/* Scroll ONLY here */}
-            <div
-              className="
-                w-full
-                min-w-0
-                overflow-x-auto
-                overscroll-x-contain
-              "
-            >
-
-              <div className="w-max min-w-full">
-
-                <RequestTable
-                  requests={requests}
-                  sortBy={sort.field}
-                  order={sort.order}
-                  onSort={onSort}
-                  selectedRequests={selectedRequests}
-                  onToggleSelect={onToggleSelect}
-                  onToggleSelectAll={onToggleSelectAll}
-                  onViewRequest={onViewRequest}
-                />
-
-              </div>
-
+            {/* Scroll wrapper */}
+            <div className="w-full overflow-x-auto">
+              <RequestTable
+                requests={requests}
+                sortBy={sort.field}
+                order={sort.order}
+                onSort={onSort}
+                selectedRequests={selectedRequests}
+                onToggleSelect={onToggleSelect}
+                onToggleSelectAll={onToggleSelectAll}
+                onViewRequest={onViewRequest}
+              />
             </div>
-
           </div>
-
-
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={onPageChange}
             totalItems={total}
           />
-
         </div>
       </DataShell>
-
     </div>
   );
 }

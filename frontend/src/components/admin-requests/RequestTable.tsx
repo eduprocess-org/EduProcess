@@ -3,19 +3,12 @@ import RequestTableRow from "./RequestTableRow";
 
 interface Props {
   requests: AdminRequestListItem[];
-
   sortBy: string;
-
   order: "asc" | "desc";
-
   onSort: (field: string) => void;
-
   selectedRequests: string[];
-
   onToggleSelect: (id: string) => void;
-
   onToggleSelectAll: () => void;
-
   onViewRequest: (id: string) => void;
 }
 
@@ -38,18 +31,10 @@ export default function RequestTable({
   onToggleSelectAll,
   onViewRequest,
 }: Props) {
-
   if (!requests.length) {
     return (
-      <div className="
-        flex flex-col items-center justify-center
-        py-16 px-4 text-center
-        bg-white dark:bg-gray-900
-      ">
-        <div className="
-          mb-4 flex h-14 w-14 items-center justify-center
-          rounded-2xl bg-[#EFF6FF] dark:bg-blue-900/30
-        ">
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center bg-white dark:bg-gray-900">
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EFF6FF] dark:bg-blue-900/30">
           <svg
             className="h-7 w-7 text-[#93C5FD] dark:text-blue-400"
             fill="none"
@@ -64,11 +49,9 @@ export default function RequestTable({
             />
           </svg>
         </div>
-
         <p className="text-sm font-semibold text-[#1B2B5E] dark:text-blue-200">
           No requests found
         </p>
-
         <p className="mt-1 text-xs text-[#64748B] dark:text-slate-400">
           Try adjusting your filters or search term.
         </p>
@@ -76,68 +59,26 @@ export default function RequestTable({
     );
   }
 
-
   return (
-    <table
-      className="
-        min-w-[860px]
-        border-collapse
-        bg-white
-        dark:bg-gray-900
-      "
-    >
-
+    <table className="w-full min-w-[860px] border-collapse bg-white dark:bg-gray-900">
       <thead>
-        <tr
-          className="
-            border-b
-            border-[#D9E3F0]
-            dark:border-gray-700
-            bg-[#EEF3FA]
-            dark:bg-gray-800
-          "
-        >
-
+        <tr className="border-b border-[#D9E3F0] dark:border-gray-700 bg-[#EEF3FA] dark:bg-gray-800">
           <th className="w-10 px-3 py-3">
             <input
               type="checkbox"
               className="accent-[#1B2B5E] dark:accent-blue-400"
-              checked={
-                requests.length > 0 &&
-                selectedRequests.length === requests.length
-              }
+              checked={requests.length > 0 && selectedRequests.length === requests.length}
               onChange={onToggleSelectAll}
             />
           </th>
-
-
           {columns.map((col) => (
-            <th
-              key={col.field}
-              className="
-                px-3 py-3
-                text-left
-                text-xs
-                uppercase
-                tracking-wider
-              "
-            >
+            <th key={col.field} className="px-3 py-3 text-left text-xs uppercase tracking-wider">
               <button
                 type="button"
                 onClick={() => onSort(col.field)}
-                className="
-                  flex items-center gap-1
-                  font-semibold
-                  text-[#64748B]
-                  dark:text-slate-400
-                  hover:text-[#1B2B5E]
-                  dark:hover:text-slate-200
-                  transition-colors
-                  whitespace-nowrap
-                "
+                className="flex items-center gap-1 font-semibold text-[#64748B] dark:text-slate-400 hover:text-[#1B2B5E] dark:hover:text-slate-200 transition-colors whitespace-nowrap"
               >
                 {col.label}
-
                 {sortBy === col.field && (
                   <span className="text-[#2563EB] dark:text-blue-400">
                     {order === "asc" ? "↑" : "↓"}
@@ -146,16 +87,10 @@ export default function RequestTable({
               </button>
             </th>
           ))}
-
-
           <th className="w-16 px-3 py-3" />
-
         </tr>
       </thead>
-
-
-      <tbody className="bg-white dark:bg-gray-900">
-
+      <tbody>
         {requests.map((request, index) => (
           <RequestTableRow
             key={request.id}
@@ -166,9 +101,7 @@ export default function RequestTable({
             onView={() => onViewRequest(request.id)}
           />
         ))}
-
       </tbody>
-
     </table>
   );
 }
