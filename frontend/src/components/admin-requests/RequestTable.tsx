@@ -21,25 +21,13 @@ const columns = [
   { label: "Submitted",  field: "createdAt" },
 ];
 
-const TABLE_STYLE = `
-  .avatar-chip {
-    background-color: var(--avatar-bg);
-    color: var(--avatar-color);
-    transition: background-color .15s, color .15s;
-  }
-  .dark .avatar-chip {
-    background-color: var(--avatar-dark-bg);
-    color: var(--avatar-dark-color);
-  }
-`;
-
 export default function RequestTable({
   requests, sortBy, order, onSort,
   selectedRequests, onToggleSelect, onToggleSelectAll, onViewRequest,
 }: Props) {
   if (!requests.length) {
     return (
-      <div className="flex flex-col items-center justify-center py-16">
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
         <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EFF6FF] dark:bg-blue-900/30">
           <svg className="h-7 w-7 text-[#93C5FD] dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round"
@@ -53,52 +41,49 @@ export default function RequestTable({
   }
 
   return (
-    <div className="w-full overflow-x-auto rounded-2xl">
-      <style>{TABLE_STYLE}</style>
-      <table className="w-full min-w-[1000px]">
-        <thead>
-          <tr className="border-b border-[#D9E3F0] dark:border-gray-700 bg-[#EEF3FA] dark:bg-gray-800">
-            <th className="w-12 px-3 py-2.5 sm:px-4">              <input
-                type="checkbox"
-                className="accent-[#1B2B5E] dark:accent-blue-400"
-                checked={requests.length > 0 && selectedRequests.length === requests.length}
-                onChange={onToggleSelectAll}
-              />
-            </th>
-            {columns.map((column) => (
-              <th
-                key={column.field}
-                className="px-3 py-2.5 text-left text-xs uppercase tracking-wider sm:px-5"
-              >
-                <button
-                  type="button"
-                  onClick={() => onSort(column.field)}
-                  className="flex items-center gap-1 text-[#64748B] dark:text-slate-400 font-semibold hover:text-[#1B2B5E] dark:hover:text-slate-200 transition-colors"
-                >
-                  {column.label}
-                  {sortBy === column.field && (
-                    <span className="text-[#2563EB] dark:text-blue-400">
-                      {order === "asc" ? "↑" : "↓"}
-                    </span>
-                  )}
-                </button>
-              </th>
-            ))}
-            <th className="w-20 px-3 py-2.5 sm:px-5" />          </tr>
-        </thead>
-        <tbody>
-          {requests.map((request, index) => (
-            <RequestTableRow
-              key={request.id}
-              request={request}
-              isEven={index % 2 === 0}
-              selected={selectedRequests.includes(request.id)}
-              onSelect={() => onToggleSelect(request.id)}
-              onView={() => onViewRequest(request.id)}
+    /* min-w forces horizontal scroll on narrow viewports — parent owns the overflow-x-auto */
+    <table className="w-full min-w-[860px]">
+      <thead>
+        <tr className="border-b border-[#D9E3F0] dark:border-gray-700 bg-[#EEF3FA] dark:bg-gray-800">
+          <th className="w-10 px-3 py-3">
+            <input
+              type="checkbox"
+              className="accent-[#1B2B5E] dark:accent-blue-400"
+              checked={requests.length > 0 && selectedRequests.length === requests.length}
+              onChange={onToggleSelectAll}
             />
+          </th>
+          {columns.map((col) => (
+            <th key={col.field} className="px-3 py-3 text-left text-xs uppercase tracking-wider">
+              <button
+                type="button"
+                onClick={() => onSort(col.field)}
+                className="flex items-center gap-1 font-semibold text-[#64748B] dark:text-slate-400 hover:text-[#1B2B5E] dark:hover:text-slate-200 transition-colors whitespace-nowrap"
+              >
+                {col.label}
+                {sortBy === col.field && (
+                  <span className="text-[#2563EB] dark:text-blue-400">
+                    {order === "asc" ? "↑" : "↓"}
+                  </span>
+                )}
+              </button>
+            </th>
           ))}
-        </tbody>
-      </table>
-    </div>
+          <th className="w-16 px-3 py-3" />
+        </tr>
+      </thead>
+      <tbody>
+        {requests.map((request, index) => (
+          <RequestTableRow
+            key={request.id}
+            request={request}
+            isEven={index % 2 === 0}
+            selected={selectedRequests.includes(request.id)}
+            onSelect={() => onToggleSelect(request.id)}
+            onView={() => onViewRequest(request.id)}
+          />
+        ))}
+      </tbody>
+    </table>
   );
 }
