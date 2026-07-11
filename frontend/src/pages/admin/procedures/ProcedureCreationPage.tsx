@@ -2,11 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { useProcedureForm } from "../../../hooks/admin/procedures/useProcedureForm";
 import { InputField, TextareaField } from "../../../components/common/atoms/FormFields";
 import RequirementsInput from "../../../components/procedures/admin/RequirementsInput";
+import InstructionsInput from "../../../components/procedures/admin/InstructionsInput";
+import ProcedureScopeSelector from "../../../components/procedures/admin/ProcedureScopeSelector";
 import { ArrowLeft, Loader2, Save, AlertCircle } from "lucide-react";
 
 export default function ProcedureCreationPage() {
   const navigate = useNavigate();
-  const { form, setters, errors, isLoading, handleSubmit } = useProcedureForm(() =>
+  const { form, setters, faculties, filteredCareers, errors, isLoading, handleSubmit } = useProcedureForm(() =>
     navigate("/admin/procedures")
   );
 
@@ -49,6 +51,19 @@ export default function ProcedureCreationPage() {
             </div>
           )}
 
+          {/* SCOPE SELECTOR */}
+          <ProcedureScopeSelector
+            isSpecific={form.isSpecific}
+            onToggle={setters.setIsSpecific}
+            facultyId={form.facultyId}
+            onFacultyChange={setters.setFacultyId}
+            careerId={form.careerId}
+            onCareerChange={setters.setCareerId}
+            faculties={faculties}
+            filteredCareers={filteredCareers}
+            disabled={isLoading}
+          />
+
           {/* CAMPO: NOMBRE */}
           <InputField
             label="Procedure Name"
@@ -87,6 +102,13 @@ export default function ProcedureCreationPage() {
             disabled={isLoading}
             rows={2}
             placeholder="Brief summary of requirements..."
+          />
+
+          {/* CAMPO: INSTRUCCIONES */}
+          <InstructionsInput
+            instructions={form.instructions}
+            onChange={setters.setInstructions}
+            disabled={isLoading}
           />
 
           {/* BOTONES DE ACCIÓN */}

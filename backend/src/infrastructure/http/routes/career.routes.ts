@@ -11,5 +11,6 @@ const service = new CareerService(repository);
 const controller = new CareerController(service);
 
 careerRouter.get('/careers', controller.getAll);
+careerRouter.get('/faculties', authMiddleware, controller.getAllFaculties);
 
 export default careerRouter;

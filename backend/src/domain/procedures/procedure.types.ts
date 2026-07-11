@@ -10,6 +10,7 @@ export interface ProcedureTypeDTO {
     name: string;
     description: string;
     requirementsText: string;
+    instructions?: string | null;
     isActive: boolean;
     requirements?: ProcedureRequirementDTO[];
 }

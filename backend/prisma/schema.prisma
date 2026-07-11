@@ -84,6 +84,7 @@ model ProcedureType {
   name                 String
   description          String                 @db.Text
   requirementsText     String                 @db.Text
+  instructions         String?                @db.Text
   isActive             Boolean                @default(true)
   faculty              Faculty?               @relation(fields: [facultyId], references: [id], onDelete: SetNull)
   career               Career?                @relation(fields: [careerId], references: [id], onDelete: SetNull)
