@@ -23,15 +23,26 @@ interface RequestManagementTemplateProps {
 
 export function RequestManagementTemplate(props: RequestManagementTemplateProps) {
   const {
-    requests, loading, error, total, filters, onFilterChange,
-    sort, onSort, selectedRequests, onToggleSelect, onToggleSelectAll,
-    currentPage, totalPages, onPageChange, onViewRequest,
+    requests,
+    loading,
+    error,
+    total,
+    filters,
+    onFilterChange,
+    sort,
+    onSort,
+    selectedRequests,
+    onToggleSelect,
+    onToggleSelectAll,
+    currentPage,
+    totalPages,
+    onPageChange,
+    onViewRequest,
   } = props;
 
   return (
     <div className="space-y-4 sm:space-y-5">
-
-      {/* Header — stacks on mobile, side-by-side on sm+ */}
+      {/* Header */}
       <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-2xl font-bold tracking-tight text-[#1B2B5E] dark:text-blue-200 sm:text-3xl">
@@ -41,7 +52,6 @@ export function RequestManagementTemplate(props: RequestManagementTemplateProps)
             Review and manage all submitted procedure requests.
           </p>
         </div>
-        {/* Total badge — sits below title on mobile, right-aligned on sm+ */}
         <div className="flex items-center gap-2 sm:flex-col sm:items-end sm:gap-0 sm:shrink-0">
           <p className="text-xs uppercase tracking-wide text-[#94A3B8] dark:text-slate-500">
             Total Requests
@@ -73,12 +83,12 @@ export function RequestManagementTemplate(props: RequestManagementTemplateProps)
         </div>
       )}
 
-      {/* Table — scrollable on mobile */}
+      {/* Table */}
       <DataShell isLoading={loading} error={error}>
         <div className="space-y-4">
           <div className="overflow-hidden rounded-2xl border border-[#D9E3F0] dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm dark:shadow-none">
             <div className="h-[3px] bg-gradient-to-r from-[#1B2B5E] to-[#2563EB]" />
-            {/* horizontal scroll wrapper */}
+            {/* Scroll wrapper */}
             <div className="w-full overflow-x-auto">
               <RequestTable
                 requests={requests}
@@ -100,7 +110,6 @@ export function RequestManagementTemplate(props: RequestManagementTemplateProps)
           />
         </div>
       </DataShell>
-
     </div>
   );
 }
