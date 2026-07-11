@@ -7,3 +7,8 @@ export interface CareerDTO {
     name: string;
   };
 }
+
+export interface FacultyDTO {
+  id: string;
+  name: string;
+}

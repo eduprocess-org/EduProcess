@@ -7,9 +7,15 @@ type Props = {
 };
 
 function ProtectedRoute({ children, roles }: Props) {
-  const { isAuthenticated, loading, user } = useAuth();
+  const { isAuthenticated, loading, initialized, user } = useAuth();
 
-  if (loading) return null;
+  if (loading || !initialized) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;

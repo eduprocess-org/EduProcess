@@ -6,4 +6,8 @@ export class CareerService {
   async getAllCareers() {
     return this.careerRepository.findAll();
   }
+
+  async getAllFaculties() {
+    return this.careerRepository.findAllFaculties();
+  }
 }

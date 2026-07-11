@@ -2,33 +2,21 @@ import RequestFilters from "../../../admin-requests/RequestFilters";
 import RequestTable from "../../../admin-requests/RequestTable";
 import { DataShell } from "../../../common/molecules/DataShell";
 import { Pagination } from "../../../common/molecules/Pagination";
-
 interface RequestManagementTemplateProps {
-  // Datos
   requests: any[];
   loading: boolean;
   error: string | null;
   total: number;
-
-  // Filtros
   filters: { search: string; status: string; procedure: string };
   onFilterChange: (key: "search" | "status" | "procedure", value: string) => void;
-
-  // Orden
   sort: { field: string; order: "asc" | "desc" };
   onSort: (field: string) => void;
-
-  // Selección
   selectedRequests: string[];
   onToggleSelect: (id: string) => void;
   onToggleSelectAll: () => void;
-
-  // Paginación
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-
-  // ✅ ¡Añade esta línea!
   onViewRequest: (id: string) => void;
 }
 
@@ -48,7 +36,7 @@ export function RequestManagementTemplate(props: RequestManagementTemplateProps)
     currentPage,
     totalPages,
     onPageChange,
-    onViewRequest, // ✅ Ya se desestructura
+    onViewRequest,
   } = props;
 
   return (
@@ -107,7 +95,7 @@ export function RequestManagementTemplate(props: RequestManagementTemplateProps)
                 selectedRequests={selectedRequests}
                 onToggleSelect={onToggleSelect}
                 onToggleSelectAll={onToggleSelectAll}
-                onViewRequest={onViewRequest} // ✅ Ahora sí existe
+                onViewRequest={onViewRequest} 
               />
             </div>
 

@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { adminProceduresApi, type CreateProcedureInput } from "../../../services/admin/procedures/procedures.service";
+import { adminProceduresApi, type CreateProcedureInput, type Faculty, type CareerWithFaculty } from "../../../services/admin/procedures/procedures.service";
 
 export function useProcedureForm(onSuccess: () => void) {
   const queryClient = useQueryClient();
@@ -9,7 +9,26 @@ export function useProcedureForm(onSuccess: () => void) {
   const [description, setDescription] = useState("");
   const [requirements, setRequirements] = useState<string[]>([""]);
   const [requirementsText, setRequirementsText] = useState("");
+  const [instructions, setInstructions] = useState<string[]>([""]);
+  const [isSpecific, setIsSpecific] = useState(false);
+  const [facultyId, setFacultyId] = useState("");
+  const [careerId, setCareerId] = useState("");
+  const [faculties, setFaculties] = useState<Faculty[]>([]);
+  const [allCareers, setAllCareers] = useState<CareerWithFaculty[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    Promise.all([adminProceduresApi.getFaculties(), adminProceduresApi.getCareers()])
+      .then(([facs, careers]) => {
+        setFaculties(facs);
+        setAllCareers(careers);
+      })
+      .catch(() => {});
+  }, []);
+
+  const filteredCareers = facultyId
+    ? allCareers.filter((c) => c.faculty.id === facultyId)
+    : [];
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
@@ -21,8 +40,11 @@ export function useProcedureForm(onSuccess: () => void) {
         name,
         description,
         requirementsText: requirementsText || undefined,
+        instructions: instructions.filter((i) => i.trim()).join("\n") || undefined,
         isActive: true,
         requirements: validRequirements.length > 0 ? validRequirements : undefined,
+        facultyId: isSpecific && facultyId ? facultyId : null,
+        careerId: isSpecific && careerId ? careerId : null,
       };
 
       return adminProceduresApi.create(input);
@@ -60,8 +82,10 @@ export function useProcedureForm(onSuccess: () => void) {
   };
 
   return {
-    form: { name, description, requirements, requirementsText },
-    setters: { setName, setDescription, setRequirements, setRequirementsText },
+    form: { name, description, requirements, requirementsText, instructions, isSpecific, facultyId, careerId },
+    setters: { setName, setDescription, setRequirements, setRequirementsText, setInstructions, setIsSpecific, setFacultyId, setCareerId },
+    faculties,
+    filteredCareers,
     errors,
     isLoading: isPending,
     handleSubmit,

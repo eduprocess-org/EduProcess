@@ -21,6 +21,7 @@ export interface ProcedureDetail {
   name: string;
   description: string;
   requirementsText: string;
+  instructions?: string | null;
   isActive: boolean;
   facultyId: string | null;
   careerId: string | null;
@@ -34,6 +35,7 @@ export interface ProcedureListItem {
   name: string;
   description: string;
   requirementsText: string;
+  instructions?: string | null;
   isActive: boolean;
   facultyId: string | null;
   careerId: string | null;
@@ -58,6 +60,7 @@ export interface CreateProcedureInput {
   name: string;
   description: string;
   requirementsText?: string;
+  instructions?: string;
   facultyId?: string | null;
   careerId?: string | null;
   isActive?: boolean;
@@ -72,6 +75,7 @@ export interface UpdateProcedureInput {
   name?: string;
   description?: string;
   requirementsText?: string;
+  instructions?: string;
   facultyId?: string | null;
   careerId?: string | null;
   isActive?: boolean;
@@ -80,6 +84,21 @@ export interface UpdateProcedureInput {
     description: string;
     isMandatory?: boolean;
   }>;
+}
+
+export interface Faculty {
+  id: string;
+  name: string;
+}
+
+export interface CareerWithFaculty {
+  id: string;
+  name: string;
+  description: string;
+  faculty: {
+    id: string;
+    name: string;
+  };
 }
 
 export const adminProceduresApi = {
@@ -109,6 +128,16 @@ export const adminProceduresApi = {
 
   toggleStatus: async (id: string, isActive: boolean): Promise<ProcedureDetail> => {
     const { data } = await apiClient.patch(`/admin/procedures/${id}/status`, { isActive });
+    return data.data;
+  },
+
+  getFaculties: async (): Promise<Faculty[]> => {
+    const { data } = await apiClient.get("/faculties");
+    return data.data;
+  },
+
+  getCareers: async (): Promise<CareerWithFaculty[]> => {
+    const { data } = await apiClient.get("/careers");
     return data.data;
   },
 };

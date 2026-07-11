@@ -3,6 +3,7 @@ export interface AdminProcedureListItem {
     name: string;
     description: string;
     requirementsText: string;
+    instructions?: string | null;
     isActive: boolean;
     facultyId: string | null;
     careerId: string | null;
@@ -18,6 +19,7 @@ export interface AdminProcedureDetail {
     name: string;
     description: string;
     requirementsText: string;
+    instructions?: string | null;
     isActive: boolean;
     facultyId: string | null;
     careerId: string | null;
@@ -37,6 +39,7 @@ export interface CreateProcedureInput {
     name: string;
     description: string;
     requirementsText: string;
+    instructions?: string;
     facultyId?: string | null;
     careerId?: string | null;
     isActive?: boolean;
@@ -51,6 +54,7 @@ export interface UpdateProcedureInput {
     name?: string;
     description?: string;
     requirementsText?: string;
+    instructions?: string;
     facultyId?: string | null;
     careerId?: string | null;
     isActive?: boolean;

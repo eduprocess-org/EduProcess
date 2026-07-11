@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma } from "../../database.config";
 import { CareerRepository } from "../../../../domain/career/career.repository";
-import { CareerDTO } from "../../../../domain/career/career.types";
+import { CareerDTO, FacultyDTO } from "../../../../domain/career/career.types";
 
 export class PrismaCareerRepository implements CareerRepository {
   async findAll(): Promise<CareerDTO[]> {
@@ -28,6 +28,21 @@ export class PrismaCareerRepository implements CareerRepository {
         id: c.faculty.id,
         name: c.faculty.name,
       },
+    }));
+  }
+
+  async findAllFaculties(): Promise<FacultyDTO[]> {
+    const faculties = await prisma.faculty.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: { name: "asc" },
+    });
+
+    return faculties.map((f: any) => ({
+      id: f.id,
+      name: f.name,
     }));
   }
 }

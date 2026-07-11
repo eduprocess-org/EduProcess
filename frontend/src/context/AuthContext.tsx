@@ -2,8 +2,10 @@ import {
   createContext,
   useState,
   useEffect,
+  useCallback,
   type ReactNode,
 } from "react";
+import { isTokenValid } from "../utils/tokenValidator";
 
 interface User {
   id: string;
@@ -19,6 +21,7 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
+  initialized: boolean;
   login: (user: User, token: string) => void;
   logout: () => void;
 }
@@ -33,6 +36,7 @@ export function AuthProvider({ children }: Props) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   const safeParseUser = (value: string | null): User | null => {
     if (!value) return null;
@@ -43,58 +47,64 @@ export function AuthProvider({ children }: Props) {
     }
   };
 
-  // HYDRATION INICIAL
-  useEffect(() => {
-    const storedUser = safeParseUser(localStorage.getItem("user"));
-
-    const storedToken =
-      localStorage.getItem("sessionToken") ||
-      localStorage.getItem("refreshToken"); // 🔥 FIX
-
-    setUser(storedUser);
-    setToken(storedToken);
-
-    setLoading(false);
+  const clearAuth = useCallback(() => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("sessionToken");
+    localStorage.removeItem("refreshToken");
+    setUser(null);
+    setToken(null);
   }, []);
+
+  // HYDRATION INICIAL - Validación de token
+  useEffect(() => {
+    try {
+      const storedUser = safeParseUser(localStorage.getItem("user"));
+      const storedToken = localStorage.getItem("sessionToken");
+
+      if (storedToken && isTokenValid(storedToken) && storedUser) {
+        setUser(storedUser);
+        setToken(storedToken);
+      } else {
+        clearAuth();
+      }
+    } catch {
+      clearAuth();
+    } finally {
+      setLoading(false);
+      setInitialized(true);
+    }
+  }, [clearAuth]);
 
   // SYNC ENTRE PESTAÑAS
   useEffect(() => {
     const syncAuth = () => {
       const storedUser = safeParseUser(localStorage.getItem("user"));
+      const storedToken = localStorage.getItem("sessionToken");
 
-      const storedToken =
-        localStorage.getItem("sessionToken") ||
-        localStorage.getItem("refreshToken");
-
-      setUser(storedUser);
-      setToken(storedToken);
+      if (storedToken && isTokenValid(storedToken) && storedUser) {
+        setUser(storedUser);
+        setToken(storedToken);
+      } else {
+        clearAuth();
+      }
     };
 
     window.addEventListener("storage", syncAuth);
-
-    return () => {
-      window.removeEventListener("storage", syncAuth);
-    };
-  }, []);
+    return () => window.removeEventListener("storage", syncAuth);
+  }, [clearAuth]);
 
   // LOGIN
-  const login = (userData: User, sessionToken: string) => {
+  const login = useCallback((userData: User, sessionToken: string) => {
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("sessionToken", sessionToken);
-
     setUser(userData);
     setToken(sessionToken);
-  };
+  }, []);
 
   // LOGOUT
-  const logout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("sessionToken");
-    localStorage.removeItem("refreshToken");
-
-    setUser(null);
-    setToken(null);
-  };
+  const logout = useCallback(() => {
+    clearAuth();
+  }, [clearAuth]);
 
   return (
     <AuthContext.Provider
@@ -102,7 +112,8 @@ export function AuthProvider({ children }: Props) {
         user,
         token,
         loading,
-        isAuthenticated: !!user && !!token, // 🔥 FIX CLAVE
+        initialized,
+        isAuthenticated: !!user && !!token && isTokenValid(token),
         login,
         logout,
       }}
