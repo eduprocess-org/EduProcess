@@ -36,8 +36,12 @@ export default function RequestTableRow({ request, isEven, selected, onSelect, o
     "--avatar-dark-color": av.darkColor,
   } as CSSProperties;
 
+  // /20 en vez de /10: a /10 el fondo queda casi transparente en dark mode
+  // y el texto (pensado para fondo claro) pierde contraste. Si tu contenedor
+  // padre usa backdrop-filter o isolation, cambia esto por un color sólido
+  // como dark:bg-blue-950.
   const rowBg = selected
-    ? "bg-[#F0F6FF] dark:bg-blue-500/10"
+    ? "bg-[#F0F6FF] dark:bg-blue-500/20"
     : isEven
     ? "bg-white dark:bg-gray-900"
     : "bg-[#FAFBFD] dark:bg-gray-800/50";
@@ -67,19 +71,12 @@ export default function RequestTableRow({ request, isEven, selected, onSelect, o
       <td className="px-3 py-3">
         <div className="flex items-center gap-2">
           <div
-            className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-full text-[.68rem] font-semibold"
-            style={{
-              backgroundColor: av.bg,
-              color: av.color,
-            }}
+            style={avatarVars}
+            className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-full text-[.68rem] font-semibold
+                       bg-[var(--avatar-bg)] text-[var(--avatar-color)]
+                       dark:bg-[var(--avatar-dark-bg)] dark:text-[var(--avatar-dark-color)]"
           >
-            <span className="dark:hidden">{initials(request.studentName)}</span>
-            <span
-              className="hidden dark:flex items-center justify-center w-full h-full rounded-full"
-              style={{ backgroundColor: av.darkBg, color: av.darkColor }}
-            >
-              {initials(request.studentName)}
-            </span>
+            {initials(request.studentName)}
           </div>
           <span className="max-w-[120px] truncate text-sm font-medium text-[#1B2B5E] dark:text-slate-200">
             {request.studentName}
