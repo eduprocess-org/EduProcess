@@ -10,18 +10,18 @@ import { NotificationType } from '../../domain/notifications/notification.types'
 const STATUS_NOTIFICATION_MAP: Record<string, { type: NotificationType; title: string; messageFn: (procedureName: string) => string }> = {
     in_review: {
         type: 'REQUEST_UPDATED',
-        title: 'Solicitud en Revisión',
-        messageFn: (name) => `Tu solicitud de "${name}" está siendo revisada por un administrador.`,
+        title: 'Request Under Review',
+        messageFn: (name) => `Your request for "${name}" is being reviewed by an administrator.`,
     },
     approved: {
         type: 'REQUEST_APPROVED',
-        title: 'Solicitud Aprobada',
-        messageFn: (name) => `Tu solicitud de "${name}" ha sido aprobada.`,
+        title: 'Request Approved',
+        messageFn: (name) => `Your request for "${name}" has been approved.`,
     },
     rejected: {
         type: 'REQUEST_REJECTED',
-        title: 'Solicitud Rechazada',
-        messageFn: (name) => `Tu solicitud de "${name}" ha sido rechazada.`,
+        title: 'Request Rejected',
+        messageFn: (name) => `Your request for "${name}" has been rejected.`,
     },
 };
 
@@ -139,7 +139,7 @@ export class ProcedureService {
             const student = await this.procedureRepository.findStudentCareer(studentId);
             this.socketEvents.notifyNewRequest({
                 requestId: request.id,
-                studentName: student?.careerName ?? 'Estudiante',
+                studentName: student?.careerName ?? 'Student',
                 procedureName: procedure.name,
                 career: student?.careerName ?? '',
                 status: 'pending',
@@ -151,14 +151,14 @@ export class ProcedureService {
             const studentName = await this.procedureRepository.findStudentCareer(studentId);
             await this.notificationService.createForAdmins({
                 typeName: 'REQUEST_CREATED',
-                title: 'Nueva Solicitud',
-                message: `El estudiante ${studentName?.careerName ?? 'Desconocido'} creó una solicitud de "${procedure.name}".`,
+                title: 'New Request',
+                message: `Student ${studentName?.careerName ?? 'Unknown'} created a request for "${procedure.name}".`,
             });
             await this.notificationService.createNotification({
                 userId: studentId,
                 typeName: 'REQUEST_CREATED',
-                title: 'Solicitud Enviada',
-                message: `Tu solicitud de "${procedure.name}" ha sido creada exitosamente.`,
+                title: 'Request Submitted',
+                message: `Your request for "${procedure.name}" has been created successfully.`,
             });
         }
 

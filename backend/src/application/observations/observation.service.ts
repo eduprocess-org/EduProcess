@@ -37,12 +37,12 @@ export class ObservationService {
         }
 
         if (this.notificationService && observation.studentId) {
-            const adminName = observation.adminName ?? 'Administrador';
+            const adminName = observation.adminName ?? 'Admin';
             await this.notificationService.createNotification({
                 userId: observation.studentId,
                 typeName: 'ADMIN_OBSERVATION',
-                title: 'Nueva Observación Administrativa',
-                message: `${adminName} agregó un comentario en tu solicitud: "${observation.comment.substring(0, 100)}${observation.comment.length > 100 ? '...' : ''}"`,
+                title: 'New Administrative Observation',
+                message: `${adminName} added a comment on your request: "${observation.comment.substring(0, 100)}${observation.comment.length > 100 ? '...' : ''}"`,
             });
             logger.info('Observation notification created', {
                 observationId: observation.id,
