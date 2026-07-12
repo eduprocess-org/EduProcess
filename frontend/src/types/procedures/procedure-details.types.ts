@@ -5,6 +5,5 @@ export interface ProcedureDetails {
   category: string;
   estimatedProcessingTime: string;
   requirements: string[];
-  documents: string[];
   instructions: string[];
 }

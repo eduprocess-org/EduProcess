@@ -64,7 +64,7 @@ function AdminDashboardSummary({ total, pending, approved, rejected }: Props) {
   ];
 
   return (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
       {cards.map((card) => {
         const Icon = card.icon;
 
@@ -73,7 +73,7 @@ function AdminDashboardSummary({ total, pending, approved, rejected }: Props) {
             key={card.label}
             className="
               bg-white dark:bg-gray-900
-              rounded-2xl p-5
+              rounded-2xl p-4 sm:p-5
               shadow-sm dark:shadow-none
               border border-slate-100 dark:border-gray-700
               transition-all duration-200
@@ -91,11 +91,11 @@ function AdminDashboardSummary({ total, pending, approved, rejected }: Props) {
               <Icon size={18} className="hidden dark:block" style={{ color: card.darkAccent }} />
             </div>
 
-            <p className="mt-4 text-3xl font-bold text-[#0B2D63] dark:text-blue-300 leading-none">
+            <p className="mt-4 text-2xl sm:text-3xl font-bold text-[#0B2D63] dark:text-blue-300 leading-none">
               {card.value}
             </p>
 
-            <span className="text-slate-500 dark:text-slate-400 text-sm">
+            <span className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm">
               {card.label}
             </span>
           </div>

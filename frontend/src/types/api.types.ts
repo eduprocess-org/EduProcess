@@ -8,6 +8,7 @@ export interface ApiProcedure {
   name: string;
   description: string;
   requirementsText: string;
+  instructions?: string | null;
   isActive: boolean;
   requirements?: ApiProcedureRequirement[];
 }

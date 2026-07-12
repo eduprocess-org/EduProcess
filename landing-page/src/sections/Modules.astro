@@ -1,0 +1,99 @@
+---
+const modules = [
+  {
+    title: "Authentication",
+    description:
+      "Secure authentication and authorization using JWT with role-based access control.",
+    color: "bg-blue-500",
+  },
+  {
+    title: "Student Portal",
+    description:
+      "Students can browse procedures, submit requests, upload documents, and track request status.",
+    color: "bg-green-500",
+  },
+  {
+    title: "Administrator Dashboard",
+    description:
+      "Manage requests, review documents, approve or reject submissions, and administer procedures.",
+    color: "bg-purple-500",
+  },
+  {
+    title: "Notifications",
+    description:
+      "Receive real-time updates whenever the status of a request changes.",
+    color: "bg-yellow-500",
+  },
+  {
+    title: "Mobile Application",
+    description:
+      "React Native application providing students with access to their dashboard from mobile devices.",
+    color: "bg-red-500",
+  },
+  {
+    title: "Desktop Application",
+    description:
+      "Electron-based desktop application for accessing the platform from Windows, Linux, and macOS.",
+    color: "bg-slate-600",
+  },
+];
+---
+
+<section id="modules" class="py-24 bg-white">
+
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+
+    <div class="text-center">
+
+      <span class="text-sm font-semibold uppercase tracking-widest text-blue-600">
+        Modules
+      </span>
+
+      <h2 class="mt-4 text-4xl font-bold text-gray-900">
+        A Complete Platform for Academic Procedures
+      </h2>
+
+      <p class="mx-auto mt-6 max-w-3xl text-lg text-gray-600">
+        EduProcess is composed of multiple integrated modules that provide
+        a complete experience for students and administrators.
+      </p>
+
+    </div>
+
+    <div class="mt-16 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+
+      {
+        modules.map((module) => (
+
+          <article
+            class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
+          >
+
+            <div class={`${module.color} h-3`} />
+
+            <div class="p-8">
+
+              <h3 class="text-xl font-semibold text-gray-900">
+
+                {module.title}
+
+              </h3>
+
+              <p class="mt-4 leading-7 text-gray-600">
+
+                {module.description}
+
+              </p>
+
+            </div>
+
+          </article>
+
+        ))
+      }
+
+    </div>
+
+  </div>
+
+</section>

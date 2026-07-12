@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
 import client from 'prom-client';
 import authRouter from './infrastructure/http/routes/auth.routes';
 import procedureRouter from './infrastructure/http/routes/procedure.routes';
@@ -10,12 +11,22 @@ import adminProcedureRouter from './infrastructure/http/routes/admin/procedure.r
 import observationRouter from './infrastructure/http/routes/observation.routes';
 import notificationRouter from './infrastructure/http/routes/notification.routes';
 import { initializeWebSocket } from './infrastructure/websocket/init';
+import swaggerSpec from './infrastructure/config/swagger.config';
 
 const app: Application = express();
 const { httpServer } = initializeWebSocket(app);
 
 app.use(express.json());
 app.use(cors());
+
+const SWAGGER_ENABLED = process.env.SWAGGER_ENABLED !== 'false';
+if (SWAGGER_ENABLED) {
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+        customCss: '.swagger-ui .topbar { display: none }',
+        customSiteTitle: 'EduProcess API Documentation',
+    }));
+    app.get('/api-docs-json', (req: Request, res: Response) => res.json(swaggerSpec));
+}
 
 const collectDefaultMetrics = client.collectDefaultMetrics;
 collectDefaultMetrics({ prefix: 'eduprocess_backend_' });

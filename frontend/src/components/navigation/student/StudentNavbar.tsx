@@ -18,6 +18,7 @@ function Navbar({ onMenuClick, onToggleSidebar }: Props) {
     <header
       className="
         h-16
+        shrink-0
         flex
         items-center
         justify-between

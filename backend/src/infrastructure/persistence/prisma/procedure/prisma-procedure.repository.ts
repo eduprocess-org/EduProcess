@@ -55,6 +55,7 @@ export class PrismaProcedureRepository implements ProcedureRepository {
         if (!result) return null;
         return {
             ...result,
+            instructions: result.instructions ?? null,
             requirements: result.procedureRequirements,
         };
     }

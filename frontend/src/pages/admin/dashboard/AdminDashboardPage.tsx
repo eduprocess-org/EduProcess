@@ -20,13 +20,12 @@ function AdminDashboardPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#F0F4FA] dark:bg-gray-950 px-10 pt-3 pb-12">
-      <div className="max-w-[1100px] mx-auto flex flex-col gap-8">
-
+    <div className="min-h-screen bg-[#F0F4FA] px-4 pt-3 pb-8 dark:bg-gray-950 sm:px-6 lg:px-10 lg:pb-12">
+        <div className="mx-auto flex w-full max-w-[1100px] flex-col gap-6 lg:gap-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-[#0B2D63] dark:text-blue-300 tracking-tight">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#0B2D63] dark:text-blue-300 tracking-tight">
               Administrator Dashboard
             </h1>
             <p className="text-slate-500 dark:text-slate-400 mt-1">
@@ -58,9 +57,7 @@ function AdminDashboardPage() {
         {distribution && distribution.length > 0 && (
           <section>
             <SectionLabel icon={<BarChart2 size={13} />} label="Requests by Procedure" />
-            <div className="bg-white dark:bg-gray-900 border border-[#E4EAF4] dark:border-gray-700 rounded-2xl p-6 grid gap-4"
-              style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}
-            >
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 rounded-2xl border border-[#E4EAF4] bg-white p-4 dark:border-gray-700 dark:bg-gray-900 sm:p-6">
               {distribution.map((item) => (
                 <div
                   key={item.procedureTypeId}

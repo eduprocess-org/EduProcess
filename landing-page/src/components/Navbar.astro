@@ -1,0 +1,49 @@
+---
+
+const links = [
+  { name: "Home", href: "#hero" },
+  { name: "About", href: "#about" },
+  { name: "Features", href: "#features" },
+  { name: "Modules", href: "#modules" },
+  { name: "Stack", href: "#technologies"},
+  { name: "Showcase", href: "#showcase" },
+  { name: "Team", href: "#team" },
+  { name: "Resources", href: "#resources" },
+];
+---
+
+<header class="fixed top-0 left-0 w-full bg-white shadow z-50">
+
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-8 py-4">
+
+        <a href="#hero" class="flex items-center gap-1 group">
+            <img 
+                src="/icon.png" 
+                alt="Logo EduProcess" 
+                class="h-8 w-8 object-contain block"
+            />
+            <h1 class="text-xl font-bold text-blue-600 transition group-hover:text-blue-700 select-none">
+                EduProcess
+            </h1>
+        </a>
+
+        <nav class="hidden gap-8 md:flex">
+
+            {
+                links.map(link => (
+
+                    <a
+                        href={link.href}
+                        class="font-medium text-gray-600 transition hover:text-blue-600"
+                    >
+                        {link.name}
+                    </a>
+
+                ))
+            }
+
+        </nav>
+
+    </div>
+
+</header>
